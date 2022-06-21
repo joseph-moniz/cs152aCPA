@@ -1,0 +1,34 @@
+<style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+</style>
+
+<h2><b>Usage Statistics for Generation <%= generation %> <%= tier %></b></h2>
+<p style="font-size: 25px; margin-bottom:5px">Skill level: <%= rating %> (<%= elo %> ELO)</p>
+<p style="font-size: 25px; margin-bottom:5px">Data from <%= date %></p>
+<br>
+<p style="font-size: 16px">The following is a table of the most current viable usage statistics for Generation <%= generation %> <%= tier %>.
+The left column is the rank of the Pokemon in terms of usage, the middle column is the Pokemon, and the right column is the usage percent of the Pokemon. 
+The <b>usage percent</b> of a Pokemon represents how often a Pokemon is seen on a team. Although there are more Pokemon used in Generation 
+<%= generation %> <%= tier %> than are displayed, this table only shows Pokemon with a usage of 0.5% or higher.</p>
+<br>
+
+<table class="table table-hover table-condensed" style="width:50%; margin-left: auto; margin-right: auto">
+    <thead>
+        <th>Rank</th>
+        <th>Pokemon</th>
+        <th>Usage %</th>
+    </thead>
+    <tbody>
+        <% for(var i=0; i<sortedMonsList.length; i++){%> 
+        <tr> 
+            <td><%= i + 1 %></td> 
+            <td><%= sortedMonsList[i] %></td> 
+            <td><%= monAndUsagePercentDict[sortedMonsList[i]] %>%</td> 
+        </tr>
+        <% } %>
+    </tbody>
+</table>
+

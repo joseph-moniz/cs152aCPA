@@ -1,0 +1,68 @@
+<style>
+    #example {font-family: monospace; color: blue}
+</style>
+
+<h2>Find All Generation Sets</h2>
+<p c>This is the page to view competitive Pokemon sets for battling with Smogon standards. 
+    Data is collected by Smogon. Enter a Pokemon's name and select a given generation to view all of the top sets of that Pokemon
+    for all tiers in that generation.</p>
+<br>
+<form method="post" action="/allSets">
+    <p style="font-size: 16px">Enter Pokemon: <input type="text" name="pokemon"></p>
+    <br>
+
+    Select generation:
+    <select name="generation">
+        <option value="8">Generation 8</option>
+        <option value="7">Generation 7</option>
+        <option value="6">Generation 6</option>
+        <option value="5">Generation 5</option>
+        <option value="4">Generation 4</option>
+        <option value="3">Generation 3</option>
+        <option value="2">Generation 2</option>
+        <option value="1">Generation 1</option>
+    </select></p>
+    <hr>
+    <input type="submit">
+</form>
+<hr>
+<h6>Name Format</h6>
+<p>Names of Pokemon must be typed in the proper format in order to search for Pokemon sets. The following is a list of specifics regarding name
+    formatting:
+</p>
+<ul>
+    <li><p style="margin-bottom:5px">Mega Pokemon should be in <span style="font-family: monospace"><b>[Pokemon]-Mega</b></span> format.
+        For Pokemon with two Mega Evolutions, the format should be <span style="font-family: monospace"><b>[Pokemon]-Mega-X</b></span> and
+        <span style="font-family: monospace"><b>[Pokemon]-Mega-Y</b></span></p>
+        <p style="margin-bottom:5px">Examples: <span style="font-family: monospace"><b>Mega Houndoom</b></span> should be <span id="example"><b>Houndoom-Mega</b></span>.
+        <span style="font-family: monospace"><b>Mega Charizard X</b></span> should be <span id="example"><b>Charizard-Mega-X</b></span> and 
+        <span style="font-family: monospace"><b>Mega Charizard Y</b></span> should be <span id="example"><b>Charizard-Mega-Y</b></span>.</p>
+    </li>
+    <li><p style="margin-bottom:5px">Alolan and Galarian formes of Pokemon should be in <span style="font-family: monospace"><b>[Pokemon]-[Forme]</b></span> format.</p>
+        <p style="margin-bottom:5px">Examples: <span style="font-family: monospace"><b>Alolan Raichu</b></span> should be <span id="example"><b>Raichu-Alola</b></span>.
+        <span style="font-family: monospace"><b>Galarian Stunfisk</b></span> should be <span id="example"><b>Stunfisk-Galar</b></span>.</p>
+    </li>
+    <li><p style="margin-bottom:5px">Non-regional formes of Pokemon should also be in <span style="font-family: monospace"><b>[Pokemon]-[Forme]</b></span> format.
+        The normal forme of a Pokemon with multiple formes should just be in <span style="font-family: monospace"><b>[Pokemon]</b></span> format.</p>
+        <p style="margin-bottom:5px">Examples: <span id="example"><b>Rotom</b></span> and <span id="example"><b>Rotom-Wash</b></span>; 
+            <span id="example"><b>Deoxys</b></span> and <span id="example"><b>Deoxys-Attack</b></span>;
+            <span id="example"><b>Groudon</b></span> and <span id="example"><b>Groudon-Primal</b></span>;
+            <span id="example"><b>Giratina</b></span> and <span id="example"><b>Giratina-Origin</b></span>;
+            <span id="example"><b>Arceus</b></span> and <span id="example"><b>Arceus-Rock</b></span>;
+            <span id="example"><b>Landorus</b></span> and <span id="example"><b>Landorus-Therian</b></span>.</p>
+    </li>
+    <li><p style="margin-bottom:5px">Formes of Pokemon in which the forme name has multiple words or the forme itself has formes should be in 
+        <span style="font-family: monospace"><b>[Pokemon]-[Forme]</b></span> format, but every word or sub-forme should be separated by a hyphen.</p>
+        <p style="margin-bottom:5px">Examples: <span style="font-family: monospace"><b>Rapid Strike Urshifu</b></span> should be <span id="example"><b>Urshifu-Rapid-Strike</b></span>.
+        <span style="font-family: monospace"><b>Galarian Zen Mode Darmanitan</b></span> should be <span id="example"><b>Darmanitan-Galar-Zen</b></span>.</p>
+    </li>
+    <li><p style="margin-bottom:5px">All punctuation and spaces should be kept for Pokemon names that have them.</p>
+        <p style="margin-bottom:5px">Examples: <span id="example"><b>Farfetch'd</b></span>, <span id="example"><b>Mr. Mime</b></span>, 
+        <span id="example"><b>Ho-Oh</b></span>, <span id="example"><b>Zygarde-10%</b></span>, <span id="example"><b>Type: Null</b></span>.</p>
+    </li>
+    <li><p style="margin-bottom:5px">Male and female Nidoran are different Pokemon, and male and female Indeedee have different stats. The male version shoud be  
+        <span style="font-family: monospace"><b>[Pokemon]</b></span> and the female version should be <span style="font-family: monospace"><b>[Pokemon]-F</b></span>.</p>
+        <p style="margin-bottom:5px">Examples: <span id="example"><b>Nidoran</b></span> and <span id="example"><b>Nidoran-F</b></span>.</p>
+    </li>
+</ul>
+
