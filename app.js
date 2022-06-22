@@ -6,6 +6,7 @@ var logger = require('morgan');
 const layouts = require("express-ejs-layouts");
 const axios = require('axios');
 const genDex = require('./data/genDex');
+const itemsDex = require('./data/itemsDex');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -48,7 +49,7 @@ async (req,res,next) => {
     res.locals.nonexistantTierFlag = getNonExistantTierFlag(nonexistantGenTiers, genPlusTier);
     res.locals.minGen = genDex[pokemon];
     
-    const tiersIn = []
+    const tiersIn = [];
     let index = 0;
     for (const newTier of tiers) {
       const genPlusTier = generation+newTier.toLowerCase();
@@ -207,6 +208,87 @@ async (req,res,next) => {
   res.render('showUsageStatsTier')
 })
 
+app.get('/usageStatsMon',
+(req,res,next) => {
+  res.render('usageStatsMon')
+});
+
+app.post('/usageStatsMon',
+async (req,res,next) => {
+  const {pokemon, format, rating} = req.body;
+  res.locals.correctNameFormatCheck = Object.keys(genDex).includes(pokemon);
+  res.locals.pokemon = pokemon;
+
+  if (res.locals.correctNameFormatCheck) {
+    const generation = getGenFromString(format);
+    const tier = getTierFromString(format);
+    const genPlusTier = generation + tier.toLowerCase();
+    const genTierSearch = getGenTierSearch(genPlusTier);
+    const elo = getELO(genPlusTier, rating);
+    const yearMonth = getYearMonth(genPlusTier);
+    const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
+    const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
+
+    res.locals.minGen = genDex[pokemon];
+
+    const tiersIn = [];
+    const tiersNotIn = [];
+    let tiersInIndex = 0;
+    let tiersOutIndex = 0;
+    for (const newTier of tiers) {
+      const genPlusTier = generation+newTier.toLowerCase();
+      const genTierSearch = getGenTierSearch(genPlusTier);
+      const elo = getELO(genPlusTier, rating);
+      const yearMonth = getYearMonth(genPlusTier);
+      const nonexistantTierFlag = getNonExistantTierFlag(nonexistantGenTiers, genPlusTier);
+      if (!nonexistantTierFlag) {
+        const responseTier = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
+        if (responseTier.data.data[pokemon] != null) {
+          tiersIn[tiersInIndex] = newTier;
+          tiersInIndex++;
+        }
+        else {
+          tiersNotIn[tiersOutIndex] = newTier;
+          tiersOutIndex++;
+        }
+      }
+    }
+    res.locals.otherTiers = tiersIn;
+
+    res.locals.rating = rating;
+    res.locals.elo = elo;
+    res.locals.generation = generation;
+    res.locals.tier = tier;
+    res.locals.date = getDate(yearMonth);
+    
+    if (tiersIn.length > 0 && generation >= res.locals.minGen) {
+  
+      const response = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
+      console.dir(response.data.length);
+      const monDetails = response.data.data[pokemon];
+      const usagePercent = monDetails.usage * 100;
+      const movesSorted = getStats(monDetails, "Moves");
+      const abilitiesSorted = getStats(monDetails, "Abilities");
+      const itemsSorted = getStats(monDetails, "Items");
+      const spreadsSorted = getStats(monDetails, "Spreads");
+
+      const newEnough = compareDates(yearMonth);
+      const teammatesSorted = getTeammates(monDetails, newEnough);
+
+      //res.locals.monDetails = monDetails;
+      res.locals.usagePercent = usagePercent;
+      res.locals.moves = movesSorted;
+      res.locals.abilities = abilitiesSorted;
+      res.locals.items = itemsSorted;
+      res.locals.spreads = spreadsSorted;
+      res.locals.teammates = teammatesSorted;
+      
+    }
+  }
+  res.render('showUsageStatsMon')
+})
+
+
 // app.get('/test',
 // (req,res,next) => {
 //   res.render('test')
@@ -216,16 +298,10 @@ async (req,res,next) => {
 // async (req,res,next) => {
 //   const {pokemon, tier, generation} = req.body;
 //   res.locals.pokemon = pokemon;
-//   res.locals.pokemonLowercase = getPokemonLowerCase(pokemon);
-//   res.locals.tier = tier;
-//   res.locals.generation = generation;
 
-//   const genCheckResponse = await axios.get('https://pokeapi.glitch.me/v1/pokemon/'+res.locals.pokemonLowercase)
-//   console.dir(genCheckResponse.data.length);
-//   res.locals.minGen = genCheckResponse.data[0].gen;
 
 //     res.render('showTest')
-//   //}
+
 // })
 
 
@@ -290,6 +366,30 @@ function getEVSpreads(namesEVs, valuesEVs) {
   return evSpreads;
 }
 
+function reformatEVSpreads(oldSpreadList) {
+  const newSpreads = [];
+  const evStats = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"];
+  for (let i = 0; i < oldSpreadList.length; i++) {
+    const natureAndEVs = oldSpreadList[i].split(":");
+    const nature = natureAndEVs[0];
+    let evSpreadString = nature + ", ";
+    const evs = natureAndEVs[1];
+    const evsSplit = evs.split("\/");
+    for (let j = 0; j < evsSplit.length; j++) {
+      if (evsSplit[j] != 0.0) {
+        if (j == evsSplit.length - 1) {
+          evSpreadString = evSpreadString + evsSplit[j] + " " + evStats[j];
+        }
+        else {
+          evSpreadString = evSpreadString + evsSplit[j] + " " + evStats[j] + " / ";
+        }
+      }
+    }
+    newSpreads[i] = evSpreadString;
+  }
+  return newSpreads;
+}
+
 function getNonExistantTierFlag(nonexistantGenTiers, genPlusTier) {
   let nonexistantTierFlag = false;
   if (nonexistantGenTiers.includes(genPlusTier)) {
@@ -349,6 +449,57 @@ function getDate(yearMonth) {
   }
   const date = dateNum+"/"+yearLastTwoNums;
   return date;
+}
+
+function getStats(monDetails, keyword) {
+  let monAndStatPercentDict = {};
+  let weightedStatTotal = 0;
+  const items = Object.keys(monDetails[keyword]);
+  for (const item of items) {
+    weightedStatTotal = weightedStatTotal + monDetails[keyword][item];
+  }
+  for (const item of items) {
+    if (((monDetails[keyword][item] / weightedStatTotal) * 100) >= 0.005) {
+      if (keyword == "Moves" ){
+        monAndStatPercentDict[item] = ((monDetails[keyword][item] / weightedStatTotal) * 400).toFixed(5);
+      }
+      else {
+        monAndStatPercentDict[item] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(5);
+      }
+    }
+  }
+  if (keyword == "Spreads") {
+    const reformattedSpreads = reformatEVSpreads(Object.keys(monDetails[keyword]));
+    for (let i = 0; i < reformattedSpreads.length; i++) {
+      monAndStatPercentDict[reformattedSpreads[i]] = monAndStatPercentDict[Object.keys(monDetails[keyword])[i]];
+      delete monAndStatPercentDict[Object.keys(monDetails[keyword])[i]];
+    }
+  }
+  monAndStatPercentDict = sortDictByValue(monAndStatPercentDict);
+  return monAndStatPercentDict;
+}
+
+function getTeammates(monDetails, newEnough) {
+  let monAndTeammatePercentDict = {};
+  const teammates = Object.keys(monDetails["Teammates"]);
+  // for (const teammate of teammates) {
+
+  // }
+  monAndTeammatePercentDict = sortDictByValue(monAndTeammatePercentDict);
+  return monAndTeammatePercentDict;
+}
+
+function compareDates(yearMonth) {
+  const dateStr = yearMonth+'-01';
+  const [year, month, day] = dateStr.split('-');
+  const date = new Date(+year, month - 1, +day);
+  const dateThreshold = new Date("May 5, 2021");
+  if (date > dateThreshold) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 function getYearMonth(genPlusTier) {
