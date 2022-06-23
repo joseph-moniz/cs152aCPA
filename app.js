@@ -6,10 +6,14 @@ var logger = require('morgan');
 const layouts = require("express-ejs-layouts");
 const axios = require('axios');
 const genDex = require('./data/genDex');
+const abilityDex = require('./data/abilityDex');
 const itemsDex = require('./data/itemsDex');
+const movesDex = require('./data/movesDex');
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const { randomFill } = require('crypto');
 
 var app = express();
 
@@ -217,9 +221,14 @@ app.post('/usageStatsMon',
 async (req,res,next) => {
   const {pokemon, format, rating} = req.body;
   res.locals.correctNameFormatCheck = Object.keys(genDex).includes(pokemon);
-  res.locals.pokemon = pokemon;
 
   if (res.locals.correctNameFormatCheck) {
+    res.locals.rating = rating;
+    res.locals.pokemon = pokemon;
+    res.locals.pokemonLowercase = getPokemonLowerCase(pokemon);
+  
+    res.locals.cap = 10;
+
     const generation = getGenFromString(format);
     const tier = getTierFromString(format);
     const genPlusTier = generation + tier.toLowerCase();
@@ -229,12 +238,14 @@ async (req,res,next) => {
     const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
     const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
 
+    res.locals.generation = generation;
+    res.locals.tier = tier;
+    res.locals.elo = elo;
+    res.locals.date = getDate(yearMonth);
     res.locals.minGen = genDex[pokemon];
 
     const tiersIn = [];
-    const tiersNotIn = [];
     let tiersInIndex = 0;
-    let tiersOutIndex = 0;
     for (const newTier of tiers) {
       const genPlusTier = generation+newTier.toLowerCase();
       const genTierSearch = getGenTierSearch(genPlusTier);
@@ -247,42 +258,59 @@ async (req,res,next) => {
           tiersIn[tiersInIndex] = newTier;
           tiersInIndex++;
         }
-        else {
-          tiersNotIn[tiersOutIndex] = newTier;
-          tiersOutIndex++;
-        }
       }
     }
     res.locals.otherTiers = tiersIn;
-
-    res.locals.rating = rating;
-    res.locals.elo = elo;
-    res.locals.generation = generation;
-    res.locals.tier = tier;
-    res.locals.date = getDate(yearMonth);
     
     if (tiersIn.length > 0 && generation >= res.locals.minGen) {
   
       const response = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
       console.dir(response.data.length);
-      const monDetails = response.data.data[pokemon];
-      const usagePercent = monDetails.usage * 100;
-      const movesSorted = getStats(monDetails, "Moves");
-      const abilitiesSorted = getStats(monDetails, "Abilities");
-      const itemsSorted = getStats(monDetails, "Items");
-      const spreadsSorted = getStats(monDetails, "Spreads");
+      const allDetails = response.data.data
+      const monDetails = allDetails[pokemon];
+      if (monDetails != null) {
+        const usagePercent = monDetails.usage * 100;
+        const movesSorted = getStats(monDetails, "Moves");
+        const abilitiesSorted = getStats(monDetails, "Abilities");
+        const itemsSorted = getStats(monDetails, "Items");
+        const spreadsSorted = getStats(monDetails, "Spreads");
 
-      const newEnough = compareDates(yearMonth);
-      const teammatesSorted = getTeammates(monDetails, newEnough);
+        //const newEnough = compareDates(yearMonth);
+        const teammatesSorted = getTeammates(monDetails, 10);
 
-      //res.locals.monDetails = monDetails;
-      res.locals.usagePercent = usagePercent;
-      res.locals.moves = movesSorted;
-      res.locals.abilities = abilitiesSorted;
-      res.locals.items = itemsSorted;
-      res.locals.spreads = spreadsSorted;
-      res.locals.teammates = teammatesSorted;
-      
+        const rank = getRank(allDetails, pokemon);
+
+
+        res.locals.monDetails = monDetails;
+        res.locals.usagePercent = usagePercent;
+        res.locals.rank = rank;
+        res.locals.moves = Object.keys(movesSorted);
+        res.locals.abilities = Object.keys(abilitiesSorted);
+        res.locals.items = Object.keys(itemsSorted);
+        res.locals.spreads = Object.keys(spreadsSorted);
+        res.locals.teammates = Object.keys(teammatesSorted);
+        res.locals.movesStats = movesSorted;
+        res.locals.abilitiesStats = abilitiesSorted;
+        res.locals.itemsStats = itemsSorted;
+        res.locals.spreadsStats = spreadsSorted;
+        res.locals.teammatesStats = teammatesSorted;
+      }
+      else {
+        res.locals.monDetails = monDetails;
+        res.locals.usagePercent = 0
+        res.locals.rank = 0;
+        res.locals.moves = [];
+        res.locals.abilities = [];
+        res.locals.items = [];
+        res.locals.spreads = [];
+        res.locals.teammates = [];
+        res.locals.movesStats = {};
+        res.locals.abilitiesStats = {};
+        res.locals.itemsStats = {};
+        res.locals.spreadsStats = {};
+        res.locals.teammatesStats = {};
+      }
+
     }
   }
   res.render('showUsageStatsMon')
@@ -374,9 +402,9 @@ function reformatEVSpreads(oldSpreadList) {
     const nature = natureAndEVs[0];
     let evSpreadString = nature + ", ";
     const evs = natureAndEVs[1];
-    const evsSplit = evs.split("\/");
+    const evsSplit = evs.split("/");
     for (let j = 0; j < evsSplit.length; j++) {
-      if (evsSplit[j] != 0.0) {
+      if (evsSplit[j] != "0") {
         if (j == evsSplit.length - 1) {
           evSpreadString = evSpreadString + evsSplit[j] + " " + evStats[j];
         }
@@ -385,6 +413,10 @@ function reformatEVSpreads(oldSpreadList) {
         }
       }
     }
+    if (evSpreadString.slice(-3) == " / ") {
+      evSpreadString = evSpreadString.slice(0, -3);
+    }
+    newSpreads[i] = evSpreadString;
     newSpreads[i] = evSpreadString;
   }
   return newSpreads;
@@ -459,34 +491,87 @@ function getStats(monDetails, keyword) {
     weightedStatTotal = weightedStatTotal + monDetails[keyword][item];
   }
   for (const item of items) {
-    if (((monDetails[keyword][item] / weightedStatTotal) * 100) >= 0.005) {
-      if (keyword == "Moves" ){
-        monAndStatPercentDict[item] = ((monDetails[keyword][item] / weightedStatTotal) * 400).toFixed(5);
-      }
-      else {
-        monAndStatPercentDict[item] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(5);
+    if (keyword == "Moves") {
+      if (((monDetails[keyword][item] / weightedStatTotal) * 400) >= 0.5) {
+        monAndStatPercentDict[movesDex[item]] = ((monDetails[keyword][item] / weightedStatTotal) * 400).toFixed(3);
       }
     }
-  }
-  if (keyword == "Spreads") {
-    const reformattedSpreads = reformatEVSpreads(Object.keys(monDetails[keyword]));
-    for (let i = 0; i < reformattedSpreads.length; i++) {
-      monAndStatPercentDict[reformattedSpreads[i]] = monAndStatPercentDict[Object.keys(monDetails[keyword])[i]];
-      delete monAndStatPercentDict[Object.keys(monDetails[keyword])[i]];
+    else {
+      if (keyword == "Abilities") {
+        monAndStatPercentDict[abilityDex[item]] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(3);
+      }
+      else if (keyword == "Items") {
+        if (((monDetails[keyword][item] / weightedStatTotal) * 100) >= 0.5) {
+          monAndStatPercentDict[itemsDex[item]] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(3);
+        }
+      }
+      else {
+        if (((monDetails[keyword][item] / weightedStatTotal) * 100) >= 0.5) {
+          monAndStatPercentDict[item] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(3);
+        }
+      }
     }
   }
   monAndStatPercentDict = sortDictByValue(monAndStatPercentDict);
+  if (keyword == "Spreads") {
+    const oldSpreads = Object.keys(monAndStatPercentDict);
+    const reformattedSpreads = reformatEVSpreads(Object.keys(monAndStatPercentDict));
+    for (let i = 0; i < reformattedSpreads.length; i++) {
+      if (oldSpreads[i] !== reformattedSpreads[i]) {
+        Object.defineProperty(monAndStatPercentDict, reformattedSpreads[i],
+          Object.getOwnPropertyDescriptor(monAndStatPercentDict, oldSpreads[i]));
+        delete monAndStatPercentDict[oldSpreads[i]];
+    }
+    }
+  }
+  
   return monAndStatPercentDict;
 }
 
-function getTeammates(monDetails, newEnough) {
-  let monAndTeammatePercentDict = {};
-  const teammates = Object.keys(monDetails["Teammates"]);
-  // for (const teammate of teammates) {
+function getTeammates(monDetails, cap) {
+  //order teammates based on value, then get all top teammates up to the cap
+  //dictionary of top teammates and their values
+  const sortedTeammates = sortDictByValue(monDetails["Teammates"]);
+  sortedTeammateNames = Object.keys(sortedTeammates);
+  sortedTeammateValues = Object.values(sortedTeammates);
+  let topTeammates = {};
+  for (let i = 0; i < cap; i++) {
+    topTeammates[sortedTeammateNames[i]] = sortedTeammateValues[i];
+  }
 
-  // }
-  monAndTeammatePercentDict = sortDictByValue(monAndTeammatePercentDict);
+  //calculate usageCount
+  const abilities = Object.keys(monDetails["Abilities"]);
+  let abilitiesTotal = 0;
+  for (const ability of abilities) {
+    abilitiesTotal = abilitiesTotal + monDetails["Abilities"][ability];
+  }
+  const usageCount = abilitiesTotal;
+
+  let monAndTeammatePercentDict = {};
+  const teammates = Object.keys(topTeammates);
+  for (const teammate of teammates) {
+    //calculate teammatePercent
+    const teammatePercent = (topTeammates[teammate] / usageCount) * 100;
+
+    //add teammate name and percent to dictionary
+    monAndTeammatePercentDict[teammate] = teammatePercent.toFixed(3);
+  }
   return monAndTeammatePercentDict;
+}
+
+function getRank(allDetails, pokemon) {
+  let usagesAndRanks = {};
+  for (const mon of Object.keys(allDetails)) {
+    usagesAndRanks[mon] = [allDetails[mon].usage]
+  }
+  usagesAndRanks = sortDictByValue(usagesAndRanks);
+  
+  pokemonList = Object.keys(usagesAndRanks);
+  for (let i = 0; i < pokemonList.length; i++) {
+    usagesAndRanks[pokemonList[i]].push(i);
+  }
+  const rank = usagesAndRanks[pokemon][1] + 1;
+  return rank;
 }
 
 function compareDates(yearMonth) {

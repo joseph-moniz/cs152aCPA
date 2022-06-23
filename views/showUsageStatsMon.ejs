@@ -1,5 +1,190 @@
+<style>
+    #tableText {margin-bottom:5px}
 
-<pre><%= JSON.stringify(moves,null,5) %> </pre>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+
+</style>
+
+<% if (correctNameFormatCheck){ %>
+    <h2><b>Usage Statistics for <%= pokemon %> in Generation <%= generation %> <%= tier %></b></h2>
+    <p style="font-size: 25px; margin-bottom:5px">Skill level: <%= rating %> (<%= elo %> ELO)</p>
+    <p style="font-size: 25px; margin-bottom:5px">Data from <%= date %></p>
+    <br>
+
+
+    <p style="text-align:center">
+    <% if(generation >= minGen){%> 
+        <% if(generation >= 6){%> 
+            <img 
+            src="http://play.pokemonshowdown.com/sprites/ani/<%= pokemonLowercase %>.gif"
+            width="150"
+            alt="Sprite of <%= pokemon %>">
+        <% } %>
+        <% if(generation == 5){%> 
+            <img 
+            src="http://play.pokemonshowdown.com/sprites/gen5ani/<%= pokemonLowercase %>.gif"
+            width="150"
+            alt="Sprite of <%= pokemon %>">
+        <% } %> 
+        <% if(generation < 5){%> 
+            <img 
+            src="http://play.pokemonshowdown.com/sprites/gen<%= generation %>/<%= pokemonLowercase %>.png"
+            width="150"
+            alt="Sprite of <%= pokemon %>">
+        <% } %> 
+    <% } %> 
+    </p>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <% if(generation < minGen){ %> 
+        <br>
+        <br>
+        <h2>Error</h2>
+        <p style="font-size: 24px"><%= pokemon %> is unavailable in Generation <%= generation %>. 
+            Its earliest generation is Generation <%= minGen %>.</p>
+        <br>
+    <% } else if (monDetails == null) { %>
+        <br>
+        <br>
+        <h2>Error</h2>
+        <p style="font-size: 24px"><%= pokemon %> does not have any usage statistics in Generation <%= generation %> <%= tier %>.</p>
+        <% if (otherTiers.length > 0) { %>
+        <p style="font-size: 24px">In Generation <%= generation %>, <%= pokemon %> is in 
+            <% if(otherTiers.length >=3) { %>
+                <% for (var i=0; i<otherTiers.length; i++){%>
+                    <% if (i < otherTiers.length - 1) { %>
+                        <%= otherTiers[i] %>, 
+                    <% } else { %>
+                        and <%= otherTiers[i] %>.
+                    <% } %>
+                <% } %>
+            <% } else if(otherTiers.length == 2){ %>
+                <%= otherTiers[0] %> and <%= otherTiers[1] %>.
+            <% } else { %>
+                <%= otherTiers[0] %>.
+            <% } %>
+        </p>
+        <% } %>
+    
+    <% } else { %>
+
+    <table class="table table-condensed" style="width:50%; margin-left: auto; margin-right: auto; 
+    border-collapse:collapse ; border-spacing:0">
+        <thead>
+            <th><p id="tableText"><b><%= pokemon %></b></p></th>
+        </thead>
+        <tbody>
+            <tr> 
+                <td>
+                    <p id="tableText"><b>Usage Percent:</b> <%= usagePercent %>%</p>
+                    <p id="tableText"><b>Rank:</b> <%= rank %></p>
+                </td> 
+            </tr>
+            <tr>
+                <td>
+                    <p id="tableText"><b>Abilities</b></p>
+                </td>
+            </tr>
+            <tr> 
+                <td>
+                    <% for(ability of abilities){%>
+                        <p id="tableText"><%= ability %>: </p>
+                    <% } %> 
+                </td> 
+                <td>
+                    <% for(ability of abilities){%>
+                        <p id="tableText"><%= abilitiesStats[ability] %>%</p>
+                    <% } %> 
+                </td> 
+            </tr>
+            <tr>
+                <td>
+                    <p id="tableText"><b>Items</b></p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <% for(var i=0; i<items.length; i++){%>
+                        <p id="tableText"><%= items[i] %>: </p>
+                    <% } %> 
+                </td>
+                <td>
+                    <% for(var i=0; i<items.length; i++){%>
+                        <p id="tableText"><%= itemsStats[items[i]] %>%</p>
+                    <% } %> 
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p id="tableText"><b>Spreads</b></p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <% for(var i=0; i<cap; i++){%>
+                        <p id="tableText"><%= spreads[i] %>: </p>
+                    <% } %> 
+                </td>
+                <td>
+                    <% for(var i=0; i<cap; i++){%>
+                        <p id="tableText"><%= spreadsStats[spreads[i]] %>%</p>
+                    <% } %> 
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p id="tableText"><b>Moves</b></p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <% for(var i=0; i<cap; i++){%>
+                        <p id="tableText"><%= moves[i] %>: </p>
+                    <% } %> 
+                </td>
+                <td>
+                    <% for(var i=0; i<cap; i++){%>
+                        <p id="tableText"><%= movesStats[moves[i]] %>%</p>
+                    <% } %> 
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p id="tableText"><b>Teammates</b></p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <% for(var i=0; i<cap; i++){%>
+                        <p id="tableText"><%= teammates[i] %>: </p>
+                    <% } %> 
+                </td>   
+                <td>
+                    <% for(var i=0; i<cap; i++){%>
+                        <p id="tableText"><%= teammatesStats[teammates[i]] %>%</p>
+                    <% } %> 
+                </td> 
+            </tr>
+        </tbody>
+    </table>
+
+    <% } %>
+
+<% } else { %>
+    <h2>Error</h2>
+    <p style="font-size: 24px">Please use the correct format when inputting a Pokemon name.</p>
+<% } %>
+
+
+
+
+
 
 
 
