@@ -753,6 +753,18 @@ function getPokemonLowerCase(pokemon) {
   else if (pokemon == "Zygarde-Complete") {
     pokemonLowerCase = "zygarde-complete"
   }
+  else if (pokemon == "Tapu Koko") {
+    pokemonLowerCase = "tapukoko"
+  }
+  else if (pokemon == "Tapu Lele") {
+    pokemonLowerCase = "tapulele"
+  }
+  else if (pokemon == "Tapu Fini") {
+    pokemonLowerCase = "tapufini"
+  }
+  else if (pokemon == "Tapu Bulu") {
+    pokemonLowerCase = "tapubulu"
+  }
   else if (pokemon == "Darmanitan-Galar-Zen") {
     pokemonLowerCase = "darmanitan-galarzen"
   }
