@@ -228,6 +228,7 @@ async (req,res,next) => {
     res.locals.pokemonLowercase = getPokemonLowerCase(pokemon);
   
     res.locals.cap = 10;
+    const teammateCap = 10;
 
     const generation = getGenFromString(format);
     const tier = getTierFromString(format);
@@ -275,8 +276,14 @@ async (req,res,next) => {
         const itemsSorted = getStats(monDetails, "Items");
         const spreadsSorted = getStats(monDetails, "Spreads");
 
-        //const newEnough = compareDates(yearMonth);
-        const teammatesSorted = getTeammates(monDetails, 10);
+        let teammatesSorted = {};
+        const newEnough = compareDates(yearMonth);
+        if (newEnough) {
+          teammatesSorted = getTeammatesNew(monDetails, teammateCap);
+        }
+        else {
+          teammatesSorted = getTeammatesOld(allDetails, monDetails, teammateCap);
+        }
 
         const rank = getRank(allDetails, pokemon);
 
@@ -294,6 +301,7 @@ async (req,res,next) => {
         res.locals.itemsStats = itemsSorted;
         res.locals.spreadsStats = spreadsSorted;
         res.locals.teammatesStats = teammatesSorted;
+
       }
       else {
         res.locals.monDetails = monDetails;
@@ -486,49 +494,88 @@ function getDate(yearMonth) {
 function getStats(monDetails, keyword) {
   let monAndStatPercentDict = {};
   let weightedStatTotal = 0;
-  const items = Object.keys(monDetails[keyword]);
-  for (const item of items) {
-    weightedStatTotal = weightedStatTotal + monDetails[keyword][item];
-  }
-  for (const item of items) {
-    if (keyword == "Moves") {
-      if (((monDetails[keyword][item] / weightedStatTotal) * 400) >= 0.5) {
-        monAndStatPercentDict[movesDex[item]] = ((monDetails[keyword][item] / weightedStatTotal) * 400).toFixed(3);
-      }
+    const items = Object.keys(monDetails[keyword]);
+    for (const item of items) {
+      weightedStatTotal = weightedStatTotal + monDetails[keyword][item];
     }
-    else {
-      if (keyword == "Abilities") {
-        monAndStatPercentDict[abilityDex[item]] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(3);
-      }
-      else if (keyword == "Items") {
-        if (((monDetails[keyword][item] / weightedStatTotal) * 100) >= 0.5) {
-          monAndStatPercentDict[itemsDex[item]] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(3);
+    for (const item of items) {
+      if (keyword == "Moves") {
+        if (((monDetails[keyword][item] / weightedStatTotal) * 400) >= 0.5) {
+          monAndStatPercentDict[movesDex[item]] = ((monDetails[keyword][item] / weightedStatTotal) * 400).toFixed(3);
         }
       }
       else {
-        if (((monDetails[keyword][item] / weightedStatTotal) * 100) >= 0.5) {
-          monAndStatPercentDict[item] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(3);
+        if (keyword == "Abilities") {
+          monAndStatPercentDict[abilityDex[item]] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(3);
+        }
+        else if (keyword == "Items") {
+          if (((monDetails[keyword][item] / weightedStatTotal) * 100) >= 0.5) {
+            monAndStatPercentDict[itemsDex[item]] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(3);
+          }
+        }
+        else {
+          if (((monDetails[keyword][item] / weightedStatTotal) * 100) >= 0.5) {
+            monAndStatPercentDict[item] = ((monDetails[keyword][item] / weightedStatTotal) * 100).toFixed(3);
+          }
         }
       }
     }
-  }
-  monAndStatPercentDict = sortDictByValue(monAndStatPercentDict);
-  if (keyword == "Spreads") {
-    const oldSpreads = Object.keys(monAndStatPercentDict);
-    const reformattedSpreads = reformatEVSpreads(Object.keys(monAndStatPercentDict));
-    for (let i = 0; i < reformattedSpreads.length; i++) {
-      if (oldSpreads[i] !== reformattedSpreads[i]) {
-        Object.defineProperty(monAndStatPercentDict, reformattedSpreads[i],
-          Object.getOwnPropertyDescriptor(monAndStatPercentDict, oldSpreads[i]));
-        delete monAndStatPercentDict[oldSpreads[i]];
+    monAndStatPercentDict = sortDictByValue(monAndStatPercentDict);
+    if (keyword == "Spreads") {
+      const oldSpreads = Object.keys(monAndStatPercentDict);
+      const reformattedSpreads = reformatEVSpreads(Object.keys(monAndStatPercentDict));
+      for (let i = 0; i < reformattedSpreads.length; i++) {
+        if (oldSpreads[i] !== reformattedSpreads[i]) {
+          Object.defineProperty(monAndStatPercentDict, reformattedSpreads[i],
+            Object.getOwnPropertyDescriptor(monAndStatPercentDict, oldSpreads[i]));
+          delete monAndStatPercentDict[oldSpreads[i]];
+      }
+      }
     }
-    }
-  }
-  
   return monAndStatPercentDict;
 }
 
-function getTeammates(monDetails, cap) {
+function getTeammatesOld(allDetails, monDetails, cap) {
+  //create dictionary of all teammates and their json values
+  const teammateNames = Object.keys(monDetails["Teammates"]);
+  let teammates = {};
+  for (const teammate of teammateNames) {
+    if (Object.keys(allDetails).includes(teammate)) {
+      teammates[teammate] = monDetails["Teammates"][teammate];
+    }
+  }
+
+  //calculate usageCount of searched Pokemon
+  const abilities = Object.keys(monDetails["Abilities"]);
+  let abilitiesTotal = 0;
+  for (const ability of abilities) {
+    abilitiesTotal = abilitiesTotal + monDetails["Abilities"][ability];
+  }
+  const usageCount = abilitiesTotal;
+
+  //calculate teammatePercent
+  //teammatePercent = ((teammate json value)/usageCount) * 100 + (teammateUsagePercent * 100)
+  //add teammate name and percent to temporary dictionary
+  let tempTeammates = {};
+  for (const teammate of Object.keys(teammates)) {
+    const teammateUsagePercent = allDetails[teammate]["usage"];
+    const teammatePercent = ((teammates[teammate] / usageCount) * 100) + (teammateUsagePercent * 100);
+    tempTeammates[teammate] = teammatePercent.toFixed(3);
+  }
+
+  //sort temp dictionary based on percent and put top teammates (based on cap) in new dictionary
+  const sortedTempTeammates = sortDictByValue(tempTeammates);
+  sortedTempTeammateNames = Object.keys(sortedTempTeammates);
+  sortedTempTeammateValues = Object.values(sortedTempTeammates);
+  let topTeammates = {};
+  for (let i = 0; i < Object.keys(sortedTempTeammates).length; i++) {
+    topTeammates[sortedTempTeammateNames[i]] = sortedTempTeammateValues[i];
+  }
+
+  return topTeammates;
+}
+
+function getTeammatesNew(monDetails, cap) {
   //order teammates based on value, then get all top teammates up to the cap
   //dictionary of top teammates and their values
   const sortedTeammates = sortDictByValue(monDetails["Teammates"]);
@@ -539,7 +586,7 @@ function getTeammates(monDetails, cap) {
     topTeammates[sortedTeammateNames[i]] = sortedTeammateValues[i];
   }
 
-  //calculate usageCount
+  //calculate usageCount of searched Pokemon
   const abilities = Object.keys(monDetails["Abilities"]);
   let abilitiesTotal = 0;
   for (const ability of abilities) {

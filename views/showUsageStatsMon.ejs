@@ -1,11 +1,31 @@
 <style>
     #tableText {margin-bottom:5px}
 
-    table, th, td {
-      border: 1px solid black;
-      border-collapse: collapse;
+    th, td {
+        border:none
     }
 
+    .bigTable {
+        border-collapse: collapse; 
+        border-spacing: 0;
+        margin-left: auto; 
+        margin-right: auto; 
+        width: 50%; 
+    }
+
+    .littleTable {
+        border-collapse: collapse; 
+        border-spacing: 0;
+        margin-bottom:0px;
+        margin-left: auto; 
+        margin-right: auto; 
+        width: 50%; 
+    }
+
+    .noStretch {
+        width: 1%;
+        white-space: nowrap;
+}
 </style>
 
 <% if (correctNameFormatCheck){ %>
@@ -40,7 +60,6 @@
     <br>
     <br>
     <br>
-    <br>
 
     <% if(generation < minGen){ %> 
         <br>
@@ -71,108 +90,176 @@
             <% } %>
         </p>
         <% } %>
-    
     <% } else { %>
 
-    <table class="table table-condensed" style="width:50%; margin-left: auto; margin-right: auto; 
-    border-collapse:collapse ; border-spacing:0">
-        <thead>
-            <th><p id="tableText"><b><%= pokemon %></b></p></th>
-        </thead>
-        <tbody>
-            <tr> 
-                <td>
-                    <p id="tableText"><b>Usage Percent:</b> <%= usagePercent %>%</p>
-                    <p id="tableText"><b>Rank:</b> <%= rank %></p>
-                </td> 
-            </tr>
-            <tr>
-                <td>
-                    <p id="tableText"><b>Abilities</b></p>
-                </td>
-            </tr>
-            <tr> 
-                <td>
-                    <% for(ability of abilities){%>
-                        <p id="tableText"><%= ability %>: </p>
-                    <% } %> 
-                </td> 
-                <td>
-                    <% for(ability of abilities){%>
-                        <p id="tableText"><%= abilitiesStats[ability] %>%</p>
-                    <% } %> 
-                </td> 
-            </tr>
-            <tr>
-                <td>
-                    <p id="tableText"><b>Items</b></p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <% for(var i=0; i<items.length; i++){%>
-                        <p id="tableText"><%= items[i] %>: </p>
-                    <% } %> 
-                </td>
-                <td>
-                    <% for(var i=0; i<items.length; i++){%>
-                        <p id="tableText"><%= itemsStats[items[i]] %>%</p>
-                    <% } %> 
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p id="tableText"><b>Spreads</b></p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <% for(var i=0; i<cap; i++){%>
-                        <p id="tableText"><%= spreads[i] %>: </p>
-                    <% } %> 
-                </td>
-                <td>
-                    <% for(var i=0; i<cap; i++){%>
-                        <p id="tableText"><%= spreadsStats[spreads[i]] %>%</p>
-                    <% } %> 
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p id="tableText"><b>Moves</b></p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <% for(var i=0; i<cap; i++){%>
-                        <p id="tableText"><%= moves[i] %>: </p>
-                    <% } %> 
-                </td>
-                <td>
-                    <% for(var i=0; i<cap; i++){%>
-                        <p id="tableText"><%= movesStats[moves[i]] %>%</p>
-                    <% } %> 
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p id="tableText"><b>Teammates</b></p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <% for(var i=0; i<cap; i++){%>
-                        <p id="tableText"><%= teammates[i] %>: </p>
-                    <% } %> 
-                </td>   
-                <td>
-                    <% for(var i=0; i<cap; i++){%>
-                        <p id="tableText"><%= teammatesStats[teammates[i]] %>%</p>
-                    <% } %> 
-                </td> 
-            </tr>
-        </tbody>
-    </table>
+        <table class="table table-condensed bigTable">
+            <thead>
+                <th><p id="tableText"><b><%= pokemon %></b></p></th>
+            </thead>
+            <tbody>
+                <tr> 
+                    <td style="padding-top: 0px">
+                        <p id="tableText"><b>Usage Percent:</b> <%= usagePercent %>%</p>
+                        <p id="tableText"><b>Rank:</b> <%= rank %></p>
+                    </td> 
+                </tr>
+    
+                <table class="table table-condensed littleTable">
+                    <tbody>
+                        <tr>
+                            <td style="padding-bottom: 0px">
+                                <p id="tableText"><b>Abilities</b></p>
+                            </td>
+                        </tr>
+                        <tr> 
+                            <td class = "noStretch" style="padding-top: 0px">
+                                <% for(ability of abilities){%>
+                                    <% if (ability == "No Ability") {%>
+                                        <p id="tableText"><%= ability %> </p>
+                                    <% } else {%>
+                                        <p id="tableText"><%= ability %>: </p>
+                                    <% } %>
+                                <% } %> 
+                            </td> 
+                            <td style="padding-top: 0px">
+                                <% for(ability of abilities){%>
+                                    <p id="tableText"><%= abilitiesStats[ability] %>%</p>
+                                <% } %> 
+                            </td> 
+                        </tr>
+                    </tbody>
+                </table>
+    
+    
+                <table class="table table-condensed littleTable">
+                    <tbody>
+                        <tr>
+                            <td style="padding-bottom: 0px">
+                                <p id="tableText"><b>Items</b></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class = "noStretch" style="padding-top: 0px">
+                                <% if (items[0] != "undefined") {%>
+                                    <% for(var i=0; i<items.length; i++){%>
+                                        <p id="tableText"><%= items[i] %>: </p>
+                                    <% } %> 
+                                <% } else {%> 
+                                    <p id="tableText">None</p>
+                                <% } %>
+                            </td>
+                            <td style="padding-top: 0px">
+                                <% for(var i=0; i<items.length; i++){%>
+                                    <p id="tableText"><%= itemsStats[items[i]] %>%</p>
+                                <% } %> 
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+    
+
+                <table class="table table-condensed littleTable">
+                    <tbody>
+                        <tr>
+                            <td style="padding-bottom: 0px">
+                                <p id="tableText"><b>Spreads</b></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class = "noStretch" style="padding-top: 0px">
+                                <% if (spreads.length < cap) {%>
+                                    <% for(var i=0; i<spreads.length; i++){%>
+                                        <% if (generation < 3) {%>
+                                            <p id="tableText">None</p>
+                                        <% } else {%> 
+                                        <p id="tableText"><%= spreads[i] %>: </p>
+                                        <% } %>
+                                    <% } %> 
+                                <% } else {%>
+                                    <% for(var i=0; i<cap; i++){%>
+                                        <% if (generation < 3) {%>
+                                            <p id="tableText">None</p>
+                                        <% } else {%> 
+                                        <p id="tableText"><%= spreads[i] %>: </p>
+                                        <% } %>
+                                    <% } %>
+                                <% } %>
+                            </td>
+                            <td style="padding-top: 0px">
+                                <% if (spreads.length < cap) {%>
+                                    <% for(var i=0; i<spreads.length; i++){%>
+                                        <p id="tableText"><%= spreadsStats[spreads[i]] %>%</p>
+                                    <% } %> 
+                                <% } else {%>
+                                    <% for(var i=0; i<cap; i++){%>
+                                        <p id="tableText"><%= spreadsStats[spreads[i]] %>%</p>
+                                    <% } %> 
+                                <% } %>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+    
+    
+                <table class="table table-condensed littleTable">
+                    <tbody>
+                        <tr>
+                            <td style="padding-bottom: 0px">
+                                <p id="tableText"><b>Moves</b></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class = "noStretch" style="padding-top: 0px">
+                                <% if (moves.length < cap) {%>
+                                    <% for(var i=0; i<moves.length; i++){%>
+                                        <p id="tableText"><%= moves[i] %>: </p>
+                                    <% } %> 
+                                <% } else {%>
+                                    <% for(var i=0; i<cap; i++){%>
+                                        <p id="tableText"><%= moves[i] %>: </p>
+                                    <% } %> 
+                                <% } %> 
+                            </td>
+                            <td style="padding-top: 0px">
+                                <% if (moves.length < cap) {%>
+                                    <% for(var i=0; i<moves.length; i++){%>
+                                        <p id="tableText"><%= movesStats[moves[i]] %>%</p>
+                                    <% } %> 
+                                <% } else {%>
+                                    <% for(var i=0; i<cap; i++){%>
+                                        <p id="tableText"><%= movesStats[moves[i]] %>%</p>
+                                    <% } %> 
+                                <% } %> 
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+    
+                <table class="table table-condensed littleTable">
+                    <tbody>
+                        <tr>
+                            <td style="padding-bottom: 0px">
+                                <p id="tableText"><b>Teammates</b></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class = "noStretch" style="padding-top: 0px">
+                                <% for(var i=0; i<cap; i++){%>
+                                    <p id="tableText"><%= teammates[i] %>: </p>
+                                <% } %> 
+                            </td>   
+                            <td style="padding-top: 0px">
+                                <% for(var i=0; i<cap; i++){%>
+                                    <p id="tableText"><%= teammatesStats[teammates[i]] %>%</p>
+                                <% } %> 
+                            </td> 
+                        </tr>
+                    </tbody>
+                </table>
+
+            </tbody>
+        </table>
+    
 
     <% } %>
 
@@ -180,9 +267,6 @@
     <h2>Error</h2>
     <p style="font-size: 24px">Please use the correct format when inputting a Pokemon name.</p>
 <% } %>
-
-
-
 
 
 
