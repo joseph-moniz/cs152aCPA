@@ -18,7 +18,6 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 //  Loading models
 // *********************************************************** //
 const Member = require('./models/Member');
-const ToDoItem = require('./models/toDoItem');
 
 
 // *********************************************************** //
