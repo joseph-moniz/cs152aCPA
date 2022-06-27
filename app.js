@@ -406,7 +406,6 @@ async (req,res,next) => {
 })
 
 
-// app.get('/todo', (req,res,next) => res.render('todo'))
 
 app.get('/teambuilderHelper', 
   (req,res,next) => {
@@ -524,74 +523,6 @@ app.get('/deleteMember/:itemId',
   }
 )
 
-
-// app.post('/todo',
-//   isLoggedIn,
-//   async (req,res,next) => {
-//     try {
-//       const desc = req.body.desc;
-//       const todoObj = {
-//         userId:res.locals.user._id,
-//         descr:desc,
-//         completed:false,
-//         createdAt: new Date(),
-//       }
-//       const todoItem = new ToDoItem(todoObj); // create ORM object for item
-//       await todoItem.save();  // stores it in the database
-//       res.redirect('/showTodoList');
-
-
-//     }catch(err){
-//       next(err);
-//     }
-//   }
-// )
-
-
-// app.get('/showTodoList',
-//   isLoggedIn,
-//   async (req,res,next) => {
-//    try {
-//     const todoitems = await ToDoItem.find({userId:res.locals.user._id});
-
-//     res.locals.todoitems = todoitems
-//     res.render('showTodoList')
-//     //res.json(todoitems);
-//    }catch(e){
-//     next(e);
-//    }
-//   }
-// )
-
-// app.get('/deleteToDoItem/:itemId',
-//   isLoggedIn,
-//   async (req,res,next) => {
-//     try {
-//       const itemId = req.params.itemId;
-//       await ToDoItem.deleteOne({_id:itemId});
-//       res.redirect('/showTodoList');
-//     }
-//     catch(e){
-//       next(e);
-//    }
-//   }
-// )
-
-// app.get('/toggleToDoItem/:itemId',
-//   isLoggedIn,
-//   async (req,res,next) => {
-//     try {
-//       const itemId = req.params.itemId;
-//       const item = await ToDoItem.findOne({_id:itemId});
-//       item.completed = ! item.completed;
-//       await item.save();
-//       res.redirect('/showTodoList');
-//     }
-//     catch(e){
-//       next(e);
-//    }
-//   }
-// )
 
 
 // app.get('/test',
