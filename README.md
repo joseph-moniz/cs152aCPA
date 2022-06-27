@@ -10,3 +10,13 @@ Ideally, the website would also have a teambuilder helper, where the user select
 
 Implementation: Javascript for the main app and helper functions in app. Axios is used to get data from various APIs, with functions in the app to parse and reformat the
 data. HTML and EJS are used to create the view pages. HTML formats and styles the pages that house the different features of the app. A custom dictionary is used to help the website in "wrong generation" errors. Conditional statements and for loops in the EJS determine what HTML elements are shown (dictate what error messages are displayed). The for loops in the EJS also create the HTML for the sets and usage statistics tables. Bootstrap and some CSS is used for additional styling.
+
+### Packages needed
+The following packages will be needed to use the app:
+`npm install nodemon`
+`npm install express-ejs-layouts`
+`npm install bcrypt`
+`npm install mongoose`
+`npm install express-session`
+`npm install connect-mongodb-session`
+
