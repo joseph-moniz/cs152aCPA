@@ -1,0 +1,31 @@
+
+
+<h2>Teambuilder Helper</h2>
+<p style="font-size: 16px">Welcome to the Teambuilder Helper. Choose a generation and tier below. Then, you will be able to select Pokemon from
+    that format and add it to a draft team. The website will offer tips and suggestions for improving your team as you add or change team members.
+    You can then export your team when you are done which is ready for use for Pokemon Showdown!.</p>
+<br>
+<form method="post" action="/teambuilderHelper">
+    <p style="font-size: 16px">
+        Select generation:
+        <select name="generation">
+            <option value="8">Generation 8</option>
+            <option value="7">Generation 7</option>
+            <option value="6">Generation 6</option>
+        </select>
+    
+        Select tier:
+        <select name="tier">
+            <option value="Ubers" style="background-color:goldenrod">Ubers</option>
+            <option value="OU" style="background-color:lightskyblue">OU</option>
+            <option value="UU" style="background-color:red; color:white"">UU</option>
+            <option value="RU" style="background-color:yellow">RU</option>
+            <option value="NU" style="background-color:blue; color:white">NU</option>
+            <option value="PU" style="background-color:olive">PU</option>
+            <option value="LC" style="background-color:green; color:white"">LC</option>
+        </select>
+    </p>
+
+    <hr>
+    <input type="submit">
+</form>

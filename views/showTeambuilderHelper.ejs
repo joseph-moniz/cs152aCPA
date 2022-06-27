@@ -1,0 +1,57 @@
+
+<h2><b>Teambuilder Helper</b></h2>
+<p style="font-size: 25px; margin-bottom:5px">Format: Generation <%= generation %> <%= tier %></p>
+<br>
+
+<iframe name="hiddenFrame" style="width: 0; height: 0; border: 0; border: none; position: absolute;"></iframe>
+
+<% if (nonexistantGenTiers.includes(genPlusTier)) {%>
+    <p style="font-size: 24px">The <%= tier %> tier does not exist in Generation <%= generation %> or Smogon does not have API data for
+        Generation <%= generation %> <%= tier %>. Please choose a legal tier. The following are illegal tiers:</p>
+    <ul>
+        <% for (illegalTier of nonexistantGenTiersLong){%>
+            <li>
+                <p style="font-size: 24px"><%= illegalTier %></p>
+            </li>
+        <% } %>
+    </ul>
+<% } else { %>
+    <p style="font-size: 25px; margin-bottom:5px">Add a Pokemon</p>
+    <form method="post" action="/showTeambuilderHelper" target="hiddenFrame" onsubmit="setTimeout(function(){window.location.reload();},10);">
+        <p style="font-size: 16px">Generation: <input type="text" name="generation" value="<%=generation %>" readonly>
+            Tier: <input type="text" name="tier" value="<%=tier %>" readonly></p>
+        <p style="font-size: 16px">
+        Select Pokemon:
+        <select name="pokemon">
+            <% for (pokemon of Object.keys(genTierSetsDex[generation][tier])) {%>
+                <option><%= pokemon %></option>
+            <% } %>
+        </select>
+        </p>
+        <hr>
+        <input type="submit">
+    </form>
+    <hr>
+
+
+    <% if (members != null){%>
+        <ul style="list-style-type: none">
+            <% for (member of members){%>
+                <li style="margin-bottom:20px"><p style="font-size: 16px; margin-bottom:5px"><b><%= member.monName %></b>
+                    </p>
+                    <p style="margin-bottom:5px"><%= member.monSet %>
+                        <% if (member.monSets.length > 1){%>
+                        <button onclick="location.href='/toggleSet/<%= member.id %>'; setTimeout(function(){window.location.reload();},10);" 
+                            type="button">
+                            Change set</button>
+                        <% } %>
+                    </p>
+                    <button onclick="location.href='/deleteMember/<%= member.id %>'; setTimeout(function(){window.location.reload();},10);" 
+                        type="button">
+                        Delete Team Member</button>
+                </li>
+            <% } %>
+        </ul>
+    <% } %>
+
+<% } %>

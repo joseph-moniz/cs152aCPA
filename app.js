@@ -4,18 +4,77 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const layouts = require("express-ejs-layouts");
-const axios = require('axios');
 const genDex = require('./data/genDex');
 const abilityDex = require('./data/abilityDex');
 const itemsDex = require('./data/itemsDex');
 const movesDex = require('./data/movesDex');
+const genTierSetsDex = require('./data/genTierSetsDex');
+const axios = require('axios');
+const auth = require('./routes/auth');
+const session = require("express-session"); 
+const MongoDBStore = require('connect-mongodb-session')(session);
+
+// *********************************************************** //
+//  Loading models
+// *********************************************************** //
+const Member = require('./models/Member');
+const ToDoItem = require('./models/toDoItem');
+
+
+// *********************************************************** //
+//  Connecting to the database
+// *********************************************************** //
+
+const mongoose = require( 'mongoose' );
+//const mongodb_URI = 'mongodb://localhost:27017/cs103a_todo'
+const mongodb_URI = 'mongodb://localhost:27017'
+
+mongoose.connect( mongodb_URI, { useNewUrlParser: true, useUnifiedTopology: true } );
+// fix deprecation warnings
+//mongoose.set('useFindAndModify', false); 
+//mongoose.set('useCreateIndex', true);
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {console.log("we are connected!!!")});
+
+// middleware to test is the user is logged in, and if not, send them to the login page
+const isLoggedIn = (req,res,next) => {
+  if (res.locals.loggedIn) {
+    next()
+  }
+  else res.redirect('/login')
+}
 
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-const { randomFill } = require('crypto');
+//const { randomFill } = require('crypto');
 
 var app = express();
+
+var store = new MongoDBStore({
+  uri: mongodb_URI,
+  collection: 'mySessions'
+});
+
+// Catch errors
+store.on('error', function(error) {
+  console.log(error);
+});
+
+app.use(require('express-session')({
+  secret: 'This is a secret 7f89a789789as789f73j2krklfdslu89fdsjklfds',
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
+  },
+  store: store,
+  // Boilerplate options, see:
+  // * https://www.npmjs.com/package/express-session#resave
+  // * https://www.npmjs.com/package/express-session#saveuninitialized
+  resave: true,
+  saveUninitialized: true
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -28,8 +87,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(layouts)
+app.use(auth)
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+
+
 
 app.get('/sets',
 (req,res,next) => {
@@ -52,6 +115,7 @@ async (req,res,next) => {
     res.locals.pokemonLowercase = getPokemonLowerCase(pokemon);
     res.locals.nonexistantTierFlag = getNonExistantTierFlag(nonexistantGenTiers, genPlusTier);
     res.locals.minGen = genDex[pokemon];
+
     
     const tiersIn = [];
     let index = 0;
@@ -78,6 +142,23 @@ async (req,res,next) => {
       const response = await axios.get('https://play.pokemonshowdown.com/data/sets/gen'+genPlusTier+'.json')
       console.dir(response.data.length)
       genTierSets = response.data.dex[pokemon];
+
+      // ********************************** //
+      // let setNameDict = {};
+      // for (const mon of Object.keys(response.data.dex).sort()) {
+      //   theSets = Object.keys(response.data.dex[mon]);
+      //   setNameDict[mon] = theSets;
+      // }
+      // let tierDict = {};
+      // tierDict[tier] = setNameDict;
+      // let genDict = {};
+      // genDict[generation] = tierDict;
+      // res.locals.tierDict = tierDict;
+      // res.locals.genDict = genDict;
+      // res.locals.genTierSetsDex = genTierSetsDex;
+      // ********************************** //
+      
+
       if (genTierSets != null) {
         sets = Object.keys(genTierSets);
         setDetails = Object.values(genTierSets);
@@ -125,7 +206,7 @@ async (req,res,next) => {
     res.locals.generation = generation;
     res.locals.minGen = genDex[pokemon];
     const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
-    const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "pu", "lc", "2lc", "1lc"];
+    const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
 
     let allTierSets = [];
     
@@ -323,6 +404,194 @@ async (req,res,next) => {
   }
   res.render('showUsageStatsMon')
 })
+
+
+// app.get('/todo', (req,res,next) => res.render('todo'))
+
+app.get('/teambuilderHelper', 
+  (req,res,next) => {
+    res.render('teambuilderHelper')
+})
+
+app.post('/teambuilderHelper', 
+  isLoggedIn,
+  async (req,res,next) => {
+    try {
+      const {generation, tier} = req.body;
+      res.locals.generation = generation;
+      res.locals.tier = tier;
+      res.locals.genTierSetsDex = genTierSetsDex;
+      res.locals.genPlusTier = generation + tier;
+      res.locals.nonexistantGenTiers = ["4RU", "3RU", "2RU", "1RU", "3PU", "2PU", "1PU", "3LC", "2LC", "1LC"];
+      res.locals.nonexistantGenTiersLong = ["Gen 4 RU", "Gen 3 RU", "Gen 2 RU", "Gen 1 RU", "Gen 3 PU", "Gen 2 PU", "Gen 1 PU", 
+      "Gen 3 LC", "Gen 2 LC", "Gen 1 LC"];
+      res.locals.members = await Member.find({userId:res.locals.user._id});
+
+
+      res.render('showTeambuilderHelper')
+    }catch(err){
+      next(err);
+    }  
+})
+
+app.get('/showTeambuilderHelper',
+  isLoggedIn,
+  async (req,res,next) => {
+    try {
+      const {generation, tier, members} = req.body;
+
+      res.locals.generation = generation;
+      res.locals.tier = tier;
+      res.locals.genTierSetsDex = genTierSetsDex;
+      if (members == null) {
+        res.locals.members = [];
+      }
+      else {
+        res.locals.members = await Member.find({userId:res.locals.user._id});
+      }
+      res.render('showTeambuilderHelper')
+    }catch(err){
+      next(err);
+    }
+  }
+)
+
+app.post('/showTeambuilderHelper',
+  isLoggedIn,
+  async (req,res,next) => {
+    try {
+      const {generation, tier, pokemon} = req.body;
+      if (generation == null || tier == null || pokemon == null) {
+        location.reload();
+      }
+      res.locals.generation = generation;
+      res.locals.tier = tier;
+      res.locals.genTierSetsDex = genTierSetsDex;
+      req.session.save();
+      const memberObj = {
+        userId:res.locals.user._id,
+        monName: pokemon,
+        monSet: genTierSetsDex[generation][tier][pokemon][0],
+        monSets: genTierSetsDex[generation][tier][pokemon],
+      }
+      const member = new Member(memberObj); // create ORM object for item
+      await member.save();  // stores it in the database
+      const updatedMembers = await Member.find({userId:res.locals.user._id});
+      res.locals.members = updatedMembers;
+      res.redirect('/showTeambuilderHelper');
+
+
+
+    }catch(err){
+      next(err);
+    }
+  }
+)
+
+app.get('/toggleSet/:itemId',
+  isLoggedIn,
+  async (req,res,next) => {
+    try {
+      const itemId = req.params.itemId;
+      const member = await Member.findOne({_id:itemId});
+      const currentIndex = member.monSets.indexOf(member.monSet)
+      if (currentIndex == member.monSets.length - 1) {
+        member.monSet = member.monSets[0];
+      }
+      else {
+        member.monSet = member.monSets[currentIndex + 1];
+      }
+      await member.save();
+      res.redirect('/showTeambuilderHelper');
+    }
+    catch(e){
+      next(e);
+   }
+  }
+)
+
+app.get('/deleteMember/:itemId',
+  isLoggedIn,
+  async (req,res,next) => {
+    try {
+      const itemId = req.params.itemId;
+      await Member.deleteOne({_id:itemId});
+      res.redirect('/showTeambuilderHelper');
+    }
+    catch(e){
+      next(e);
+   }
+  }
+)
+
+
+// app.post('/todo',
+//   isLoggedIn,
+//   async (req,res,next) => {
+//     try {
+//       const desc = req.body.desc;
+//       const todoObj = {
+//         userId:res.locals.user._id,
+//         descr:desc,
+//         completed:false,
+//         createdAt: new Date(),
+//       }
+//       const todoItem = new ToDoItem(todoObj); // create ORM object for item
+//       await todoItem.save();  // stores it in the database
+//       res.redirect('/showTodoList');
+
+
+//     }catch(err){
+//       next(err);
+//     }
+//   }
+// )
+
+
+// app.get('/showTodoList',
+//   isLoggedIn,
+//   async (req,res,next) => {
+//    try {
+//     const todoitems = await ToDoItem.find({userId:res.locals.user._id});
+
+//     res.locals.todoitems = todoitems
+//     res.render('showTodoList')
+//     //res.json(todoitems);
+//    }catch(e){
+//     next(e);
+//    }
+//   }
+// )
+
+// app.get('/deleteToDoItem/:itemId',
+//   isLoggedIn,
+//   async (req,res,next) => {
+//     try {
+//       const itemId = req.params.itemId;
+//       await ToDoItem.deleteOne({_id:itemId});
+//       res.redirect('/showTodoList');
+//     }
+//     catch(e){
+//       next(e);
+//    }
+//   }
+// )
+
+// app.get('/toggleToDoItem/:itemId',
+//   isLoggedIn,
+//   async (req,res,next) => {
+//     try {
+//       const itemId = req.params.itemId;
+//       const item = await ToDoItem.findOne({_id:itemId});
+//       item.completed = ! item.completed;
+//       await item.save();
+//       res.redirect('/showTodoList');
+//     }
+//     catch(e){
+//       next(e);
+//    }
+//   }
+// )
 
 
 // app.get('/test',
