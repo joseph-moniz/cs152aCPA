@@ -14,7 +14,7 @@ data. HTML and EJS are used to create the view pages. HTML formats and styles th
 ### Packages needed
 The following packages will be needed to use the app:
 
-  `npm install nodemon`
+  `npm install -g nodemon`
   
   `npm install express-ejs-layouts`
   
