@@ -14,6 +14,8 @@ const auth = require('./routes/auth');
 const session = require("express-session"); 
 const MongoDBStore = require('connect-mongodb-session')(session);
 
+const autoSuggest = require('./autoSuggest');
+
 // *********************************************************** //
 //  Loading models
 // *********************************************************** //
@@ -26,7 +28,10 @@ const Member = require('./models/Member');
 
 const mongoose = require( 'mongoose' );
 //const mongodb_URI = 'mongodb://localhost:27017/cs103a_todo'
-const mongodb_URI = 'mongodb://localhost:27017'
+//const mongodb_URI = 'mongodb://localhost:27017'
+
+// const mongodb_URI = 'mongodb+srv://jmoniz:hellosir@cluster0.n2wmy.mongodb.net/?retryWrites=true&w=majority'
+const mongodb_URI = process.env.mongodb_URI
 
 mongoose.connect( mongodb_URI, { useNewUrlParser: true, useUnifiedTopology: true } );
 // fix deprecation warnings
@@ -95,7 +100,8 @@ app.use('/users', usersRouter);
 
 app.get('/sets',
 (req,res,next) => {
-  res.render('sets')
+  res.locals.allMonNames = Object.keys(genDex);
+  res.render('sets', { autoSuggest:autoSuggest })
 });
 
 app.post('/sets',
@@ -436,16 +442,17 @@ app.get('/showTeambuilderHelper',
   isLoggedIn,
   async (req,res,next) => {
     try {
-      const {generation, tier, members} = req.body;
+      const {generation, tier} = req.body;
 
       res.locals.generation = generation;
       res.locals.tier = tier;
       res.locals.genTierSetsDex = genTierSetsDex;
+      const members = await Member.find({userId:res.locals.user._id});
       if (members == null) {
         res.locals.members = [];
       }
       else {
-        res.locals.members = await Member.find({userId:res.locals.user._id});
+        res.locals.members = members;
       }
       res.render('showTeambuilderHelper')
     }catch(err){
@@ -459,13 +466,9 @@ app.post('/showTeambuilderHelper',
   async (req,res,next) => {
     try {
       const {generation, tier, pokemon} = req.body;
-      if (generation == null || tier == null || pokemon == null) {
-        location.reload();
-      }
       res.locals.generation = generation;
       res.locals.tier = tier;
       res.locals.genTierSetsDex = genTierSetsDex;
-      req.session.save();
       const memberObj = {
         userId:res.locals.user._id,
         monName: pokemon,
@@ -538,6 +541,12 @@ app.get('/deleteMember/:itemId',
 //     res.render('showTest')
 
 // })
+
+app.get('/testAutoComplete',
+(req,res,next) => {
+  res.locals.allMonNames = Object.keys(genDex);
+  res.render('testAutoComplete')
+});
 
 
 function convertEVFormats(evNames) {
