@@ -9,12 +9,13 @@ const abilityDex = require('./data/abilityDex');
 const itemsDex = require('./data/itemsDex');
 const movesDex = require('./data/movesDex');
 const genTierSetsDex = require('./data/genTierSetsDex');
+const spriteNameDex = require('./data/spriteNameDex');
+const typesDex = require('./data/typesDex');
 const axios = require('axios');
 const auth = require('./routes/auth');
 const session = require("express-session"); 
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-const autoSuggest = require('./autoSuggest');
 
 // *********************************************************** //
 //  Loading models
@@ -30,8 +31,8 @@ const mongoose = require( 'mongoose' );
 //const mongodb_URI = 'mongodb://localhost:27017/cs103a_todo'
 //const mongodb_URI = 'mongodb://localhost:27017'
 
-// const mongodb_URI = 'mongodb+srv://jmoniz:hellosir@cluster0.n2wmy.mongodb.net/?retryWrites=true&w=majority'
-const mongodb_URI = process.env.mongodb_URI
+const mongodb_URI = 'mongodb+srv://jmoniz:hellosir@cluster0.n2wmy.mongodb.net/?retryWrites=true&w=majority'
+// const mongodb_URI = process.env.mongodb_URI
 
 mongoose.connect( mongodb_URI, { useNewUrlParser: true, useUnifiedTopology: true } );
 // fix deprecation warnings
@@ -101,7 +102,7 @@ app.use('/users', usersRouter);
 app.get('/sets',
 (req,res,next) => {
   res.locals.allMonNames = Object.keys(genDex);
-  res.render('sets', { autoSuggest:autoSuggest })
+  res.render('sets')
 });
 
 app.post('/sets',
@@ -160,9 +161,8 @@ async (req,res,next) => {
       // genDict[generation] = tierDict;
       // res.locals.tierDict = tierDict;
       // res.locals.genDict = genDict;
-      // res.locals.genTierSetsDex = genTierSetsDex;
+      //res.locals.genTierSetsDex = genTierSetsDex;
       // ********************************** //
-      
 
       if (genTierSets != null) {
         sets = Object.keys(genTierSets);
@@ -197,6 +197,7 @@ async (req,res,next) => {
 
 app.get('/allSets',
 (req,res,next) => {
+  res.locals.allMonNames = Object.keys(genDex);
   res.render('allSets')
 });
 
@@ -300,6 +301,7 @@ async (req,res,next) => {
 
 app.get('/usageStatsMon',
 (req,res,next) => {
+  res.locals.allMonNames = Object.keys(genDex);
   res.render('usageStatsMon')
 });
 
@@ -425,11 +427,20 @@ app.post('/teambuilderHelper',
       res.locals.generation = generation;
       res.locals.tier = tier;
       res.locals.genTierSetsDex = genTierSetsDex;
+      res.locals.spriteNameDex = spriteNameDex;
+      res.locals.typesDex = typesDex;
       res.locals.genPlusTier = generation + tier;
       res.locals.nonexistantGenTiers = ["4RU", "3RU", "2RU", "1RU", "3PU", "2PU", "1PU", "3LC", "2LC", "1LC"];
       res.locals.nonexistantGenTiersLong = ["Gen 4 RU", "Gen 3 RU", "Gen 2 RU", "Gen 1 RU", "Gen 3 PU", "Gen 2 PU", "Gen 1 PU", 
       "Gen 3 LC", "Gen 2 LC", "Gen 1 LC"];
       res.locals.members = await Member.find({userId:res.locals.user._id});
+      let memberNames = [];
+      let index = 0;
+      for (const member of res.locals.members) {
+        memberNames[index] = member.monName;
+        index++;
+      }
+      res.locals.memberNames = memberNames;
 
 
       res.render('showTeambuilderHelper')
@@ -443,10 +454,11 @@ app.get('/showTeambuilderHelper',
   async (req,res,next) => {
     try {
       const {generation, tier} = req.body;
-
       res.locals.generation = generation;
       res.locals.tier = tier;
       res.locals.genTierSetsDex = genTierSetsDex;
+      res.locals.spriteNameDex = spriteNameDex;
+      res.locals.typesDex = typesDex;
       const members = await Member.find({userId:res.locals.user._id});
       if (members == null) {
         res.locals.members = [];
@@ -454,7 +466,16 @@ app.get('/showTeambuilderHelper',
       else {
         res.locals.members = members;
       }
-      res.render('showTeambuilderHelper')
+
+      let memberNames = [];
+      let index = 0;
+      for (const member of members) {
+        memberNames[index] = member.monName;
+        index++;
+      }
+      res.locals.memberNames = memberNames;
+
+      res.render('showTeambuilderHelper');
     }catch(err){
       next(err);
     }
@@ -469,19 +490,31 @@ app.post('/showTeambuilderHelper',
       res.locals.generation = generation;
       res.locals.tier = tier;
       res.locals.genTierSetsDex = genTierSetsDex;
+      res.locals.spriteNameDex = spriteNameDex;
+      res.locals.typesDex = typesDex;
       const memberObj = {
         userId:res.locals.user._id,
         monName: pokemon,
+        monGen: generation,
+        monTier: tier,
         monSet: genTierSetsDex[generation][tier][pokemon][0],
         monSets: genTierSetsDex[generation][tier][pokemon],
+        teamName: "",
       }
       const member = new Member(memberObj); // create ORM object for item
       await member.save();  // stores it in the database
       const updatedMembers = await Member.find({userId:res.locals.user._id});
       res.locals.members = updatedMembers;
+
+      let memberNames = [];
+      let index = 0;
+      for (const member of updatedMembers) {
+        memberNames[index] = member.monName;
+        index++;
+      }
+      res.locals.memberNames = memberNames;
+
       res.redirect('/showTeambuilderHelper');
-
-
 
     }catch(err){
       next(err);
@@ -496,11 +529,11 @@ app.get('/toggleSet/:itemId',
       const itemId = req.params.itemId;
       const member = await Member.findOne({_id:itemId});
       const currentIndex = member.monSets.indexOf(member.monSet)
-      if (currentIndex == member.monSets.length - 1) {
+      if (currentIndex == member.monSets.length - 4) {
         member.monSet = member.monSets[0];
       }
       else {
-        member.monSet = member.monSets[currentIndex + 1];
+        member.monSet = member.monSets[currentIndex + 4];
       }
       await member.save();
       res.redirect('/showTeambuilderHelper');
@@ -525,7 +558,109 @@ app.get('/deleteMember/:itemId',
   }
 )
 
+// app.get('/setTeam/:teamName',
+//   isLoggedIn,
+//   async (req,res,next) => {
+//     try {
+//       const teamName = req.params.teamName
+//       const members = await Member.find({userId:res.locals.user._id, teamName:""})
+//       for (const member of members) {
+//         member.teamName = teamName;
+//       }
+//       res.redirect('/showTeambuilderHelper');
+//     }
+//     catch(e){
+//       next(e);
+//    }
+//   }
+// )
 
+app.get('/teamSummary', 
+  isLoggedIn,
+  async (req,res,next) => {
+    try {
+      const members = await Member.find({userId:res.locals.user._id});
+      const generation = members[0].monGen;
+      const tier = members[0].monTier;
+      const genPlusTier = generation + tier.toLowerCase();
+      const numDefMons = getNumDefMons(members);
+      const stalliness = getStalliness(members);
+      const archetype = getTeamArchetype(stalliness, numDefMons);
+      const damageSpreadValue = getDamageSpreadValue(members);
+
+      const response = await axios.get('https://play.pokemonshowdown.com/data/sets/gen'+genPlusTier+'.json');
+      const theSets = response.data.dex;
+
+      console.dir(response.data.length)
+      let teamSets = {};
+
+      for (const member of members) {
+        let memberSet = {};
+        const setDetails = theSets[member.monName][member.monSet];
+        const evNames = getEVNamesTeamSummary(setDetails);
+        const evValues = getEVValuesTeamSummary(setDetails);
+        const evSpread = getEVSpreadsTeamSummary(evNames, evValues);
+        memberSet["item"] = setDetails["item"];
+        memberSet["ability"] = setDetails["ability"];
+        memberSet["nature"] = setDetails["nature"];
+        memberSet["evs"] = evSpread;
+
+        let movesList = [];
+        let index = 0;
+        for (const move of setDetails["moves"]) {
+          movesList[index] = move;
+          index++;
+        }
+        memberSet["moves"] = movesList;
+
+        teamSets[member.monName] = memberSet;
+      }
+
+      let lowercaseNames = {};
+      for (const member of members) {
+        lowercaseNames[member.monName] = getPokemonLowerCase(member.monName);
+      }
+
+      let teamMoveTypes = {};
+      for (const member of members) {
+        let moveTypes = [];
+        let index = 0;
+        for (const move of teamSets[member.monName]["moves"]) {
+          const moveResponse = await axios.get('https://play.pokemonshowdown.com/data/moves.json');
+          const allMoves = moveResponse.data;
+          console.dir(response.data.length)
+          const moveType = allMoves[move.replace(/[^A-Za-z0-9]/g, '').toLowerCase()]["type"];
+          moveTypes[index] = moveType;
+          index++;
+        }
+        teamMoveTypes[member.monName] = moveTypes;
+      }
+
+      const setDetails = theSets[members[0].monName][members[0].monSet];
+      res.locals.setDetails = setDetails;
+      const evNames = getEVNamesTeamSummary(setDetails)
+      const evValues = getEVValuesTeamSummary(setDetails);
+      const evSpread = getEVSpreadsTeamSummary(evNames, evValues);
+      res.locals.test = evSpread;
+
+      res.locals.members = members;
+      res.locals.generation = generation;
+      res.locals.tier = tier;
+      res.locals.numDefMons = numDefMons;
+      res.locals.stalliness = stalliness;
+      res.locals.archetype = archetype;
+      res.locals.damageSpreadValue = damageSpreadValue;
+      res.locals.teamSets = teamSets;
+      res.locals.lowercaseNames = lowercaseNames;
+      res.locals.teamMoveTypes = teamMoveTypes;
+      res.locals.genTierSetsDex = genTierSetsDex;
+      res.locals.spriteNameDex = spriteNameDex;
+      res.locals.typesDex = typesDex;
+      res.render('teamSummary')
+    } catch(e){
+      next(e);
+   }
+  })
 
 // app.get('/test',
 // (req,res,next) => {
@@ -541,12 +676,6 @@ app.get('/deleteMember/:itemId',
 //     res.render('showTest')
 
 // })
-
-app.get('/testAutoComplete',
-(req,res,next) => {
-  res.locals.allMonNames = Object.keys(genDex);
-  res.render('testAutoComplete')
-});
 
 
 function convertEVFormats(evNames) {
@@ -577,7 +706,7 @@ function convertEVFormats(evNames) {
 function getEVNames(setNames, setDetails) {
   let evNamesList = [];
   for (let i = 0; i < setNames.length; i++) {
-    const namesEVsSet = Object.keys(setDetails[i].evs);
+    const namesEVsSet = Object.keys(setDetails[i]["evs"]);
     evNamesProper = convertEVFormats(namesEVsSet);
     evNamesList[i] = evNamesProper;
   }
@@ -587,9 +716,22 @@ function getEVNames(setNames, setDetails) {
 function getEVValues(setNames, setDetails) {
   let evList = [];
   for (let i = 0; i < setNames.length; i++) {
-    const evsSet = Object.values(setDetails[i].evs);
+    const evsSet = Object.values(setDetails[i]["evs"]);
     evList[i] = evsSet;
   }
+  return evList;
+}
+
+function getEVNamesTeamSummary(setDetails) {
+  const namesEVsSet = Object.keys(setDetails["evs"]);
+  const evNamesProper = convertEVFormats(namesEVsSet);
+  const evNamesList = evNamesProper;
+  return evNamesList;
+}
+
+function getEVValuesTeamSummary(setDetails) {
+  const evsSet = Object.values(setDetails["evs"]);
+  const evList = evsSet;
   return evList;
 }
 
@@ -608,6 +750,19 @@ function getEVSpreads(namesEVs, valuesEVs) {
     evSpreads[i] = evSpread;
   }
   return evSpreads;
+}
+
+function getEVSpreadsTeamSummary(namesEVs, valuesEVs) {
+  let evSpread = "";
+  for (let i = 0; i < namesEVs.length; i++) {
+    if (i == namesEVs[i].length - 1) {
+      evSpread = evSpread + valuesEVs[i] + " " + namesEVs[i];
+    }
+    else {
+      evSpread = evSpread + valuesEVs[i] + " " + namesEVs[i] + " / ";
+    }
+  }
+  return evSpread;
 }
 
 function reformatEVSpreads(oldSpreadList) {
@@ -829,6 +984,72 @@ function getRank(allDetails, pokemon) {
   return rank;
 }
 
+function getNumDefMons(members) {
+  let numDefMons = 0;
+  for (const member of members) {
+    const setIndex = member.monSets.indexOf(member.monSet);
+    const memberStallinessScore = member.monSets[setIndex + 1];
+    const memberRole = member.monSets[setIndex + 3];
+    if (member.monName != "Smeargle" && member.monName != "Shuckle") {
+      if (memberStallinessScore > 3 && memberRole != "OL") {
+        numDefMons++;
+      }
+      else if (memberStallinessScore == 3 && (memberRole == "PW" || memberRole == "SW" || memberRole == "MW" || memberRole == "S")) {
+        numDefMons++;
+      }
+    }
+  }
+  return numDefMons;
+}
+
+function getStalliness(members) {
+  let stalliness = 0;
+  for (const member of members) {
+    const setIndex = member.monSets.indexOf(member.monSet);
+    const score = member.monSets[setIndex + 1];
+    stalliness = stalliness + score;
+  }
+  return stalliness;
+}
+
+function getTeamArchetype(stalliness, numDefMons) {
+  let archetype = "";
+  if (numDefMons == 0) {
+    archetype = "Hyper Offense";
+  }
+  else if (stalliness >= 6 && numDefMons == 1) {
+    archetype = "Offense";
+  }
+  else if (stalliness >= 10 && numDefMons == 2) {
+    archetype = "Bulky Offense";
+  }
+  else if (stalliness >= 12 && (numDefMons == 3 || numDefMons == 4)) {
+    archetype = "Balance";
+  }
+  else if (stalliness >= 16 && numDefMons == 5) {
+    archetype = "Defensive";
+  }
+  else if (numDefMons == 6) {
+    archetype = "Stall";
+  }
+  return archetype;
+}
+
+function getDamageSpreadValue(members) {
+  let damageSpreadValue = 0;
+  for (const member of members) {
+    const setIndex = member.monSets.indexOf(member.monSet);
+    const damageType = member.monSets[setIndex + 2];
+    if (damageType == "P") {
+      damageSpreadValue++;
+    }
+    else if (damageType == "S") {
+      damageSpreadValue--;
+    }
+  }
+  return damageSpreadValue;
+}
+
 function compareDates(yearMonth) {
   const dateStr = yearMonth+'-01';
   const [year, month, day] = dateStr.split('-');
@@ -872,7 +1093,7 @@ function getYearMonth(genPlusTier) {
     case "2ubers": case "5ru": 
       yearMonth = "2021-07";
       break;
-    case "1ubers": case "3nu": case "7uu": 
+    case "3nu":
       yearMonth = "2021-06";
       break;
     case "4nu": 
@@ -890,8 +1111,11 @@ function getYearMonth(genPlusTier) {
     case "6ru": case "6nu": case "6lc": 
       yearMonth = "2017-01";
       break;
-    default: 
+    case "6uu": case "7ru":
       yearMonth = "2022-05";
+      break;
+    default: 
+      yearMonth = "2022-06";
   };
   return yearMonth;
 }
@@ -993,6 +1217,92 @@ function getPokemonLowerCase(pokemon) {
   }
   else if (pokemon == "Urshifu-Rapid-Strike") {
     pokemonLowerCase = "urshifu-rapidstrike"
+  }
+  else {
+    pokemonLowerCase = pokemon.toLowerCase();
+  }
+  return pokemonLowerCase;
+}
+
+function getPokemonLowerCaseSprite(pokemon) {
+  let pokemonLowerCase = "";
+  if (pokemon == "Mr. Mime") {
+    pokemonLowerCase = "mr-mime"
+  }
+  else if (pokemon == "Mr. Mime-Galar") {
+    pokemonLowerCase = "mr-mime-galar"
+  }
+  else if (pokemon == "Mr. Rime") {
+    pokemonLowerCase = "mr-rime"
+  }
+  else if (pokemon == "Mime Jr.") {
+    pokemonLowerCase = "mime-jr"
+  }
+  else if (pokemon == "Nidoran") {
+    pokemonLowerCase = "nidoran-m"
+  }
+  else if (pokemon == "Farfetch'd") {
+    pokemonLowerCase = "farfetchd"
+  }
+  else if (pokemon == "Sirfetch'd") {
+    pokemonLowerCase = "sirfetchd"
+  }
+  else if (pokemon == "Charizard-Mega-X") {
+    pokemonLowerCase = "charizard-mega-x"
+  }
+  else if (pokemon == "Charizard-Mega-Y") {
+    pokemonLowerCase = "charizard-mega-y"
+  }
+  else if (pokemon == "Mewtwo-Mega-X") {
+    pokemonLowerCase = "mewtwo-mega-x"
+  }
+  else if (pokemon == "Mewtwo-Mega-Y") {
+    pokemonLowerCase = "mewtwo-mega-y"
+  }
+  else if (pokemon == "Zygarde-10%") {
+    pokemonLowerCase = "zygarde-10"
+  }
+  else if (pokemon == "Zygarde-Complete") {
+    pokemonLowerCase = "zygarde-complete"
+  }
+  else if (pokemon == "Tapu Koko") {
+    pokemonLowerCase = "tapu-koko"
+  }
+  else if (pokemon == "Tapu Lele") {
+    pokemonLowerCase = "tapu-lele"
+  }
+  else if (pokemon == "Tapu Fini") {
+    pokemonLowerCase = "tapu-fini"
+  }
+  else if (pokemon == "Tapu Bulu") {
+    pokemonLowerCase = "tapu-bulu"
+  }
+  else if (pokemon == "Darmanitan-Galar-Zen") {
+    pokemonLowerCase = "darmanitan-galar-zen"
+  }
+  else if (pokemon == "Oricorio-Pau'") {
+    pokemonLowerCase = "oricorio-pau"
+  }
+  else if (pokemon == "Oricorio-Pom-Pom") {
+    pokemonLowerCase = "oricorio-pom-pom"
+  }
+  else if (pokemon == "Type: Null") {
+    pokemonLowerCase = "type-null"
+  }
+  else if (pokemon == "Necrozma-Dawn-Wings") {
+    pokemonLowerCase = "necrozma-dawn"
+  }
+  else if (pokemon == "Necrozma-Dusk-Mane") {
+    pokemonLowerCase = "necrozma-dusk"
+  }
+  else if (pokemon == "Urshifu-Rapid-Strike") {
+    pokemonLowerCase = "urshifu"
+  }
+  else if (pokemon == "Calyrex-Ice") {
+    pokemonLowerCase = "calyrex-ice-rider"
+  }
+  else if (pokemon == "Calyrex-Shadow") {
+    pokemonLowerCase = "calyrex-shadow-rider"
   }
   else {
     pokemonLowerCase = pokemon.toLowerCase();

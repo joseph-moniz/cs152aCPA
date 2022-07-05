@@ -6,7 +6,7 @@ module.exports = {
     "Raichu-Alola": 7, "Sandshrew": 1, "Sandshrew-Alola": 7, "Sandslash": 1, "Sandslash-Alola": 7, "Nidoran-F": 1, "Nidorina": 1, "Nidoqueen": 1,
     "Nidoran": 1, "Nidorino": 1, "Nidoking": 1, "Clefairy": 1, "Clefable": 1, "Vulpix": 1, "Vulpix-Alola": 7, "Ninetales": 1, "Ninetales-Alola": 7,
     "Jigglypuff": 1, "Wigglytuff": 1, "Zubat": 1, "Golbat": 1, "Oddish": 1, "Gloom": 1, "Vileplume": 1, "Paras": 1, "Parasect": 1, "Venonat": 1,
-    "Venomoth": 1, "Diglett": 1, "Digglett-Alola": 7, "Dugtrio": 1, "Dugtrio-Alola": 7, "Meowth": 1, "Meowth-Alola": 7, "Persian": 1,
+    "Venomoth": 1, "Diglett": 1, "Digglett-Alola": 7, "Dugtrio": 1, "Dugtrio-Alola": 7, "Meowth": 1, "Meowth-Alola": 7, "Meowth-Galar": 8, "Persian": 1,
     "Persian-Alola": 7, "Psyduck": 1, "Golduck": 1, "Mankey": 1, "Primeape": 1, "Growlithe": 1, "Arcanine": 1, "Poliwag": 1, "Poliwhirl": 1,
     "Poliwrath": 1, "Abra": 1, "Kadabra": 1, "Alakazam": 1, "Alakazam-Mega": 6, "Machop": 1, "Machoke": 1, "Machamp": 1, "Bellsprout": 1, "Weepinbell": 1,
     "Victreebel": 1, "Tentacool": 1, "Tentacruel": 1, "Geodude": 1, "Geodude-Alola": 7, "Graveler": 1, "Graveler-Alola": 7, "Golem": 1,
@@ -45,7 +45,7 @@ module.exports = {
     "Lunatone": 3, "Solrock": 3, "Barboach": 3, "Whiscash": 3, "Corphish": 3, "Crawdaunt": 3, "Baltoy": 3, "Claydol": 3, "Lileep": 3, "Cradily": 3,
     "Anorith": 3, "Armaldo": 3, "Feebas": 3, "Milotic": 3, "Castform": 3, "Kecleon": 3, "Shuppet": 3, "Banette": 3, "Banette-Mega": 6, "Duskull": 3, "Dusclops": 3,
     "Tropius": 3, "Chimecho": 3, "Absol": 3, "Absol-Mega": 6, "Wynaut": 3, "Snorunt": 3, "Glalie": 3, "Glalie-Mega": 6, "Spheal": 3, "Sealeo": 3, "Walrein": 3, "Clamperl": 3, 
-    "Huntail": 3, "Gorebyss": 3, "Relicanth": 3, "Luvdisc": 3, "Bagon": 3, "Shelgon": 3, "Salamence": 3, "Salamence-Mega": 6, "Beldum": 3, "Metang": 3, "Metagross": 3, 
+    "Huntail": 3, "Gorebyss": 3, "Relicanth": 3, "Luvdisc": 3, "Bagon": 3, "Shelgon": 3, "Salamence": 3, "Salamence-Mega": 6, "Beldum": 3, "Metang": 3, "Metagross": 3, "Metagross-Mega": 3,
     "Regirock": 3, "Regice": 3, "Registeel": 3, "Latias": 3, "Latias-Mega": 6, "Latios": 3, "Latios-Mega": 6, "Kyogre": 3, "Kyogre-Primal": 6, 
     "Groudon": 3, "Groudon-Primal": 6, "Rayquaza": 3, "Rayquaza-Mega": 6, "Jirachi": 3, "Deoxys": 3, "Deoxys-Attack": 3, "Deoxys-Defense": 3, "Deoxys-Speed": 3,
 
@@ -117,10 +117,10 @@ module.exports = {
     "Barraskewda": 8, "Toxel": 8, "Toxtricity": 8, "Sizzlipede": 8, "Centiskorch": 8, "Clobbopus": 8, "Grapploct": 8, "Sinistea": 8, 
     "Polteageist": 8, "Hatenna": 8, "Hattrem": 8, "Hatterene": 8, "Impidimp": 8, "Morgrem": 8, "Grimmsnarl": 8, "Obstagoon": 8, "Perrserker": 8, 
     "Cursola": 8, "Sirfetch'd": 8, "Mr. Rime": 8, "Runerigus": 8, "Milcery": 8, "Alcremie": 8, "Falinks": 8, "Pincurchin": 8, "Snom": 8, 
-    "Frosmoth": 8, "Stonjourner": 8, "Eiscue": 8, "Indeedee": 8, "Indeedee-F": 8, "Morpeko": 8, "Cufant": 8, "Copperajah": 8, "Dracozolt": 8, 
-    "Arctozolt": 8, "Dracovish": 8, "Arctovish": 8, "Duraludon": 8, "Dreepy": 8, "Drakloak": 8, "Dragapult": 8, "Zacian": 8, "Zamazenta": 8, 
-    "Eternatus": 8, "Kubfu": 8, "Urshifu": 8, "Urshifu-Rapid-Strike": 8, "Zarude": 8, "Regieleki": 8, "Regidrago": 8, "Glastrier": 8, 
-    "Spectrier": 8, "Calyrex": 8, "Calyrex-Ice": 8, "Calyrex-Shadow": 8,
+    "Frosmoth": 8, "Stonjourner": 8, "Eiscue": 8, "Eiscue-Noice": 8, "Indeedee": 8, "Indeedee-F": 8, "Morpeko": 8, "Cufant": 8, "Copperajah": 8, "Dracozolt": 8, 
+    "Arctozolt": 8, "Dracovish": 8, "Arctovish": 8, "Duraludon": 8, "Dreepy": 8, "Drakloak": 8, "Dragapult": 8, "Zacian": 8, "Zacian-Crowned": 8,
+    "Zamazenta": 8, "Zamazenta-Crowned": 8, "Eternatus": 8, "Kubfu": 8, "Urshifu": 8, "Urshifu-Rapid-Strike": 8, "Zarude": 8, "Regieleki": 8, 
+    "Regidrago": 8, "Glastrier": 8, "Spectrier": 8, "Calyrex": 8, "Calyrex-Ice": 8, "Calyrex-Shadow": 8,
 
 };
 

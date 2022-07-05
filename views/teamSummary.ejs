@@ -1,0 +1,123 @@
+<style>
+    .contain {
+        width: 1600px
+    }
+    
+</style>
+
+<h2>Team Summary Page</h2>
+<p style="font-size: 25px; margin-bottom:5px">Format: Generation <%= generation %> <%= tier %></p>
+
+
+
+<% for (member of members){%>
+    <div style="display: inline-block; vertical-align: top; border: solid; margin: 5px; padding: 5px; height: auto; width: 400px">
+        <img 
+            style="margin-bottom:5px"
+            src="http://play.pokemonshowdown.com/sprites/ani/<%= lowercaseNames[member.monName] %>.gif"
+            
+            alt="Sprite of <%= member.monName %>">
+        <br>
+        <div style="float: left; vertical-align: top">
+            <img 
+            src="https://www.serebii.net/pokedex-bw/type/<%= typesDex[member.monName][0].toLowerCase() %>.gif"
+            alt="type icon">
+        </div>
+        <% if (typesDex[member.monName].length > 1) {%>
+            <div style="float: left; vertical-align: top">
+                <img 
+                src="https://www.serebii.net/pokedex-bw/type/<%= typesDex[member.monName][1].toLowerCase() %>.gif"
+                alt="type icon">
+            </div>
+        <% } %>
+        <br>
+        <p style="font-size: 16px; margin-bottom:5px; margin-top:5px"><b><%= member.monName %></b></p>
+        <p style="font-size: 16px; margin-bottom:5px"><%= member.monSet %></p>
+        <br>
+        <p style="margin-bottom:5px"><%= member.monName %> @ <%= teamSets[member.monName].item %></p>
+        <p style="margin-bottom:5px">Ability: <%= teamSets[member.monName].ability %></p>
+        <p style="margin-bottom:5px">EVs: <%= teamSets[member.monName].evs %></p>
+        <p style="margin-bottom:5px"><%= teamSets[member.monName].nature %> Nature</p>
+        <% for (var i=0; i<teamSets[member.monName].moves.length; i++){%>
+            <img 
+                src="https://www.serebii.net/pokedex-bw/type/<%= teamMoveTypes[member.monName][i].toLowerCase() %>.gif"
+                alt="type icon">
+                <p style= "display: inline-block; vertical-align: top; margin-bottom:5px"><%= teamSets[member.monName].moves[i] %></p>
+                <br>
+        <% } %>
+    
+    </div>
+<% } %>
+<br>
+<hr>
+
+<h3>Summary</h3>
+<br>
+<p style="font-size: 22px">Team Archetype</p>
+<p style="font-size: 16px">Your team is a <b><%= archetype %></b> team.</p>
+    <p style="font-size: 16px"><%= archetype %></b> teams
+    <% if (archetype == "Hyper Offense") {%>
+        <span>rely on brute force to break the opposition. Hyper Offense teams lack defensive utility, and rarely are Pokemon able to switch
+            into powerful attacks and defensively counter the opponent's Pokemon. Instead, users of these teams must rely on sacrificing Pokemon
+            that have done their job in order to get momentum. Hyper Offense teams are good against more balanced teams, as those teams can be 
+            overpowered. Hyper Offense teams struggle against more defensive teams, since defensive teams can weather and outlast them.
+        </span>
+    <% } else if (archetype == "Offense") {%>
+        <span>rely on offensive power and a little utility. Offensive teams have some defensive utility, unlike Hyper Offense teams, which allows
+            them to better support the team's offensive pieces. It is common for users of these teams to rely on sacrificing Pokemon
+            that have done their job in order to get momentum. Offense teams are good against more balanced teams, as those teams can be 
+            overpowered. Offense teams struggle against more defensive teams, since defensive teams can weather and outlast them.
+        </span>
+    <% } else if (archetype == "Bulky Offense") {%>
+        <span>are offensively oriented teams that have a few defensive Pokemon. It is common for some of the offensive members of Bulky Offensive
+            teams to be more durable, unlike members of Hyper Offense and Offense teams, which are usually glass cannons. Bulky Offense teams
+            can deal with defensive better than Hyper Offense and Offense teams due to their stronger defensive backbone, making it harder for
+            defensive teams to wither them down. However, Bulky Offense teams can struggle against Hyper Offense and Offense teams, which can overpower
+            them.
+        </span>
+    <% } else if (archetype == "Balance") {%>
+        <span>have a strong mix of offensive power and defensive utility, ususally having a strong defensive backbone that consists of several walls. 
+            Balance teams cannot wallbreak as effectively as offensive teams, so they rely on utility that helps set up for easier wallbreaking or
+            a potential late-game sweep. Balance teams can handle defensive teams well, since they are bulky enough to switch in and outdamage
+            the defensive team. Balance teams are also good against bulkier offensive teams, since they have enough defense to sustain. However,
+            Balance teams can struggle against Hyper Offense teams, which can overpower them.
+        </span>
+    <% } else if (archetype == "Defensive") {%>
+        <span>contain mostly defensive Pokemon, usually with one offensive Pokemon. The core defensive backbone of the team is designed to handle
+            most situations and outlast the opponents. The one offensive Pokemon serves as the team's win condition, picking off and denting foes early in the
+            match before sweeping the rest of the team. This Pokemon is helped by all of the defensive Pokemon around it. Defensive teams are good
+            against offensive teams that cannot win a war of attrition but struggle against Balance and Bulky Offense teams that have enough
+            bulk to keep up.
+        </span>
+    <% } else {%>
+        <span>usually contain all defensive Pokemon. Stall teams are designed to outlast the opponent for as long as possible. They do not really
+            have much going for them in terms of offensive power, but they slowly wither down teams with status while they outheal. They thrive
+            in long battles. Stall teams are excellent against offensive teams, as it is easy for 6 defensive Pokemon to deal with wallbreakers.
+            Balance teams can deal with Stall teams though, since it takes much longer to stall them out, and Balance teams have ways to weaken
+            stall teams to allow their offensive Pokemon to break through them. Stall teams also struggle against any team with stallbreakers.
+        </span>
+    <% } %>
+</p>
+<br>
+<br>
+
+<p style="font-size: 22px">Damage Spread</p>
+<% if (damageSpreadValue >= -1 && damageSpreadValue <= 1) {%>
+    <p style="font-size: 16px"><b>Mixed</b>. Your team has a solid mix of physical and special damage.</p>
+<% } else if (damageSpreadValue == 2) {%>
+    <p style="font-size: 16px"><b>Physically based</b>. Your team has more physical damage than special damage. Be careful of physical
+    walls.</p>
+<% } else if (damageSpreadValue == -2) {%>
+    <p style="font-size: 16px"><b>Specially based</b>. Your team has more special damage than physical damage. Be careful of special
+        walls.</p>
+<% } else if (damageSpreadValue > 2) {%>
+    <p style="font-size: 16px"><b>Mostly physical</b>. Your team has too much physical damage. Physical walls can easily
+    wall your team. Try to find a special attacker or a defensive Pokemon that deals special damage to help balance out the team.</p>
+<% } else {%>
+    <p style="font-size: 16px"><b>Mostly special</b>. Your team has too much special damage. Special walls can easily
+wall your team. Try to find a physical attacker or a defensive Pokemon that deals physical damage to help balance out the team.</p>
+<% } %>
+<hr>
+
+
+

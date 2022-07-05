@@ -1,3 +1,21 @@
+<style>
+
+.row {
+  display: flex; /* equal height of the children */
+}
+
+.col {
+  flex: 1; /* additionally, equal width */
+  
+}
+
+.contain {
+    width: 1000px
+}
+
+</style>
+
+
 
 <h2><b>Teambuilder Helper</b></h2>
 <p style="font-size: 25px; margin-bottom:5px">Format: Generation <%= generation %> <%= tier %></p>
@@ -16,42 +34,123 @@
         <% } %>
     </ul>
 <% } else { %>
-    <p style="font-size: 25px; margin-bottom:5px">Add a Pokemon</p>
-    <form method="post" action="/showTeambuilderHelper" target="hiddenFrame" onsubmit="setTimeout(function(){window.location.reload();},10);">
-        <p style="font-size: 16px">Generation: <input type="text" name="generation" value="<%=generation %>" readonly>
-            Tier: <input type="text" name="tier" value="<%=tier %>" readonly></p>
-        <p style="font-size: 16px">
-        Select Pokemon:
-        <select name="pokemon">
-            <% for (pokemon of Object.keys(genTierSetsDex[generation][tier])) {%>
-                <option><%= pokemon %></option>
+    <div class="row">
+        <div class="col" style="float: left; vertical-align: top; width: 50%">
+            <p style="font-size: 25px; margin-bottom:5px">Add a Pokemon</p>
+            <form method="post" action="/showTeambuilderHelper" target="hiddenFrame" onsubmit="setTimeout(function(){window.location.reload();},10);">
+                <p style="font-size: 16px">Generation: <input type="text" name="generation" value="<%=generation %>" readonly>
+                    Tier: <input type="text" name="tier" value="<%=tier %>" readonly></p>
+                <p style="font-size: 16px">
+                    Select Pokemon:
+                    <select name="pokemon">
+                        <% for (pokemon of Object.keys(genTierSetsDex[generation][tier])) {%>
+                            <% if (members != null){%>
+                                <% if (memberNames.includes(pokemon)){%>
+                                    <option disabled>
+                                        <%= pokemon %>
+                                    </option>
+                                <% } else {%>
+                                    <option>
+                                        <%= pokemon %>
+                                    </option>
+                                <% } %>
+
+                            <% } else { %>
+                                <option>
+                                    <%= pokemon %>
+                                </option>
+                            <% } %>
+                        <% } %>
+                    </select>
+                </p>
+
+                <% if (members != null){%>
+                    <% if (members.length < 6){%>
+                        <input class="btn btn-primary" type="submit" value="Add Pokemon">
+                    <% } %>
+                <% } %>
+            </form>
+        </div>
+
+        <div class="col" style="float: left; vertical-align: top; width: 50%">
+            <% if (members != null){%>
+                <% if (members.length == 6){%>
+                    <p style="font-size: 25px; margin-bottom:5px">Save Team</p>
+                    <p style="font-size: 16px">Enter Team Name: <input type="text" name="teamName" id="teamName"></p>
+                    <button class="btn btn-success" type="button" onclick="setTeam(getTeamName())">Save Team</button>
+                    <button class="btn btn-dark" type="button" onclick="location.href='/teamSummary'">View Summary</button>
+
+                <% } %>
             <% } %>
-        </select>
-        </p>
-        <hr>
-        <input type="submit">
-    </form>
+        </div>
+    </div>
     <hr>
 
-
     <% if (members != null){%>
-        <ul style="list-style-type: none">
-            <% for (member of members){%>
-                <li style="margin-bottom:20px"><p style="font-size: 16px; margin-bottom:5px"><b><%= member.monName %></b>
-                    </p>
-                    <p style="margin-bottom:5px"><%= member.monSet %>
-                        <% if (member.monSets.length > 1){%>
-                        <button onclick="location.href='/toggleSet/<%= member.id %>'; setTimeout(function(){window.location.reload();},10);" 
+        <div class="contain" style="margin: auto; width: 75%;">
+        <% for (member of members){%>
+                <div style="display: inline-block; vertical-align: top; border: solid; margin: 5px; padding: 5px; height: 135px; width: 300px">
+                    <div style="display: inline-block; vertical-align: top">
+                        <p style="font-size: 16px; margin-bottom:5px"><b><%= member.monName %></b></p>
+                    </div>
+                    <div style="float: right; vertical-align: top">
+                        <img 
+                        src="https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/regular/<%= spriteNameDex[member.monName] %>.png"
+                        height="56px"
+                        width="68px"
+                        alt="Sprite icon of <%= pokemon %>">
+                    </div>
+                        <p style="margin-bottom:5px"><%= member.monSet %></p>
+                            <% if (member.monSets.length > 4){%>
+                            <p>
+                                <button style="margin:5px" onclick="location.href='/toggleSet/<%= member.id %>'; setTimeout(function(){window.location.reload();},10);" 
+                                type="button">
+                                Change set</button>
+                            </p>
+                            <% } else { %>
+                                <br>
+                                <br>
+                            <% } %>
+                        <p></p>
+                        <button style="margin:5px; background-color: darkred; color: white"
+                            onclick="location.href='/deleteMember/<%= member.id %>'; setTimeout(function(){window.location.reload();},10);" 
                             type="button">
-                            Change set</button>
-                        <% } %>
-                    </p>
-                    <button onclick="location.href='/deleteMember/<%= member.id %>'; setTimeout(function(){window.location.reload();},10);" 
-                        type="button">
-                        Delete Team Member</button>
-                </li>
-            <% } %>
-        </ul>
+                            Delete</button>
+                        <div style="float: right; vertical-align: top">
+                            <div style="float: left; vertical-align: top">
+                                <img 
+                                src="https://www.serebii.net/pokedex-bw/type/<%= typesDex[member.monName][0].toLowerCase() %>.gif"
+                                alt="type icon">
+                            </div>
+                            <% if (typesDex[member.monName].length > 1) {%>
+                                <div style="float: left; vertical-align: top">
+                                    <img 
+                                    src="https://www.serebii.net/pokedex-bw/type/<%= typesDex[member.monName][1].toLowerCase() %>.gif"
+                                    alt="type icon">
+                                </div>
+                            <% } %>
+                        </div>
+                </div>
+        <% } %>
+        </div>
     <% } %>
 
+
 <% } %>
+
+
+<script>
+    function getTeamName() {
+        const teamName = document.getElementById('teamName').value;
+        return teamName;
+    }
+
+    function setTeam(teamName) {
+        const members = await Member.find({userId:res.locals.user._id, teamName:""});
+        for (const member of members) {
+            member.teamName = teamName;
+        }
+    }
+
+</script>
+<pre><%= JSON.stringify(members, null, 5) %></pre>
