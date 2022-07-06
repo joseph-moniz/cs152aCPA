@@ -2,6 +2,14 @@
     .contain {
         width: 1600px
     }
+
+    datalist {
+        display: flex;
+        justify-content: space-between;
+        width: 50%;
+    }
+
+    
     
 </style>
 
@@ -50,10 +58,55 @@
 <% } %>
 <br>
 <hr>
+<h3><b>Importable</b></h3>
+<p style="font-size: 16px; margin-bottom:5px; margin-top:5px">Copy and paste your team directly into the Pokemon Showdown! teambuilder to
+immediately start battling!</p>
+<br>
+<input type="button" class="btn btn-warning" value="Show" id="importableButton" onclick="changeImportable(); showHideImportable()"></input>
+<br>
+<br>
+<div style="display:none; background-color: lightgray; padding-top:10px; padding-left:30px; padding-bottom:10px" id="importable">
+    <% for (member of members) {%>
+        <p>
+            <%= member.monName %> @ <%= teamSets[member.monName].item %><br />
+            Ability: <%= teamSets[member.monName].ability %><br />
+            EVs: <%= teamSets[member.monName].evs %><br />
+            <%= teamSets[member.monName].nature %> Nature<br />
+            <% for (var i=0; i<teamSets[member.monName].moves.length; i++){%>
+                <% if (i == teamSets[member.monName].moves.length - 1) {%>
+                    - <%= teamSets[member.monName].moves[i] %>
+                <% } else {%>
+                    - <%= teamSets[member.monName].moves[i] %><br />
+                <% } %>
+            <% } %>
+        </p>
+    <% } %>
+</div>
+<hr>
 
-<h3>Summary</h3>
+
+
+<h3><b>Summary</b></h3>
 <br>
 <p style="font-size: 22px">Team Archetype</p>
+<input style="width:50%" type="range" list="tickmarks" id="teamType" min="6" max="30" value="<%= stalliness %>" disabled>
+
+<datalist id="tickmarks">
+  <option value="0" label="Hyper Offense"></option>
+  <option value="10"></option>
+  <option value="20"></option>
+  <option value="30"></option>
+  <option value="40"></option>
+  <option value="50" label="Balance"></option>
+  <option value="60"></option>
+  <option value="70"></option>
+  <option value="80"></option>
+  <option value="90"></option>
+  <option value="100" label="Stall"></option>
+</datalist>
+
+<br>
+<br>
 <p style="font-size: 16px">Your team is a <b><%= archetype %></b> team.</p>
     <p style="font-size: 16px"><%= archetype %></b> teams
     <% if (archetype == "Hyper Offense") {%>
@@ -100,8 +153,25 @@
 </p>
 <br>
 <br>
+<br>
 
 <p style="font-size: 22px">Damage Spread</p>
+<input style="width:50%" type="range" list="tickmarks" id="teamType" min="-6" max="6" value="<%= damageSpreadValue %>" disabled>
+<datalist id="tickmarks">
+    <option value="0" label="Special"></option>
+    <option value="10"></option>
+    <option value="20"></option>
+    <option value="30"></option>
+    <option value="40"></option>
+    <option value="50" label="Mixed"></option>
+    <option value="60"></option>
+    <option value="70"></option>
+    <option value="80"></option>
+    <option value="90"></option>
+    <option value="100" label="Physical"></option>
+  </datalist>
+<br>
+<br>
 <% if (damageSpreadValue >= -1 && damageSpreadValue <= 1) {%>
     <p style="font-size: 16px"><b>Mixed</b>. Your team has a solid mix of physical and special damage.</p>
 <% } else if (damageSpreadValue == 2) {%>
@@ -119,5 +189,498 @@ wall your team. Try to find a physical attacker or a defensive Pokemon that deal
 <% } %>
 <hr>
 
+<h3><b>Team Members</b></h3>
+<br>
+<% for (member of members){%>
+    <div>
+        <img 
+            src="https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/regular/<%= spriteNameDex[member.monName] %>.png"
+            height="56px"
+            width="68px"
+            alt="Sprite icon of <%= member.monName %>">
+        <p style="display: inline-block; vertical-align:bottom"><b><%= member.monName %></b>: 
+            <% if (member.monSets[member.monSets.indexOf(member.monSet) + 3] == "W") {%>
+                <% if (member.monSets[member.monSets.indexOf(member.monSet) + 1] >= 3) {%>
+                    <span>Bulky </span>
+                <% } %>
+                <% if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "P") {%>
+                    <span>Physical Wallbreaker</span>
+                <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "S") {%>
+                    <span>Special Wallbreaker</span>
+                <% } else {%>
+                    <span>Mixed Wallbreaker</span>
+                <% } %>
+
+            <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 3] == "OS") {%>
+                <% if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "P") {%>
+                    <span>Physical Offensive Sweeper</span>
+                <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "S") {%>
+                    <span>Special Offensive Sweeper</span>
+                <% } else {%>
+                    <span>Mixed Offensive Sweeper</span>
+                <% } %>
+
+            <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 3] == "BS") {%>
+                <% if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "P") {%>
+                    <span>Physical Bulky Sweeper</span>
+                <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "S") {%>
+                    <span>Special Bulky Sweeper</span>
+                <% } else {%>
+                    <span>Mixed Bulky Sweeper</span>
+                <% } %>
+
+            <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 3] == "PW") {%>
+                <span>Physical Wall</span>
+
+            <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 3] == "SW") {%>
+                <span>Special Wall</span>
+
+            <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 3] == "MW") {%>
+                <span>Mixed Wall</span>
+
+            <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 3] == "S") {%>
+                <% if (member.monSets[member.monSets.indexOf(member.monSet) + 1] < 3) {%>
+                    <span>Offensive </span>
+                <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 1] == 3) {%>
+                    <span>Bulky </span>
+                <% } else {%>
+                    <span>Defensive </span>
+                <% } %>
+                <% if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "P") {%>
+                    <span>Physical </span>
+                <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "S") {%>
+                    <span>Special </span>
+                <% } else {%>
+                    <span>Mixed </span>
+                <% } %>
+                <span>Support</span>
+
+            <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 3] == "RK") {%>
+                <% if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "P") {%>
+                    <span>Physical </span>
+                <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "S") {%>
+                    <span>Special </span>
+                <% } else {%>
+                    <span>Mixed </span>
+                <% } %>
+                <% if (teamSets[member.monName].item == "Choice Scarf") {%>
+                    <span>Choice Scarf Revenge Killer</span>
+                <% } else {%>
+                    <span>Revenge Killer</span>
+                <% } %>
+
+            <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 3] == "OL") {%>
+                <% if (member.monSets[member.monSets.indexOf(member.monSet) + 1] >= 3) {%>
+                    <span>Bulky </span>
+                <% } %>
+                <span>Offensive Lead</span>
+
+            <% } else {%>
+                <% if (member.monSets[member.monSets.indexOf(member.monSet) + 1] < 3) {%>
+                    <span>Offensive </span>
+                <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 1] == 3) {%>
+                    <span>Bulky </span>
+                <% } else {%>
+                    <span>Defensive </span>
+                <% } %>
+                <% if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "P") {%>
+                    <span>Physical </span>
+                <% } else if (member.monSets[member.monSets.indexOf(member.monSet) + 2] == "S") {%>
+                    <span>Special </span>
+                <% } else {%>
+                    <span>Mixed </span>
+                <% } %>
+                <span>Stallbreaker</span>
+            <% } %>
+        </p>
+    </div>
+    <br>
+<% } %>
+<hr>
+
+<h3><b>Type Synergy</b></h3>
+<br>
+<h4><b><u>Offensive Synergy</u></b></h4>
+<p style="font-size: 22px"><b>Strengths</b></p>
+<p style="font-size: 16px">Offensively, your team is strong against the following types and able to hit these Pokemon for a lot of damage:</p>
+<% for (type of teamOffensiveStrengths){%>
+    <img 
+    src="https://www.serebii.net/pokedex-bw/type/<%= type.toLowerCase() %>.gif"
+    width=40
+    alt="type icon">
+    <p style= "font-size: 16px; display: inline-block; vertical-align: top; margin-bottom:5px"><%= type %>-types</p>
+    <br>
+<% } %>
+
+<br>
+<p style="font-size: 22px"><b>Weaknesses</b></p>
+<p style="font-size: 16px">Offensively, your team is weak against the following types. It is difficult for your team to threaten these Pokemon
+with high damage, particularly defensive Pokemon of these types:</p>
+<% for (type of teamOffensiveWeaknesses){%>
+    <img 
+    src="https://www.serebii.net/pokedex-bw/type/<%= type.toLowerCase() %>.gif"
+    width=40
+    alt="type icon">
+    <p style= "font-size: 16px; display: inline-block; vertical-align: top; margin-bottom:5px"><%= type %>-types</p>
+    <br>
+<% } %>
+<br>
+<p style="font-size: 20px"><b>Threatlist</b></p>
+<p style="font-size: 16px">The Pokemon in the threatlist are ordered by usage percent. Pokemon that are <b><u>underlined</u></b> are Pokemon that are meta relevant 
+    (Pokemon with ~4.52% usage or more)</p>
+<br>
+<input type="button" class="btn btn-danger" value="Show" id="offensiveThreatsButton" onclick="changeOffensiveThreats(); showHideOffensiveThreats()"></input>
+<br>
+<br>
+<div style="display:none; border: solid; margin: 5px; padding: 20px" id="offensiveThreats">
+    <% for (pokemon of monsList) {%>
+        <% if (Object.keys(genTierSetsDex[generation][tier]).includes(pokemon)) {%>
+            <% if (typesDex[pokemon].length == 1) {%>
+                <% if (teamOffensiveWeaknesses.includes(typesDex[pokemon][0])) {%>
+                    <% for (var i=0; i<genTierSetsDex[generation][tier][pokemon].length; i+=4) {%>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] > 3 || (genTierSetsDex[generation][tier][pokemon][i + 1] == 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB"))) {%>
+                            <img 
+                                style="margin-bottom:5px"
+                                src="http://play.pokemonshowdown.com/sprites/ani/<%= lowercaseNamesTier[pokemon] %>.gif"
+                                
+                                alt="Sprite of <%= pokemon %>">
+                            <br>
+                            <div style="float: left; vertical-align: top">
+                                <img 
+                                src="https://www.serebii.net/pokedex-bw/type/<%= typesDex[pokemon][0].toLowerCase() %>.gif"
+                                alt="type icon">
+                            </div>
+                            <br>
+                            <% if (monAndUsagePercentDict[pokemon] >= 4.515839608) {%>
+                                <p style="font-size: 16px; margin-bottom:5px; margin-top:5px"><b><u><%= pokemon %></b></u></p>
+                            <% } else { %>
+                                <p style="font-size: 16px; margin-bottom:5px; margin-top:5px"><b><%= pokemon %></b></p>
+                            <% } %>
+                        <% } %>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] == 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB")) {%>
+                            <p style="font-size: 16px; margin-bottom:5px"><%= genTierSetsDex[generation][tier][pokemon][i] %></p>
+                            <% if (Object.keys(theSets[pokemon]).includes(genTierSetsDex[generation][tier][pokemon][i])) {%>
+                                <br>
+                                <p style="margin-bottom:5px"><%= pokemon %> @ <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].item %></p>
+                                <p style="margin-bottom:5px">Ability: <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].ability %></p>
+                                <p style="margin-bottom:5px">EVs: <%= allMonEVs[pokemon][genTierSetsDex[generation][tier][pokemon][i]] %></p>
+                                <p style="margin-bottom:5px"><%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].nature %> Nature</p>
+                                <% for (var j=0; j<theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves.length; j++){%>
+                                    <p style="margin-bottom:5px">- <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves[j] %></p>
+                                <% } %>
+                            <% } %>
+                        <% } else if (genTierSetsDex[generation][tier][pokemon][i + 1] > 3) {%>
+                            <p style="font-size: 16px; margin-bottom:5px"><%= genTierSetsDex[generation][tier][pokemon][i] %></p>
+                            <% if (Object.keys(theSets[pokemon]).includes(genTierSetsDex[generation][tier][pokemon][i])) {%>
+                                <br>
+                                <p style="margin-bottom:5px"><%= pokemon %> @ <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].item %></p>
+                                <p style="margin-bottom:5px">Ability: <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].ability %></p>
+                                <p style="margin-bottom:5px">EVs: <%= allMonEVs[pokemon][genTierSetsDex[generation][tier][pokemon][i]] %></p>
+                                <p style="margin-bottom:5px"><%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].nature %> Nature</p>
+                                <% for (var j=0; j<theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves.length; j++){%>
+                                    <p style="margin-bottom:5px">- <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves[j] %></p>
+                                <% } %>
+                            <% } %>
+                        <% } %>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] > 3 || (genTierSetsDex[generation][tier][pokemon][i + 1] == 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB"))) {%>
+                            <hr>
+                        <% } %>
+                    <% } %>
+                <% } %>
+            <% } else if (typesDex[pokemon].length == 2) {%>
+                <% if (teamOffensiveWeaknesses.includes(typesDex[pokemon][0]) || teamOffensiveWeaknesses.includes(typesDex[pokemon][1])) {%>
+                    <% for (var i=0; i<genTierSetsDex[generation][tier][pokemon].length; i+=4) {%>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] > 3 || (genTierSetsDex[generation][tier][pokemon][i + 1] == 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB"))) {%>
+                            <img 
+                                style="margin-bottom:5px"
+                                src="http://play.pokemonshowdown.com/sprites/ani/<%= lowercaseNamesTier[pokemon] %>.gif"
+                                
+                                alt="Sprite of <%= pokemon %>">
+                            <br>
+                            <div style="float: left; vertical-align: top">
+                                <img 
+                                src="https://www.serebii.net/pokedex-bw/type/<%= typesDex[pokemon][0].toLowerCase() %>.gif"
+                                alt="type icon">
+                            </div>
+
+                            <div style="float: left; vertical-align: top">
+                                <img 
+                                src="https://www.serebii.net/pokedex-bw/type/<%= typesDex[pokemon][1].toLowerCase() %>.gif"
+                                alt="type icon">
+                            </div>
+                            <br>
+                            <% if (monAndUsagePercentDict[pokemon] >= 4.515839608) {%>
+                                <p style="font-size: 16px; margin-bottom:5px; margin-top:5px"><b><u><%= pokemon %></b></u></p>
+                            <% } else { %>
+                                <p style="font-size: 16px; margin-bottom:5px; margin-top:5px"><b><%= pokemon %></b></p>
+                            <% } %>
+
+                        <% } %>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] == 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB")) {%>
+                            <p style="font-size: 16px; margin-bottom:5px"><%= genTierSetsDex[generation][tier][pokemon][i] %></p>
+                            <% if (Object.keys(theSets[pokemon]).includes(genTierSetsDex[generation][tier][pokemon][i])) {%>
+                                <br>
+                                <p style="margin-bottom:5px"><%= pokemon %> @ <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].item %></p>
+                                <p style="margin-bottom:5px">Ability: <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].ability %></p>
+                                <p style="margin-bottom:5px">EVs: <%= allMonEVs[pokemon][genTierSetsDex[generation][tier][pokemon][i]] %></p>
+                                <p style="margin-bottom:5px"><%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].nature %> Nature</p>
+                                <% for (var j=0; j<theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves.length; j++){%>
+                                    <p style="margin-bottom:5px">- <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves[j] %></p>
+                                <% } %>
+                            <% } %>
+                        <% } else if (genTierSetsDex[generation][tier][pokemon][i + 1] > 3) {%>
+                            <p style="font-size: 16px; margin-bottom:5px"><%= genTierSetsDex[generation][tier][pokemon][i] %></p>
+                            <% if (Object.keys(theSets[pokemon]).includes(genTierSetsDex[generation][tier][pokemon][i])) {%>
+                                <br>
+                                <p style="margin-bottom:5px"><%= pokemon %> @ <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].item %></p>
+                                <p style="margin-bottom:5px">Ability: <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].ability %></p>
+                                <p style="margin-bottom:5px">EVs: <%= allMonEVs[pokemon][genTierSetsDex[generation][tier][pokemon][i]] %></p>
+                                <p style="margin-bottom:5px"><%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].nature %> Nature</p>
+                                <% for (var j=0; j<theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves.length; j++){%>
+                                    <p style="margin-bottom:5px">- <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves[j] %></p>
+                                <% } %>
+                            <% } %>
+                        <% } %>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] > 3 || (genTierSetsDex[generation][tier][pokemon][i + 1] == 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB"))) {%>
+                            <br>
+                            <hr>
+                            <br>
+                        <% } %>
+                    <% } %>
+                <% } %>
+            <% } %>   
+        <% } %>
+    <% } %>
+</div>
+
+<br>
+<br>
+<h4><b><u>Defensive Synergy</u></b></h4>
+<p style="font-size: 22px"><b>Strengths</b></p>
+<p style="font-size: 16px">Defensively, your team is strong against the following types and able to switch into these Pokemon without taking
+too much damage:</p>
+<% for (type of teamDefensiveStrengths){%>
+    <img 
+    src="https://www.serebii.net/pokedex-bw/type/<%= type.toLowerCase() %>.gif"
+    width=40
+    alt="type icon">
+    <p style= "font-size: 16px; display: inline-block; vertical-align: top; margin-bottom:5px"><%= type %>-types</p>
+    <br>
+<% } %>
+<br>
+<p style="font-size: 22px"><b>Weaknesses</b></p>
+<p style="font-size: 16px">Defensively, your team is weak against the following types. Pokemon of this type are able to hit the majority of your
+team for high amounts of damage or your team struggles to switch into these Pokemon. Your team is easily dented by wallbreakers and some sweepers
+of these types:</p>
+<% for (type of teamDefensiveWeaknesses){%>
+    <img 
+    src="https://www.serebii.net/pokedex-bw/type/<%= type.toLowerCase() %>.gif"
+    width=40
+    alt="type icon">
+    <p style= "font-size: 16px; display: inline-block; vertical-align: top; margin-bottom:5px"><%= type %>-types</p>
+    <br>
+<% } %>
+<br>
+<p style="font-size: 20px"><b>Threatlist</b></p>
+<p style="font-size: 16px">The Pokemon in the threatlist are ordered by usage percent. Pokemon that are <b><u>underlined</u></b> are Pokemon that are meta relevant 
+    (Pokemon with ~4.52% usage or more)</p>
+<br>
+<input type="button" class="btn btn-danger" value="Show" id="defensiveThreatsButton" onclick="changeDefensiveThreats(); showHideDefensiveThreats()"></input>
+<br>
+<br>
+<div style="display:none; border: solid; margin: 5px; padding: 20px" id="defensiveThreats">
+    <% for (pokemon of monsList) {%>
+        <% if (Object.keys(genTierSetsDex[generation][tier]).includes(pokemon)) {%>
+            <% if (typesDex[pokemon].length == 1) {%>
+                <% if (teamDefensiveWeaknesses.includes(typesDex[pokemon][0])) {%>
+                    <% for (var i=0; i<genTierSetsDex[generation][tier][pokemon].length; i+=4) {%>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] <= 3 && (genTierSetsDex[generation][tier][pokemon][i + 3] == "OS" || 
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "BS" || genTierSetsDex[generation][tier][pokemon][i + 3] == "W" ||
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "RK") 
+                        || (genTierSetsDex[generation][tier][pokemon][i + 1] < 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB"))) {%>
+                            <img 
+                                style="margin-bottom:5px"
+                                src="http://play.pokemonshowdown.com/sprites/ani/<%= lowercaseNamesTier[pokemon] %>.gif"
+                                
+                                alt="Sprite of <%= pokemon %>">
+                            <br>
+                            <div style="float: left; vertical-align: top">
+                                <img 
+                                src="https://www.serebii.net/pokedex-bw/type/<%= typesDex[pokemon][0].toLowerCase() %>.gif"
+                                alt="type icon">
+                            </div>
+                            <br>
+                            <% if (monAndUsagePercentDict[pokemon] >= 4.515839608) {%>
+                                <p style="font-size: 16px; margin-bottom:5px; margin-top:5px"><b><u><%= pokemon %></b></u></p>
+                            <% } else { %>
+                                <p style="font-size: 16px; margin-bottom:5px; margin-top:5px"><b><%= pokemon %></b></p>
+                            <% } %>
+                        <% } %>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] < 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB")) {%>
+                            <p style="font-size: 16px; margin-bottom:5px"><%= genTierSetsDex[generation][tier][pokemon][i] %></p>
+                            <% if (Object.keys(theSets[pokemon]).includes(genTierSetsDex[generation][tier][pokemon][i])) {%>
+                                <br>
+                                <p style="margin-bottom:5px"><%= pokemon %> @ <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].item %></p>
+                                <p style="margin-bottom:5px">Ability: <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].ability %></p>
+                                <p style="margin-bottom:5px">EVs: <%= allMonEVs[pokemon][genTierSetsDex[generation][tier][pokemon][i]] %></p>
+                                <p style="margin-bottom:5px"><%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].nature %> Nature</p>
+                                <% for (var j=0; j<theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves.length; j++){%>
+                                    <p style="margin-bottom:5px">- <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves[j] %></p>
+                                <% } %>
+                            <% } %>
+                        <% } else if (genTierSetsDex[generation][tier][pokemon][i + 1] <= 3 && (genTierSetsDex[generation][tier][pokemon][i + 3] == "OS" || 
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "BS" || genTierSetsDex[generation][tier][pokemon][i + 3] == "W" ||
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "RK")) {%>
+                            <p style="font-size: 16px; margin-bottom:5px"><%= genTierSetsDex[generation][tier][pokemon][i] %></p>
+                            <% if (Object.keys(theSets[pokemon]).includes(genTierSetsDex[generation][tier][pokemon][i])) {%>
+                                <br>
+                                <p style="margin-bottom:5px"><%= pokemon %> @ <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].item %></p>
+                                <p style="margin-bottom:5px">Ability: <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].ability %></p>
+                                <p style="margin-bottom:5px">EVs: <%= allMonEVs[pokemon][genTierSetsDex[generation][tier][pokemon][i]] %></p>
+                                <p style="margin-bottom:5px"><%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].nature %> Nature</p>
+                                <% for (var j=0; j<theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves.length; j++){%>
+                                    <p style="margin-bottom:5px">- <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves[j] %></p>
+                                <% } %>
+                            <% } %>
+                        <% } %>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] <= 3 && (genTierSetsDex[generation][tier][pokemon][i + 3] == "OS" || 
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "BS" || genTierSetsDex[generation][tier][pokemon][i + 3] == "W" ||
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "RK") 
+                        || (genTierSetsDex[generation][tier][pokemon][i + 1] < 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB"))) {%>
+                            <hr>
+                        <% } %>
+                    <% } %>
+                <% } %>
+            <% } else if (typesDex[pokemon].length == 2) {%>
+                <% if (teamDefensiveWeaknesses.includes(typesDex[pokemon][0]) || teamDefensiveWeaknesses.includes(typesDex[pokemon][1])) {%>
+                    <% for (var i=0; i<genTierSetsDex[generation][tier][pokemon].length; i+=4) {%>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] <= 3 && (genTierSetsDex[generation][tier][pokemon][i + 3] == "OS" || 
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "BS" || genTierSetsDex[generation][tier][pokemon][i + 3] == "W" ||
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "RK") 
+                        || (genTierSetsDex[generation][tier][pokemon][i + 1] < 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB"))) {%>
+                            <img 
+                                style="margin-bottom:5px"
+                                src="http://play.pokemonshowdown.com/sprites/ani/<%= lowercaseNamesTier[pokemon] %>.gif"
+                                
+                                alt="Sprite of <%= pokemon %>">
+                            <br>
+                            <div style="float: left; vertical-align: top">
+                                <img 
+                                src="https://www.serebii.net/pokedex-bw/type/<%= typesDex[pokemon][0].toLowerCase() %>.gif"
+                                alt="type icon">
+                            </div>
+
+                            <div style="float: left; vertical-align: top">
+                                <img 
+                                src="https://www.serebii.net/pokedex-bw/type/<%= typesDex[pokemon][1].toLowerCase() %>.gif"
+                                alt="type icon">
+                            </div>
+                            <br>
+                            <% if (monAndUsagePercentDict[pokemon] >= 4.515839608) {%>
+                                <p style="font-size: 16px; margin-bottom:5px; margin-top:5px"><b><u><%= pokemon %></b></u></p>
+                            <% } else { %>
+                                <p style="font-size: 16px; margin-bottom:5px; margin-top:5px"><b><%= pokemon %></b></p>
+                            <% } %>
+
+                        <% } %>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] < 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB")) {%>
+                            <p style="font-size: 16px; margin-bottom:5px"><%= genTierSetsDex[generation][tier][pokemon][i] %></p>
+                            <% if (Object.keys(theSets[pokemon]).includes(genTierSetsDex[generation][tier][pokemon][i])) {%>
+                                <br>
+                                <p style="margin-bottom:5px"><%= pokemon %> @ <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].item %></p>
+                                <p style="margin-bottom:5px">Ability: <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].ability %></p>
+                                <p style="margin-bottom:5px">EVs: <%= allMonEVs[pokemon][genTierSetsDex[generation][tier][pokemon][i]] %></p>
+                                <p style="margin-bottom:5px"><%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].nature %> Nature</p>
+                                <% for (var j=0; j<theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves.length; j++){%>
+                                    <p style="margin-bottom:5px">- <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves[j] %></p>
+                                <% } %>
+                            <% } %>
+                        <% } else if (genTierSetsDex[generation][tier][pokemon][i + 1] <= 3 && (genTierSetsDex[generation][tier][pokemon][i + 3] == "OS" || 
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "BS" || genTierSetsDex[generation][tier][pokemon][i + 3] == "W" ||
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "RK")) {%>
+                            <p style="font-size: 16px; margin-bottom:5px"><%= genTierSetsDex[generation][tier][pokemon][i] %></p>
+                            <% if (Object.keys(theSets[pokemon]).includes(genTierSetsDex[generation][tier][pokemon][i])) {%>
+                                <br>
+                                <p style="margin-bottom:5px"><%= pokemon %> @ <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].item %></p>
+                                <p style="margin-bottom:5px">Ability: <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].ability %></p>
+                                <p style="margin-bottom:5px">EVs: <%= allMonEVs[pokemon][genTierSetsDex[generation][tier][pokemon][i]] %></p>
+                                <p style="margin-bottom:5px"><%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].nature %> Nature</p>
+                                <% for (var j=0; j<theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves.length; j++){%>
+                                    <p style="margin-bottom:5px">- <%= theSets[pokemon][genTierSetsDex[generation][tier][pokemon][i]].moves[j] %></p>
+                                <% } %>
+                            <% } %>
+                        <% } %>
+                        <% if (genTierSetsDex[generation][tier][pokemon][i + 1] <= 3 && (genTierSetsDex[generation][tier][pokemon][i + 3] == "OS" || 
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "BS" || genTierSetsDex[generation][tier][pokemon][i + 3] == "W" ||
+                        genTierSetsDex[generation][tier][pokemon][i + 3] == "RK")
+                        || (genTierSetsDex[generation][tier][pokemon][i + 1] < 3 && 
+                        (genTierSetsDex[generation][tier][pokemon][i + 3] == "S" || genTierSetsDex[generation][tier][pokemon][i + 3] == "SB"))) {%>
+                            <br>
+                            <hr>
+                            <br>
+                        <% } %>
+                    <% } %>
+                <% } %>
+            <% } %>   
+        <% } %>
+    <% } %>
+</div>
 
 
+<script>
+    function showHideImportable() {
+      var x = document.getElementById("importable");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+      } else {
+        x.style.display = "none";
+      }
+    }
+
+    function changeImportable() {
+        var elem = document.getElementById("importableButton");
+        if (elem.value=="Show") elem.value = "Hide";
+        else elem.value = "Show";
+    }
+
+    function showHideOffensiveThreats() {
+      var x = document.getElementById("offensiveThreats");
+      if (x.style.display === "none") {
+        x.style.display = "inline-block";
+      } else {
+        x.style.display = "none";
+      }
+    }
+
+    function changeOffensiveThreats() {
+        var elem = document.getElementById("offensiveThreatsButton");
+        if (elem.value=="Show") elem.value = "Hide";
+        else elem.value = "Show";
+    }
+
+    function showHideDefensiveThreats() {
+      var x = document.getElementById("defensiveThreats");
+      if (x.style.display === "none") {
+        x.style.display = "inline-block";
+      } else {
+        x.style.display = "none";
+      }
+    }
+
+    function changeDefensiveThreats() {
+        var elem = document.getElementById("defensiveThreatsButton");
+        if (elem.value=="Show") elem.value = "Hide";
+        else elem.value = "Show";
+    }
+</script>

@@ -11,6 +11,7 @@ const movesDex = require('./data/movesDex');
 const genTierSetsDex = require('./data/genTierSetsDex');
 const spriteNameDex = require('./data/spriteNameDex');
 const typesDex = require('./data/typesDex');
+const typeChart = require('./data/typeChart');
 const axios = require('axios');
 const auth = require('./routes/auth');
 const session = require("express-session"); 
@@ -21,7 +22,6 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 //  Loading models
 // *********************************************************** //
 const Member = require('./models/Member');
-
 
 // *********************************************************** //
 //  Connecting to the database
@@ -558,6 +558,49 @@ app.get('/deleteMember/:itemId',
   }
 )
 
+app.get('/toggleSet/:itemId',
+  isLoggedIn,
+  async (req,res,next) => {
+    try {
+      const itemId = req.params.itemId;
+      const member = await Member.findOne({_id:itemId});
+      const currentIndex = member.monSets.indexOf(member.monSet)
+      if (currentIndex == member.monSets.length - 4) {
+        member.monSet = member.monSets[0];
+      }
+      else {
+        member.monSet = member.monSets[currentIndex + 4];
+      }
+      await member.save();
+      res.redirect('/showTeambuilderHelper');
+    }
+    catch(e){
+      next(e);
+   }
+  }
+)
+
+app.get('/setTeam/:teamName',
+  isLoggedIn,
+  async (req,res,next) => {
+    try {
+      const teamName = req.params.teamName;
+      const members = await Member.find({userId:res.locals.user._id, teamName:""})
+      for (const member of members) {
+        await Member.updateOne(
+          {"teamName" : ""},
+          { $set: { "teamName" : teamName } }
+       );
+        await member.save();
+      }
+      res.redirect('/showTeambuilderHelper');
+    }
+    catch(e){
+      next(e);
+   }
+  }
+)
+
 // app.get('/setTeam/:teamName',
 //   isLoggedIn,
 //   async (req,res,next) => {
@@ -616,6 +659,19 @@ app.get('/teamSummary',
         teamSets[member.monName] = memberSet;
       }
 
+      let allMonEVs = {};
+      for (const pokemon of Object.keys(theSets)) {
+        let monEVs = {};
+        for (const set of Object.keys(theSets[pokemon])) {
+          const setDetails = theSets[pokemon][set];
+          const evNames = getEVNamesTeamSummary(setDetails);
+          const evValues = getEVValuesTeamSummary(setDetails);
+          const evSpread = getEVSpreadsTeamSummary(evNames, evValues);
+          monEVs[set] = evSpread;
+        }
+        allMonEVs[pokemon] = monEVs;
+      }
+
       let lowercaseNames = {};
       for (const member of members) {
         lowercaseNames[member.monName] = getPokemonLowerCase(member.monName);
@@ -636,12 +692,45 @@ app.get('/teamSummary',
         teamMoveTypes[member.monName] = moveTypes;
       }
 
-      const setDetails = theSets[members[0].monName][members[0].monSet];
-      res.locals.setDetails = setDetails;
-      const evNames = getEVNamesTeamSummary(setDetails)
-      const evValues = getEVValuesTeamSummary(setDetails);
-      const evSpread = getEVSpreadsTeamSummary(evNames, evValues);
-      res.locals.test = evSpread;
+      const genTierSearch = getGenTierSearch(genPlusTier);
+      let elo = "1760";
+      if (tier == "OU") {
+        elo = "1825";
+      }
+      const yearMonth = getYearMonth(genPlusTier);
+      
+      const usageResponse = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
+      console.dir(usageResponse.data.length);
+      const usageData = usageResponse.data.data;
+      const monsList = Object.keys(usageData);
+      const monsDetails = Object.values(usageData);
+      let monAndUsagePercentDict = {};
+      let filteredMonsList = [];
+      let filteredUsages = [];
+      let filteredIndex = 0;
+      for (let i = 0; i < monsList.length; i++) {
+        if (monsDetails[i].usage >= 0.001) {
+          filteredMonsList[filteredIndex] = monsList[i];
+          filteredUsages[filteredIndex] = monsDetails[i].usage
+          filteredIndex++;
+        } 
+      }
+      for (let i = 0; i < filteredMonsList.length; i++) {
+        monAndUsagePercentDict[filteredMonsList[i]] = (filteredUsages[i]* 100).toFixed(5); 
+      }
+      
+      monAndUsagePercentDict = sortDictByValue(monAndUsagePercentDict);
+      const monNames = Object.keys(monAndUsagePercentDict)
+
+      let lowercaseNamesTier = {};
+      for (const mon of monNames) {
+        lowercaseNamesTier[mon] = getPokemonLowerCase(mon);
+      }
+      
+      const teamOffensiveStrengths = getTeamOffensiveStrengths(members);
+      const teamOffensiveWeaknesses = getTeamOffensiveWeaknesses(members);
+      const teamDefensiveStrengths = getTeamDefensiveStrengths(members);
+      const teamDefensiveWeaknesses = getTeamDefensiveWeaknesses(members);
 
       res.locals.members = members;
       res.locals.generation = generation;
@@ -656,6 +745,17 @@ app.get('/teamSummary',
       res.locals.genTierSetsDex = genTierSetsDex;
       res.locals.spriteNameDex = spriteNameDex;
       res.locals.typesDex = typesDex;
+      res.locals.monsList = monNames;
+      res.locals.lowercaseNamesTier = lowercaseNamesTier;
+      res.locals.theSets = theSets;
+      res.locals.allMonEVs = allMonEVs;
+      res.locals.monAndUsagePercentDict = monAndUsagePercentDict;
+      res.locals.teamOffensiveStrengths = clearRedundantTypes(teamOffensiveStrengths, teamOffensiveWeaknesses);
+      res.locals.teamOffensiveWeaknesses = clearRedundantTypes(teamOffensiveWeaknesses, teamOffensiveStrengths);
+      res.locals.teamDefensiveStrengths = clearRedundantTypes(teamDefensiveStrengths, teamDefensiveWeaknesses);
+      res.locals.teamDefensiveWeaknesses = clearRedundantTypes(teamDefensiveWeaknesses, teamDefensiveStrengths);
+
+
       res.render('teamSummary')
     } catch(e){
       next(e);
@@ -676,6 +776,7 @@ app.get('/teamSummary',
 //     res.render('showTest')
 
 // })
+
 
 
 function convertEVFormats(evNames) {
@@ -755,7 +856,7 @@ function getEVSpreads(namesEVs, valuesEVs) {
 function getEVSpreadsTeamSummary(namesEVs, valuesEVs) {
   let evSpread = "";
   for (let i = 0; i < namesEVs.length; i++) {
-    if (i == namesEVs[i].length - 1) {
+    if (i == namesEVs.length - 1) {
       evSpread = evSpread + valuesEVs[i] + " " + namesEVs[i];
     }
     else {
@@ -990,7 +1091,7 @@ function getNumDefMons(members) {
     const setIndex = member.monSets.indexOf(member.monSet);
     const memberStallinessScore = member.monSets[setIndex + 1];
     const memberRole = member.monSets[setIndex + 3];
-    if (member.monName != "Smeargle" && member.monName != "Shuckle") {
+    if (member.monName != "Smeargle" && member.monName != "Shuckle" && member.monName != "Ditto") {
       if (memberStallinessScore > 3 && memberRole != "OL") {
         numDefMons++;
       }
@@ -1048,6 +1149,222 @@ function getDamageSpreadValue(members) {
     }
   }
   return damageSpreadValue;
+}
+
+
+
+function getTeamOffensiveStrengths(members) {
+  let teamStrengths = [];
+  let allStrengths = [];
+  for (const member of members) {
+    if (typesDex[member.monName].length == 1) {
+      const monType = typesDex[member.monName][0];
+      for (type of Object.keys(typeChart)) {
+        if (typeChart[type]["damageTaken"][monType] == 1) {
+          allStrengths.push(type);
+        }
+      }
+    }
+    else {
+      const monType1 = typesDex[member.monName][0];
+      const monType2 = typesDex[member.monName][1];
+      for (type of Object.keys(typeChart)) {
+        if (typeChart[type]["damageTaken"][monType1] == 1 && typeChart[type]["damageTaken"][monType2] == 1) {
+          allStrengths.push(type);
+          allStrengths.push(type);
+        }
+        else if (typeChart[type]["damageTaken"][monType1] == 1 || typeChart[type]["damageTaken"][monType2] == 1) {
+          allStrengths.push(type);
+        }
+      }
+    }
+  }
+  
+  for (type of Object.keys(typeChart)) {
+    let typeCount = 0;
+    for (let i = 0; i < allStrengths.length; i++) {
+      if (allStrengths[i] == type) {
+        typeCount++;
+      }
+    }
+    if (typeCount >= 3) {
+      teamStrengths.push(type);
+    }
+  }
+  return teamStrengths;
+}
+
+function getTeamOffensiveWeaknesses(members) {
+  let teamWeaknesses = [];
+  let allWeaknesses = [];
+  for (const member of members) {
+    if (typesDex[member.monName].length == 1) {
+      const monType = typesDex[member.monName][0];
+      for (type of Object.keys(typeChart)) {
+        if (typeChart[type]["damageTaken"][monType] == 2) {
+          allWeaknesses.push(type);
+        }
+        if (typeChart[type]["damageTaken"][monType] == 3) {
+          allWeaknesses.push(type);
+          allWeaknesses.push(type);
+        }
+      }
+    }
+    else {
+      const monType1 = typesDex[member.monName][0];
+      const monType2 = typesDex[member.monName][1];
+      for (type of Object.keys(typeChart)) {
+        if (typeChart[type]["damageTaken"][monType1] == 3) {
+          allWeaknesses.push(type);
+          allWeaknesses.push(type);
+          if (typeChart[type]["damageTaken"][monType2] == 1) {
+            allWeaknesses.pop();
+          }
+        }
+        else if (typeChart[type]["damageTaken"][monType2] == 3) {
+          allWeaknesses.push(type);
+          allWeaknesses.push(type);
+          if (typeChart[type]["damageTaken"][monType1] == 1) {
+            allWeaknesses.pop();
+          }
+        }
+        else if (typeChart[type]["damageTaken"][monType1] == 2 && typeChart[type]["damageTaken"][monType2] == 0) {
+          allWeaknesses.push(type);
+        }
+        else if (typeChart[type]["damageTaken"][monType1] == 2 && typeChart[type]["damageTaken"][monType2] == 2) {
+          allWeaknesses.push(type);
+          allWeaknesses.push(type);
+        }
+        else if (typeChart[type]["damageTaken"][monType1] == 0 && typeChart[type]["damageTaken"][monType2] == 2) {
+          allWeaknesses.push(type);
+        }
+        else if (typeChart[type]["damageTaken"][monType1] == 2 && typeChart[type]["damageTaken"][monType2] == 2) {
+          allWeaknesses.push(type);
+          allWeaknesses.push(type);
+        }
+      }
+    }
+  }
+  
+  for (type of Object.keys(typeChart)) {
+    let typeCount = 0;
+    for (let i = 0; i < allWeaknesses.length; i++) {
+      if (allWeaknesses[i] == type) {
+        typeCount++;
+      }
+    }
+    if (typeCount >= 3) {
+      teamWeaknesses.push(type);
+    }
+  }
+  return teamWeaknesses;
+}
+
+function getTeamDefensiveStrengths(members) {
+  let teamStrengths = [];
+  let allStrengths = [];
+  for (const member of members) {
+    if (typesDex[member.monName].length == 1) {
+      const monType = typesDex[member.monName][0];
+      for (type of Object.keys(typeChart)) {
+        if (typeChart[monType]["damageTaken"][type] == 3) {
+          allStrengths.push(type);
+          allStrengths.push(type);
+        }
+        else if (typeChart[monType]["damageTaken"][type] == 2) {
+          allStrengths.push(type);
+        }
+      }
+    }
+    else {
+      const monType1 = typesDex[member.monName][0];
+      const monType2 = typesDex[member.monName][1];
+      for (type of Object.keys(typeChart)) {
+        if (typeChart[monType1]["damageTaken"][type] == 3 || typeChart[monType2]["damageTaken"][type] == 3) {
+          allStrengths.push(type);
+          allStrengths.push(type);
+        }
+        else if (typeChart[monType1]["damageTaken"][type] == 2 && typeChart[monType2]["damageTaken"][type] == 2) {
+          allStrengths.push(type);
+          allStrengths.push(type);
+        }
+        else if (typeChart[monType1]["damageTaken"][type] == 2 && typeChart[monType2]["damageTaken"][type] == 0) {
+          allStrengths.push(type);
+        }
+        else if (typeChart[monType1]["damageTaken"][type] == 0 && typeChart[monType2]["damageTaken"][type] == 2) {
+          allStrengths.push(type);
+        }
+      }
+    }
+  }
+  
+  for (type of Object.keys(typeChart)) {
+    let typeCount = 0;
+    for (let i = 0; i < allStrengths.length; i++) {
+      if (allStrengths[i] == type) {
+        typeCount++;
+      }
+    }
+    if (typeCount >= 3) {
+      teamStrengths.push(type);
+    }
+  }
+  return teamStrengths;
+}
+
+
+function getTeamDefensiveWeaknesses(members) {
+  let teamWeaknesses = [];
+  let allWeaknesses = [];
+  for (const member of members) {
+    if (typesDex[member.monName].length == 1) {
+      const monType = typesDex[member.monName][0];
+      for (type of Object.keys(typeChart)) {
+        if (typeChart[monType]["damageTaken"][type] == 1) {
+          allWeaknesses.push(type);
+        }
+      }
+    }
+    else {
+      const monType1 = typesDex[member.monName][0];
+      const monType2 = typesDex[member.monName][1];
+      for (type of Object.keys(typeChart)) {
+        if (typeChart[monType1]["damageTaken"][type] == 1 && typeChart[monType2]["damageTaken"][type] == 1) {
+          allWeaknesses.push(type);
+          allWeaknesses.push(type);
+        }
+        else if (typeChart[monType1]["damageTaken"][type] == 0 && typeChart[monType2]["damageTaken"][type] == 1) {
+          allWeaknesses.push(type);
+        }
+        else if (typeChart[monType1]["damageTaken"][type] == 1 && typeChart[monType2]["damageTaken"][type] == 0) {
+          allWeaknesses.push(type);
+        }
+      }
+    }
+  }
+  
+  for (type of Object.keys(typeChart)) {
+    let typeCount = 0;
+    for (let i = 0; i < allWeaknesses.length; i++) {
+      if (allWeaknesses[i] == type) {
+        typeCount++;
+      }
+    }
+    if (typeCount >= 3) {
+      teamWeaknesses.push(type);
+    }
+  }
+  return teamWeaknesses;
+}
+
+function clearRedundantTypes(typeList1, typeList2) {
+  let newList = [];
+  for (const type of typeList1) {
+    if (!typeList2.includes(type)) {
+      newList.push(type);
+    }
+  }
+  return newList;
 }
 
 function compareDates(yearMonth) {

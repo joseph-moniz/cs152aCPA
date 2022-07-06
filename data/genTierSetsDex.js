@@ -750,7 +750,7 @@ module.exports = {
                 "Cleaner", 1, "M", "W"
            ],
            "Shuckle": [
-                "Sticky Web", 4, "S", "MW"
+                "Sticky Web", 4, "S", "OL"
            ],
            "Skarmory": [
                 "Physically Defensive", 4, "P", "PW"

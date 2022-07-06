@@ -16,7 +16,6 @@
 </style>
 
 
-
 <h2><b>Teambuilder Helper</b></h2>
 <p style="font-size: 25px; margin-bottom:5px">Format: Generation <%= generation %> <%= tier %></p>
 <br>
@@ -77,7 +76,9 @@
                 <% if (members.length == 6){%>
                     <p style="font-size: 25px; margin-bottom:5px">Save Team</p>
                     <p style="font-size: 16px">Enter Team Name: <input type="text" name="teamName" id="teamName"></p>
-                    <button class="btn btn-success" type="button" onclick="setTeam(getTeamName())">Save Team</button>
+                    <button class="btn btn-success" type="button" 
+                    onclick="location.href='/setTeam/getTeamName()'; setTimeout(function(){window.location.reload();},10);">
+                    Save Team</button>
                     <button class="btn btn-dark" type="button" onclick="location.href='/teamSummary'">View Summary</button>
 
                 <% } %>
@@ -141,16 +142,8 @@
 
 <script>
     function getTeamName() {
-        const teamName = document.getElementById('teamName').value;
+        const teamName = document.getElementById('teamName');
         return teamName;
     }
 
-    function setTeam(teamName) {
-        const members = await Member.find({userId:res.locals.user._id, teamName:""});
-        for (const member of members) {
-            member.teamName = teamName;
-        }
-    }
-
 </script>
-<pre><%= JSON.stringify(members, null, 5) %></pre>
