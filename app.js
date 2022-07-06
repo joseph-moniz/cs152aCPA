@@ -429,11 +429,7 @@ app.post('/teambuilderHelper',
       res.locals.genTierSetsDex = genTierSetsDex;
       res.locals.spriteNameDex = spriteNameDex;
       res.locals.typesDex = typesDex;
-      res.locals.genPlusTier = generation + tier;
-      res.locals.nonexistantGenTiers = ["4RU", "3RU", "2RU", "1RU", "3PU", "2PU", "1PU", "3LC", "2LC", "1LC"];
-      res.locals.nonexistantGenTiersLong = ["Gen 4 RU", "Gen 3 RU", "Gen 2 RU", "Gen 1 RU", "Gen 3 PU", "Gen 2 PU", "Gen 1 PU", 
-      "Gen 3 LC", "Gen 2 LC", "Gen 1 LC"];
-      res.locals.members = await Member.find({userId:res.locals.user._id});
+      res.locals.members = await Member.find({userId:res.locals.user._id}).skip(Member.count() - 6);
       let memberNames = [];
       let index = 0;
       for (const member of res.locals.members) {
@@ -459,7 +455,7 @@ app.get('/showTeambuilderHelper',
       res.locals.genTierSetsDex = genTierSetsDex;
       res.locals.spriteNameDex = spriteNameDex;
       res.locals.typesDex = typesDex;
-      const members = await Member.find({userId:res.locals.user._id});
+      const members = await Member.find({userId:res.locals.user._id}).skip(Member.count() - 6);
       if (members == null) {
         res.locals.members = [];
       }
@@ -499,11 +495,10 @@ app.post('/showTeambuilderHelper',
         monTier: tier,
         monSet: genTierSetsDex[generation][tier][pokemon][0],
         monSets: genTierSetsDex[generation][tier][pokemon],
-        teamName: "",
       }
       const member = new Member(memberObj); // create ORM object for item
       await member.save();  // stores it in the database
-      const updatedMembers = await Member.find({userId:res.locals.user._id});
+      const updatedMembers = await Member.find({userId:res.locals.user._id}).skip(Member.count() - 6);
       res.locals.members = updatedMembers;
 
       let memberNames = [];
@@ -558,71 +553,22 @@ app.get('/deleteMember/:itemId',
   }
 )
 
-app.get('/toggleSet/:itemId',
-  isLoggedIn,
+app.get('/deleteAll',
   async (req,res,next) => {
     try {
-      const itemId = req.params.itemId;
-      const member = await Member.findOne({_id:itemId});
-      const currentIndex = member.monSets.indexOf(member.monSet)
-      if (currentIndex == member.monSets.length - 4) {
-        member.monSet = member.monSets[0];
-      }
-      else {
-        member.monSet = member.monSets[currentIndex + 4];
-      }
-      await member.save();
-      res.redirect('/showTeambuilderHelper');
-    }
-    catch(e){
+      await Member.deleteMany({userId:res.locals.user._id});
+      res.redirect('/teambuilderHelper')
+    }catch(e){
       next(e);
-   }
+    }
   }
 )
-
-app.get('/setTeam/:teamName',
-  isLoggedIn,
-  async (req,res,next) => {
-    try {
-      const teamName = req.params.teamName;
-      const members = await Member.find({userId:res.locals.user._id, teamName:""})
-      for (const member of members) {
-        await Member.updateOne(
-          {"teamName" : ""},
-          { $set: { "teamName" : teamName } }
-       );
-        await member.save();
-      }
-      res.redirect('/showTeambuilderHelper');
-    }
-    catch(e){
-      next(e);
-   }
-  }
-)
-
-// app.get('/setTeam/:teamName',
-//   isLoggedIn,
-//   async (req,res,next) => {
-//     try {
-//       const teamName = req.params.teamName
-//       const members = await Member.find({userId:res.locals.user._id, teamName:""})
-//       for (const member of members) {
-//         member.teamName = teamName;
-//       }
-//       res.redirect('/showTeambuilderHelper');
-//     }
-//     catch(e){
-//       next(e);
-//    }
-//   }
-// )
 
 app.get('/teamSummary', 
   isLoggedIn,
   async (req,res,next) => {
     try {
-      const members = await Member.find({userId:res.locals.user._id});
+      const members = await Member.find({userId:res.locals.user._id}).skip(Member.count() - 6);
       const generation = members[0].monGen;
       const tier = members[0].monTier;
       const genPlusTier = generation + tier.toLowerCase();
@@ -1481,6 +1427,9 @@ function getPokemonLowerCase(pokemon) {
   else if (pokemon == "Farfetch'd") {
     pokemonLowerCase = "farfetchd"
   }
+  else if (pokemon == "Ho-Oh") {
+    pokemonLowerCase = "hooh"
+  }
   else if (pokemon == "Sirfetch'd") {
     pokemonLowerCase = "sirfetchd"
   }
@@ -1525,6 +1474,15 @@ function getPokemonLowerCase(pokemon) {
   }
   else if (pokemon == "Type: Null") {
     pokemonLowerCase = "typenull"
+  }
+  else if (pokemon == "Jangmo-o") {
+    pokemonLowerCase = "jangmoo"
+  }
+  else if (pokemon == "Hakamo-o") {
+    pokemonLowerCase = "hakamoo"
+  }
+  else if (pokemon == "Kommo-o") {
+    pokemonLowerCase = "kommoo"
   }
   else if (pokemon == "Necrozma-Dawn-Wings") {
     pokemonLowerCase = "necrozma-dawnwings"

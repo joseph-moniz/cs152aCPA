@@ -2,8 +2,16 @@
 
 <h2>Teambuilder Helper</h2>
 <p style="font-size: 16px">Welcome to the Teambuilder Helper. Choose a generation and tier below. Then, you will be able to select Pokemon from
-    that format and add it to a draft team. After, the website will offer tips and suggestions for improving your team.
+    that format and add it to a draft team. After, the website will generate a summary page, showing the sets of your Pokemon, general stats of
+    your team like the team archetype, and some strengths and weaknesses of your team.
     You can then export your team when you are done which is ready for use for Pokemon Showdown!.</p>
+
+<div style="border: solid; border-color:red; padding: 10px;">
+    <p style="font-size: 16px; margin-bottom:5px"><b>NOTE:</b> If you want to change the generation or tier and create a new team, you must press the "Refresh
+    Teambuilder Helper" button, which will allow you to add Pokemon to the team. If you do not press it, then you will not be able to add
+    Pokemon with the newly selected generation and/or tier.</p>
+</div>
+<br>
 <br>
 <form method="post" action="/teambuilderHelper">
     <p style="font-size: 16px">
@@ -25,7 +33,9 @@
             <option value="LC" style="background-color:green; color:white">LC</option>
         </select>
     </p>
-
+    <br>
+    <button style="margin:5px" class="btn btn-success" onclick="location.href='/deleteAll'" type="button">
+        Refresh Teambuilder Helper</button>
     <hr>
     <input type="submit">
 </form>

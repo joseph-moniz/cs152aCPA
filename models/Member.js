@@ -9,7 +9,6 @@ var memberSchema = Schema( {
   monTier: String,
   monSet: String,
   monSets: Array,
-  teamName: String,
 } );
 
 module.exports = mongoose.model( 'Member', memberSchema );
