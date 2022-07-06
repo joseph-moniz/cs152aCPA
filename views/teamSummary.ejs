@@ -58,32 +58,6 @@
 <% } %>
 <br>
 <hr>
-<h3><b>Importable</b></h3>
-<p style="font-size: 16px; margin-bottom:5px; margin-top:5px">Copy and paste your team directly into the Pokemon Showdown! teambuilder to
-immediately start battling!</p>
-<br>
-<input type="button" class="btn btn-warning" value="Show" id="importableButton" onclick="changeImportable(); showHideImportable()"></input>
-<br>
-<br>
-<div style="display:none; background-color: lightgray; padding-top:10px; padding-left:30px; padding-bottom:10px" id="importable">
-    <% for (member of members) {%>
-        <p>
-            <%= member.monName %> @ <%= teamSets[member.monName].item %><br />
-            Ability: <%= teamSets[member.monName].ability %><br />
-            EVs: <%= teamSets[member.monName].evs %><br />
-            <%= teamSets[member.monName].nature %> Nature<br />
-            <% for (var i=0; i<teamSets[member.monName].moves.length; i++){%>
-                <% if (i == teamSets[member.monName].moves.length - 1) {%>
-                    - <%= teamSets[member.monName].moves[i] %>
-                <% } else {%>
-                    - <%= teamSets[member.monName].moves[i] %><br />
-                <% } %>
-            <% } %>
-        </p>
-    <% } %>
-</div>
-<hr>
-
 
 
 <h3><b>Summary</b></h3>
@@ -636,6 +610,34 @@ of these types:</p>
         <% } %>
     <% } %>
 </div>
+<hr>
+<br>
+
+<h3><b>Importable</b></h3>
+<p style="font-size: 16px; margin-bottom:5px; margin-top:5px">Copy and paste your team directly into the Pokemon Showdown! teambuilder to
+immediately start battling!</p>
+<br>
+<input type="button" class="btn btn-warning" value="Show" id="importableButton" onclick="changeImportable(); showHideImportable()"></input>
+<br>
+<br>
+<div style="display:none; background-color: lightgray; padding-top:10px; padding-left:30px; padding-bottom:10px" id="importable">
+    <% for (member of members) {%>
+        <p>
+            <%= member.monName %> @ <%= teamSets[member.monName].item %><br />
+            Ability: <%= teamSets[member.monName].ability %><br />
+            EVs: <%= teamSets[member.monName].evs %><br />
+            <%= teamSets[member.monName].nature %> Nature<br />
+            <% for (var i=0; i<teamSets[member.monName].moves.length; i++){%>
+                <% if (i == teamSets[member.monName].moves.length - 1) {%>
+                    - <%= teamSets[member.monName].moves[i] %>
+                <% } else {%>
+                    - <%= teamSets[member.monName].moves[i] %><br />
+                <% } %>
+            <% } %>
+        </p>
+    <% } %>
+</div>
+<br>
 
 
 <script>
