@@ -1,84 +1,107 @@
-<h2>View Usage Stats for Generation/Tier</h2>
-<p style="font-size: 16px">This is the page to view the usage statistics of Pokemon in a specific competitive format. Data is collected by Smogon.
-    The data are from different dates. The most current data with reasonable sample sizes are used to display the stats.</p> 
-<p style="font-size: 16px">Select a given format (tier and generation) and a skill level to view a table of all Pokemon used in the format at that skill level.</p>
-<br>
-<form method="post" action="/usageStatsTier">
-    <p style="font-size: 16px">
-    Select format:
-    <select name="format">
-        <optgroup label="Gen 1">
-            <option value="1Ubers">Gen 1 Ubers</option>
-            <option value="1OU">Gen 1 OU</option>
-            <option value="1UU">Gen 1 UU</option>
-            <option value="1NU">Gen 1 NU</option>
-        </optgroup>
-        <optgroup label="Gen 2">
-            <option value="2Ubers">Gen 2 Ubers</option>
-            <option value="2OU">Gen 2 OU</option>
-            <option value="2UU">Gen 2 UU</option>
-            <option value="2NU">Gen 2 NU</option>
-        </optgroup>
-        <optgroup label="Gen 3">
-            <option value="3Ubers">Gen 3 Ubers</option>
-            <option value="3OU">Gen 3 OU</option>
-            <option value="3UU">Gen 3 UU</option>
-            <option value="3NU">Gen 3 NU</option>
-        </optgroup>
-        <optgroup label="Gen 4">
-            <option value="4Ubers">Gen 4 Ubers</option>
-            <option value="4OU">Gen 4 OU</option>
-            <option value="4UU">Gen 4 UU</option>
-            <option value="4NU">Gen 4 NU</option>
-            <option value="4PU">Gen 4 PU</option>
-            <option value="4LC">Gen 4 LC</option>
-        </optgroup>
-        <optgroup label="Gen 5">
-            <option value="5Ubers">Gen 5 Ubers</option>
-            <option value="5OU">Gen 5 OU</option>
-            <option value="5UU">Gen 5 UU</option>
-            <option value="5RU">Gen 5 RU</option>
-            <option value="5NU">Gen 5 NU</option>
-            <option value="5PU">Gen 5 PU</option>
-            <option value="5LC">Gen 5 LC</option>
-        </optgroup>
-        <optgroup label="Gen 6">
-            <option value="6Ubers">Gen 6 Ubers</option>
-            <option value="6OU">Gen 6 OU</option>
-            <option value="6UU">Gen 6 UU</option>
-            <option value="6RU">Gen 6 RU</option>
-            <option value="6NU">Gen 6 NU</option>
-            <option value="6PU">Gen 6 PU</option>
-            <option value="6LC">Gen 6 LC</option>
-        </optgroup>
-        <optgroup label="Gen 7">
-            <option value="7Ubers">Gen 7 Ubers</option>
-            <option value="7OU">Gen 7 OU</option>
-            <option value="7UU">Gen 7 UU</option>
-            <option value="7RU">Gen 7 RU</option>
-            <option value="7NU">Gen 7 NU</option>
-            <option value="7PU">Gen 7 PU</option>
-            <option value="7LC">Gen 7 LC</option>
-        </optgroup>
-        <optgroup label="Gen 8">
-            <option value="8Ubers">Gen 8 Ubers</option>
-            <option value="8OU">Gen 8 OU</option>
-            <option value="8UU">Gen 8 UU</option>
-            <option value="8RU">Gen 8 RU</option>
-            <option value="8NU">Gen 8 NU</option>
-            <option value="8PU">Gen 8 PU</option>
-            <option value="8LC">Gen 8 LC</option>
-        </optgroup>
-    </select>
+<style>
+input {
+  border: 1px solid transparent;
+  border-color: black;
+  background-color: white;
+  padding: 10px;
+  font-size: 16px;
+}
 
-    Select skill level:
-    <select name="rating">
-        <option value="Beginner" style="background-color:forestgreen">Beginner</option>
-        <option value="Average" style="background-color:gold">Average</option>
-        <option value="Skilled" style="background-color:darkorange; color:white"">Skilled</option>
-        <option value="Expert" style="background-color:red; color:white">Expert</option>
-    </select>
-    </p>
-    <hr>
-    <input type="submit">
-</form>
+input[type=text] {
+  background-color: white;
+  width: 100%;
+}
+
+input[type=submit] {
+  background-color: DodgerBlue;
+  color: #fff;
+  cursor: pointer;
+}
+</style>
+
+<h2>View Usage Stats for Generation/Tier</h2>
+<div style="background-color: rgb(233, 255, 235); border: solid; border-color: rgb(195, 219, 197); padding: 25px; width: auto">
+    <p style="font-size: 16px">This is the page to view the usage statistics of Pokemon in a specific competitive format. Data is collected by Smogon.
+        The data are from different dates. The most current data with reasonable sample sizes are used to display the stats.</p> 
+    <p style="font-size: 16px">Select a given format (tier and generation) and a skill level to view a table of all Pokemon used in the format at that skill level.</p>
+    <br>
+    <form method="post" action="/usageStatsTier">
+        <p style="font-size: 16px">
+        Select format:
+        <select name="format">
+            <optgroup label="Gen 1">
+                <option value="1Ubers">Gen 1 Ubers</option>
+                <option value="1OU">Gen 1 OU</option>
+                <option value="1UU">Gen 1 UU</option>
+                <option value="1NU">Gen 1 NU</option>
+            </optgroup>
+            <optgroup label="Gen 2">
+                <option value="2Ubers">Gen 2 Ubers</option>
+                <option value="2OU">Gen 2 OU</option>
+                <option value="2UU">Gen 2 UU</option>
+                <option value="2NU">Gen 2 NU</option>
+            </optgroup>
+            <optgroup label="Gen 3">
+                <option value="3Ubers">Gen 3 Ubers</option>
+                <option value="3OU">Gen 3 OU</option>
+                <option value="3UU">Gen 3 UU</option>
+                <option value="3NU">Gen 3 NU</option>
+            </optgroup>
+            <optgroup label="Gen 4">
+                <option value="4Ubers">Gen 4 Ubers</option>
+                <option value="4OU">Gen 4 OU</option>
+                <option value="4UU">Gen 4 UU</option>
+                <option value="4NU">Gen 4 NU</option>
+                <option value="4PU">Gen 4 PU</option>
+                <option value="4LC">Gen 4 LC</option>
+            </optgroup>
+            <optgroup label="Gen 5">
+                <option value="5Ubers">Gen 5 Ubers</option>
+                <option value="5OU">Gen 5 OU</option>
+                <option value="5UU">Gen 5 UU</option>
+                <option value="5RU">Gen 5 RU</option>
+                <option value="5NU">Gen 5 NU</option>
+                <option value="5PU">Gen 5 PU</option>
+                <option value="5LC">Gen 5 LC</option>
+            </optgroup>
+            <optgroup label="Gen 6">
+                <option value="6Ubers">Gen 6 Ubers</option>
+                <option value="6OU">Gen 6 OU</option>
+                <option value="6UU">Gen 6 UU</option>
+                <option value="6RU">Gen 6 RU</option>
+                <option value="6NU">Gen 6 NU</option>
+                <option value="6PU">Gen 6 PU</option>
+                <option value="6LC">Gen 6 LC</option>
+            </optgroup>
+            <optgroup label="Gen 7">
+                <option value="7Ubers">Gen 7 Ubers</option>
+                <option value="7OU">Gen 7 OU</option>
+                <option value="7UU">Gen 7 UU</option>
+                <option value="7RU">Gen 7 RU</option>
+                <option value="7NU">Gen 7 NU</option>
+                <option value="7PU">Gen 7 PU</option>
+                <option value="7LC">Gen 7 LC</option>
+            </optgroup>
+            <optgroup label="Gen 8">
+                <option value="8Ubers">Gen 8 Ubers</option>
+                <option value="8OU">Gen 8 OU</option>
+                <option value="8UU">Gen 8 UU</option>
+                <option value="8RU">Gen 8 RU</option>
+                <option value="8NU">Gen 8 NU</option>
+                <option value="8PU">Gen 8 PU</option>
+                <option value="8LC">Gen 8 LC</option>
+            </optgroup>
+        </select>
+
+        Select skill level:
+        <select name="rating">
+            <option value="Beginner" style="background-color:forestgreen">Beginner</option>
+            <option value="Average" style="background-color:gold">Average</option>
+            <option value="Skilled" style="background-color:darkorange; color:white"">Skilled</option>
+            <option value="Expert" style="background-color:red; color:white">Expert</option>
+        </select>
+        </p>
+        <hr>
+        <input type="submit">
+    </form>
+</div>

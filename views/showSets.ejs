@@ -1,91 +1,92 @@
-<% if (correctNameFormatCheck){ %>
-    <h2><b><%= pokemon %> Sets in Generation <%= generation %> <%= tier %></b></h2>
-    <% if(generation >= minGen){%> 
-        <% if(generation >= 6){%> 
-            <img 
-            src="http://play.pokemonshowdown.com/sprites/ani/<%= pokemonLowercase %>.gif"
-            width="150"
-            alt="Sprite of <%= pokemon %>">
-        <% } %>
-        <% if(generation == 5){%> 
-            <img 
-            src="http://play.pokemonshowdown.com/sprites/gen5ani/<%= pokemonLowercase %>.gif"
-            width="150"
-            alt="Sprite of <%= pokemon %>">
+<div style="background-color: white; border: solid; padding: 25px; width: auto">
+    <% if (correctNameFormatCheck){ %>
+        <h2><b><%= pokemon %> Sets in Generation <%= generation %> <%= tier %></b></h2>
+        <% if(generation >= minGen){%> 
+            <% if(generation >= 6){%> 
+                <img 
+                src="http://play.pokemonshowdown.com/sprites/ani/<%= pokemonLowercase %>.gif"
+                width="150"
+                alt="Sprite of <%= pokemon %>">
+            <% } %>
+            <% if(generation == 5){%> 
+                <img 
+                src="http://play.pokemonshowdown.com/sprites/gen5ani/<%= pokemonLowercase %>.gif"
+                width="150"
+                alt="Sprite of <%= pokemon %>">
+            <% } %> 
+            <% if(generation < 5){%> 
+                <img 
+                src="http://play.pokemonshowdown.com/sprites/gen<%= generation %>/<%= pokemonLowercase %>.png"
+                width="150"
+                alt="Sprite of <%= pokemon %>">
+            <% } %> 
         <% } %> 
-        <% if(generation < 5){%> 
-            <img 
-            src="http://play.pokemonshowdown.com/sprites/gen<%= generation %>/<%= pokemonLowercase %>.png"
-            width="150"
-            alt="Sprite of <%= pokemon %>">
-        <% } %> 
-    <% } %> 
-    <br>
-    <br>
-    <br>
-    <br>
+        <br>
+        <br>
+        <br>
+        <br>
 
-    <% if(generation < minGen){ %> 
-        <br>
-        <br>
-        <h2>Error</h2>
-        <p style="font-size: 24px"><%= pokemon %> is unavailable in Generation <%= generation %>. 
-            Its earliest generation is Generation <%= minGen %>.</p>
-        <br>
-    <% } else if (nonexistantTierFlag == true) { %> 
-        <br>
-        <br>
-        <h2>Error</h2>
-        <p style="font-size: 24px">The <%= tier %> tier does not exist in Generation <%= generation %> or Smogon does not have API data for
-            Generation <%= generation %> <%= tier %>.</p>
-        <br>
-    <% } else if (sets.length == 0 || sets == null) { %>
-        <br>
-        <br>
-        <h2>Error</h2>
-        <p style="font-size: 24px"><%= pokemon %> does not have any sets in Generation <%= generation %> <%= tier %>.</p>
-        <% if (otherTiers.length > 0) { %>
-        <p style="font-size: 24px">In Generation <%= generation %>, <%= pokemon %> is in 
-            <% if(otherTiers.length >=3) { %>
-                <% for (var i=0; i<otherTiers.length; i++){%>
-                    <% if (i < otherTiers.length - 1) { %>
-                        <%= otherTiers[i] %>, 
-                    <% } else { %>
-                        and <%= otherTiers[i] %>.
+        <% if(generation < minGen){ %> 
+            <br>
+            <br>
+            <h2>Error</h2>
+            <p style="font-size: 24px"><%= pokemon %> is unavailable in Generation <%= generation %>. 
+                Its earliest generation is Generation <%= minGen %>.</p>
+            <br>
+        <% } else if (nonexistantTierFlag == true) { %> 
+            <br>
+            <br>
+            <h2>Error</h2>
+            <p style="font-size: 24px">The <%= tier %> tier does not exist in Generation <%= generation %> or Smogon does not have API data for
+                Generation <%= generation %> <%= tier %>.</p>
+            <br>
+        <% } else if (sets.length == 0 || sets == null) { %>
+            <br>
+            <br>
+            <h2>Error</h2>
+            <p style="font-size: 24px"><%= pokemon %> does not have any sets in Generation <%= generation %> <%= tier %>.</p>
+            <% if (otherTiers.length > 0) { %>
+            <p style="font-size: 24px">In Generation <%= generation %>, <%= pokemon %> is in 
+                <% if(otherTiers.length >=3) { %>
+                    <% for (var i=0; i<otherTiers.length; i++){%>
+                        <% if (i < otherTiers.length - 1) { %>
+                            <%= otherTiers[i] %>, 
+                        <% } else { %>
+                            and <%= otherTiers[i] %>.
+                        <% } %>
                     <% } %>
+                <% } else if(otherTiers.length == 2){ %>
+                    <%= otherTiers[0] %> and <%= otherTiers[1] %>.
+                <% } else { %>
+                    <%= otherTiers[0] %>.
                 <% } %>
-            <% } else if(otherTiers.length == 2){ %>
-                <%= otherTiers[0] %> and <%= otherTiers[1] %>.
-            <% } else { %>
-                <%= otherTiers[0] %>.
+            </p>
             <% } %>
-        </p>
-        <% } %>
 
-    <% } else { %>
-        <% for(var i=0; i<sets.length; i++){%> 
-            <p style="font-size: 16px; margin-bottom: 5px"><b><%= sets[i] %></b></p>
-            <p style="margin: 0"><%= pokemon %> 
-            <% if(generation > 1){%>   
-                @ <%= setDetails[i].item %></p>
-            <% } %>
-            <% if(generation > 2){%>
-                <p style="margin: 0">Ability: <%= setDetails[i].ability %></p>
-                <p style="margin: 0">EVs: <%= evSpreads[i] %></p>
-                <p style="margin: 0"><%= setDetails[i].nature %> Nature</p>
-            <% } %>
+        <% } else { %>
+            <% for(var i=0; i<sets.length; i++){%> 
+                <p style="font-size: 20px; margin-bottom: 5px"><b><%= sets[i] %></b></p>
+                <p style="font-size: 16px; margin: 0"><%= pokemon %> 
+                <% if(generation > 1){%>   
+                    @ <%= setDetails[i].item %></p>
+                <% } %>
+                <% if(generation > 2){%>
+                    <p style="font-size: 16px; margin: 0">Ability: <%= setDetails[i].ability %></p>
+                    <p style="font-size: 16px; margin: 0">EVs: <%= evSpreads[i] %></p>
+                    <p style="font-size: 16px; margin: 0"><%= setDetails[i].nature %> Nature</p>
+                <% } %>
+                
+                <% for(var j=0; j<setDetails[i].moves.length; j++){%> 
+                    <p style="font-size: 16px; margin: 0">- <%= setDetails[i].moves[j]%></p>
+                <% } %>
+                <% if(i != sets.length - 1){%> 
+                    <hr>
+                <% } %>
             
-            <% for(var j=0; j<setDetails[i].moves.length; j++){%> 
-                <p style="margin: 0">- <%= setDetails[i].moves[j]%></p>
             <% } %>
-            <% if(i != sets.length - 1){%> 
-                <hr>
-            <% } %>
-        
         <% } %>
+    <% } else { %>
+        <h2>Error</h2>
+        <p style="font-size: 24px">Please use the correct format when inputting a Pokemon name.</p>
     <% } %>
-<% } else { %>
-    <h2>Error</h2>
-    <p style="font-size: 24px">Please use the correct format when inputting a Pokemon name.</p>
-<% } %>
-
+</div>

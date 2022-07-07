@@ -307,109 +307,113 @@ app.get('/usageStatsMon',
 
 app.post('/usageStatsMon',
 async (req,res,next) => {
-  const {pokemon, format, rating} = req.body;
-  res.locals.correctNameFormatCheck = Object.keys(genDex).includes(pokemon);
+  try {
+    const {pokemon, format, rating} = req.body;
+    res.locals.correctNameFormatCheck = Object.keys(genDex).includes(pokemon);
 
-  if (res.locals.correctNameFormatCheck) {
-    res.locals.rating = rating;
-    res.locals.pokemon = pokemon;
-    res.locals.pokemonLowercase = getPokemonLowerCase(pokemon);
-  
-    res.locals.cap = 10;
-    const teammateCap = 10;
+    if (res.locals.correctNameFormatCheck) {
+      res.locals.rating = rating;
+      res.locals.pokemon = pokemon;
+      res.locals.pokemonLowercase = getPokemonLowerCase(pokemon);
+    
+      res.locals.cap = 10;
+      const teammateCap = 10;
 
-    const generation = getGenFromString(format);
-    const tier = getTierFromString(format);
-    const genPlusTier = generation + tier.toLowerCase();
-    const genTierSearch = getGenTierSearch(genPlusTier);
-    const elo = getELO(genPlusTier, rating);
-    const yearMonth = getYearMonth(genPlusTier);
-    const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
-    const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
-
-    res.locals.generation = generation;
-    res.locals.tier = tier;
-    res.locals.elo = elo;
-    res.locals.date = getDate(yearMonth);
-    res.locals.minGen = genDex[pokemon];
-
-    const tiersIn = [];
-    let tiersInIndex = 0;
-    for (const newTier of tiers) {
-      const genPlusTier = generation+newTier.toLowerCase();
+      const generation = getGenFromString(format);
+      const tier = getTierFromString(format);
+      const genPlusTier = generation + tier.toLowerCase();
       const genTierSearch = getGenTierSearch(genPlusTier);
       const elo = getELO(genPlusTier, rating);
       const yearMonth = getYearMonth(genPlusTier);
-      const nonexistantTierFlag = getNonExistantTierFlag(nonexistantGenTiers, genPlusTier);
-      if (!nonexistantTierFlag) {
-        const responseTier = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
-        if (responseTier.data.data[pokemon] != null) {
-          tiersIn[tiersInIndex] = newTier;
-          tiersInIndex++;
+      const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
+      const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
+
+      res.locals.generation = generation;
+      res.locals.tier = tier;
+      res.locals.elo = elo;
+      res.locals.date = getDate(yearMonth);
+      res.locals.minGen = genDex[pokemon];
+
+      const tiersIn = [];
+      let tiersInIndex = 0;
+      for (const newTier of tiers) {
+        const genPlusTier = generation+newTier.toLowerCase();
+        const genTierSearch = getGenTierSearch(genPlusTier);
+        const elo = getELO(genPlusTier, rating);
+        const yearMonth = getYearMonth(genPlusTier);
+        const nonexistantTierFlag = getNonExistantTierFlag(nonexistantGenTiers, genPlusTier);
+        if (!nonexistantTierFlag) {
+          const responseTier = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
+          if (responseTier.data.data[pokemon] != null) {
+            tiersIn[tiersInIndex] = newTier;
+            tiersInIndex++;
+          }
         }
       }
-    }
-    res.locals.otherTiers = tiersIn;
+      res.locals.otherTiers = tiersIn;
+      
+      if (tiersIn.length > 0 && generation >= res.locals.minGen) {
     
-    if (tiersIn.length > 0 && generation >= res.locals.minGen) {
-  
-      const response = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
-      console.dir(response.data.length);
-      const allDetails = response.data.data
-      const monDetails = allDetails[pokemon];
-      if (monDetails != null) {
-        const usagePercent = monDetails.usage * 100;
-        const movesSorted = getStats(monDetails, "Moves");
-        const abilitiesSorted = getStats(monDetails, "Abilities");
-        const itemsSorted = getStats(monDetails, "Items");
-        const spreadsSorted = getStats(monDetails, "Spreads");
+        const response = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
+        console.dir(response.data.length);
+        const allDetails = response.data.data
+        const monDetails = allDetails[pokemon];
+        if (monDetails != null) {
+          const usagePercent = monDetails.usage * 100;
+          const movesSorted = getStats(monDetails, "Moves");
+          const abilitiesSorted = getStats(monDetails, "Abilities");
+          const itemsSorted = getStats(monDetails, "Items");
+          const spreadsSorted = getStats(monDetails, "Spreads");
 
-        let teammatesSorted = {};
-        const newEnough = compareDates(yearMonth);
-        if (newEnough) {
-          teammatesSorted = getTeammatesNew(monDetails, teammateCap);
+          let teammatesSorted = {};
+          const newEnough = compareDates(yearMonth);
+          if (newEnough) {
+            teammatesSorted = getTeammatesNew(monDetails, teammateCap);
+          }
+          else {
+            teammatesSorted = getTeammatesOld(allDetails, monDetails, teammateCap);
+          }
+
+          const rank = getRank(allDetails, pokemon);
+
+
+          res.locals.monDetails = monDetails;
+          res.locals.usagePercent = usagePercent;
+          res.locals.rank = rank;
+          res.locals.moves = Object.keys(movesSorted);
+          res.locals.abilities = Object.keys(abilitiesSorted);
+          res.locals.items = Object.keys(itemsSorted);
+          res.locals.spreads = Object.keys(spreadsSorted);
+          res.locals.teammates = Object.keys(teammatesSorted);
+          res.locals.movesStats = movesSorted;
+          res.locals.abilitiesStats = abilitiesSorted;
+          res.locals.itemsStats = itemsSorted;
+          res.locals.spreadsStats = spreadsSorted;
+          res.locals.teammatesStats = teammatesSorted;
+
         }
         else {
-          teammatesSorted = getTeammatesOld(allDetails, monDetails, teammateCap);
+
+          res.locals.monDetails = {};
+          res.locals.usagePercent = 0
+          res.locals.rank = 0;
+          res.locals.moves = [];
+          res.locals.abilities = [];
+          res.locals.items = [];
+          res.locals.spreads = [];
+          res.locals.teammates = [];
+          res.locals.movesStats = {};
+          res.locals.abilitiesStats = {};
+          res.locals.itemsStats = {};
+          res.locals.spreadsStats = {};
+          res.locals.teammatesStats = {};
         }
-
-        const rank = getRank(allDetails, pokemon);
-
-
-        res.locals.monDetails = monDetails;
-        res.locals.usagePercent = usagePercent;
-        res.locals.rank = rank;
-        res.locals.moves = Object.keys(movesSorted);
-        res.locals.abilities = Object.keys(abilitiesSorted);
-        res.locals.items = Object.keys(itemsSorted);
-        res.locals.spreads = Object.keys(spreadsSorted);
-        res.locals.teammates = Object.keys(teammatesSorted);
-        res.locals.movesStats = movesSorted;
-        res.locals.abilitiesStats = abilitiesSorted;
-        res.locals.itemsStats = itemsSorted;
-        res.locals.spreadsStats = spreadsSorted;
-        res.locals.teammatesStats = teammatesSorted;
-
       }
-      else {
-        res.locals.monDetails = monDetails;
-        res.locals.usagePercent = 0
-        res.locals.rank = 0;
-        res.locals.moves = [];
-        res.locals.abilities = [];
-        res.locals.items = [];
-        res.locals.spreads = [];
-        res.locals.teammates = [];
-        res.locals.movesStats = {};
-        res.locals.abilitiesStats = {};
-        res.locals.itemsStats = {};
-        res.locals.spreadsStats = {};
-        res.locals.teammatesStats = {};
-      }
-
     }
-  }
-  res.render('showUsageStatsMon')
+    res.render('showUsageStatsMon')
+  }catch(err){
+    next(err);
+  } 
 })
 
 

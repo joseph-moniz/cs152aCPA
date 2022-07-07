@@ -22,7 +22,7 @@
 
 <iframe name="hiddenFrame" style="width: 0; height: 0; border: 0; border: none; position: absolute;"></iframe>
 
-
+<div style="background-color: rgb(220, 244, 250); border: solid; border-color: rgb(182, 210, 216); padding: 25px; width: auto">
     <div class="row">
         <div class="col" style="float: left; vertical-align: top; width: 50%">
             <p style="font-size: 25px; margin-bottom:5px">Add a Pokemon</p>
@@ -81,7 +81,7 @@
         <div class="contain" style="margin: auto; width: 75%;">
             <% for (member of members){%>
                 <% if (member.monGen == generation && member.monTier == tier){%>
-                    <div style="display: inline-block; vertical-align: top; border: solid; margin: 5px; padding: 5px; height: 135px; width: 300px">
+                    <div style="display: inline-block; vertical-align: top; background-color: white; border: solid; margin: 5px; padding: 5px; height: 135px; width: 290px">
                         <div style="display: inline-block; vertical-align: top">
                             <p style="font-size: 16px; margin-bottom:5px"><b><%= member.monName %></b></p>
                         </div>
@@ -128,7 +128,7 @@
             
         </div>
     <% } %>
-
+</div>
 
 
 

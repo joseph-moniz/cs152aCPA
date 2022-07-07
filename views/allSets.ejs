@@ -1,85 +1,90 @@
 <style>
-    #example {font-family: monospace; color: blue}
+  #example {font-family: monospace; color: blue}
 
-    .autocomplete {
-  position: relative;
-  display: inline-block;
-}
-
-input {
-  border: 1px solid transparent;
-  background-color: #f1f1f1;
-  padding: 10px;
-  font-size: 16px;
+  input {
+border: 1px solid transparent;
+border-color: black;
+background-color: white;
+padding: 10px;
+font-size: 16px;
 }
 
 input[type=text] {
-  background-color: #f1f1f1;
-  width: 100%;
+background-color: white;
+width: 100%;
 }
 
 input[type=submit] {
-  background-color: DodgerBlue;
-  color: #fff;
-  cursor: pointer;
+background-color: DodgerBlue;
+color: #fff;
+cursor: pointer;
+}
+
+/*the container must be positioned relative:*/
+.autocomplete {
+position: relative;
+display: inline-block;
 }
 
 .autocomplete-items {
-  position: absolute;
-  border: 1px solid #d4d4d4;
-  border-bottom: none;
-  border-top: none;
-  z-index: 99;
-  /*position the autocomplete items to be the same width as the container:*/
-  top: 100%;
-  left: 0;
-  right: 0;
+position: absolute;
+border: 1px solid #d4d4d4;
+border-bottom: none;
+border-top: none;
+z-index: 99;
+/*position the autocomplete items to be the same width as the container:*/
+top: 100%;
+left: 0;
+right: 0;
 }
 
 .autocomplete-items div {
-  padding: 10px;
-  cursor: pointer;
-  background-color: #fff; 
-  border-bottom: 1px solid #d4d4d4; 
+padding: 10px;
+cursor: pointer;
+background-color: #fff; 
+border-bottom: 1px solid #d4d4d4; 
 }
 
 /*when hovering an item:*/
 .autocomplete-items div:hover {
-  background-color: #e9e9e9; 
+background-color: white; 
 }
 
 /*when navigating through the items using the arrow keys:*/
 .autocomplete-active {
-  background-color: DodgerBlue !important; 
-  color: #ffffff; 
+background-color: DodgerBlue !important; 
+color: #ffffff; 
 }
 </style>
 
-<h2>Find All Generation Sets</h2>
-<p style="font-size: 16px">This is the page to view competitive Pokemon sets for battling with Smogon standards. 
-    Data is collected by Smogon. Enter a Pokemon's name and select a given generation to view all of the top sets of that Pokemon
-    for all tiers in that generation.</p>
-<br>
-<form method="post" action="/allSets" autocomplete="off">
-    <div class="autocomplete" style="width:300px;">
-        <p style="font-size: 16px">Enter Pokemon: <input type="text" name="pokemon" id="monInput"></p>
-    </div>
-    <br>
 
-    Select generation:
-    <select name="generation">
-        <option value="8">Generation 8</option>
-        <option value="7">Generation 7</option>
-        <option value="6">Generation 6</option>
-        <option value="5">Generation 5</option>
-        <option value="4">Generation 4</option>
-        <option value="3">Generation 3</option>
-        <option value="2">Generation 2</option>
-        <option value="1">Generation 1</option>
-    </select></p>
-    <hr>
-    <input type="submit">
-</form>
+<h2>Find All Generation Sets</h2>
+<div style="background-color: rgb(255, 251, 226); border: solid; border-color: rgb(207, 204, 181); padding: 25px; width: auto">
+  <p style="font-size: 16px">This is the page to view competitive Pokemon sets for battling with Smogon standards. 
+      Data is collected by Smogon. Enter a Pokemon's name and select a given generation to view all of the top sets of that Pokemon
+      for all tiers in that generation.</p>
+  <br>
+  <form method="post" action="/allSets" autocomplete="off">
+      <div class="autocomplete" style="width:300px;">
+          <p style="font-size: 16px">Enter Pokemon: <input type="text" name="pokemon" id="monInput"></p>
+      </div>
+      <br>
+
+      <p style="font-size: 16px">Select generation:
+      <select name="generation">
+          <option value="8">Generation 8</option>
+          <option value="7">Generation 7</option>
+          <option value="6">Generation 6</option>
+          <option value="5">Generation 5</option>
+          <option value="4">Generation 4</option>
+          <option value="3">Generation 3</option>
+          <option value="2">Generation 2</option>
+          <option value="1">Generation 1</option>
+      </select></p>
+      <hr>
+      <input type="submit">
+  </form>
+</div>
 <hr>
 <h6>Name Format</h6>
 <p>Names of Pokemon must be typed in the proper format in order to search for Pokemon sets. The following is a list of specifics regarding name
