@@ -7082,6 +7082,9 @@ module.exports = {
               "Aerodactyl": [
                    "Stealth Rock Lead", 2, "P", "OL",
               ],
+              "Blissey": [
+               "Special Wall", 5, "P", "SW",
+               ],
               "Buzzwole": [
                    "Defensive", 3, "P", "BS",
                    "Bulky Attacker", 3, "P", "W",
@@ -7095,6 +7098,9 @@ module.exports = {
                    "SubSeed", 2, "P", "OS",
                    "Nasty Plot", 1, "P", "OS",
               ],
+              "Cinderace": [
+               "Physical Attacker", 2, "P", "W",
+               ],
               "Clefable": [
                    "Stealth Rock", 4, "S", "PW",
               ],
@@ -7123,14 +7129,17 @@ module.exports = {
               ],
               "Eternatus": [
                    "Specially Defensive", 4, "S", "SW",
-                   "Offensive", 1, "S", "W",
+                   "Meteor Beam", 1, "S", "W",
+                   "Life Orb", 1, "S", "W",
+                   "Physically Defensive", 3, "S", "PW"
               ],
               "Excadrill": [
                    "Entry Hazard Lead", 2, "P", "OL",
                    "Sand Rush", 2, "P", "OS",
               ],
               "Ferrothorn": [
-                   "Defensive", 4, "P", "PW",
+                   "Physically Defensive", 4, "P", "PW",
+                   "Specially Defensive", 4, "P", "SW",
               ],
               "Froslass": [
                    "Suicide Lead", 2, "S", "OL",
@@ -7163,11 +7172,12 @@ module.exports = {
                    "Defensive", 4, "P", "PW",
               ],
               "Heatran": [
-                   "Specially Defensive", 4, "S", "SW",
+                   "Specially Defensive Trapper", 4, "S", "SW",
               ],
               "Ho-Oh": [
                    "Defensive", 4, "P", "PW",
                    "Choice Band", 2, "P", "W",
+                   "Offensive", 3, "P", "W",
               ],
               "Hydreigon": [
                    "Life Orb", 1, "S", "W",
@@ -7178,6 +7188,9 @@ module.exports = {
                    "Choice Scarf", 1, "S", "RK",
                    "SubCM", 3, "S", "BS",
               ],
+              "Kyurem": [
+               "Pressure", 3, "P", "BS",
+               ],
               "Kyurem-Black": [
                    "Dragon Dance", 1, "P", "OS",
               ],
@@ -7195,7 +7208,7 @@ module.exports = {
               ],
               "Lunala": [
                    "Defensive", 4, "S", "S",
-                   "Power Herb", 2, "S", "W",
+                   "Meteor Beam", 2, "S", "W",
               ],
               "Magearna": [
                    "Physically Defensive", 4, "S", "PW",
@@ -7234,9 +7247,9 @@ module.exports = {
                    "Choice Band", 1, "P", "W",
               ],
               "Rayquaza": [
-                   "Dragon Dance", 1, "P", "OS",
-                   "Swords Dance", 1, "M", "W",
-                   "Choice Band", 1, "M", "W",
+                   "Choice Band", 1, "P", "W",
+                   "Swords Dance", 1, "P", "W",
+                   "MixQuaza", 1, "M", "W",
               ],
               "Regieleki": [
                    "Physical Attacker", 2, "P", "W",
@@ -7261,10 +7274,10 @@ module.exports = {
                    "FuturePort", 4, "M", "SW",
               ],
               "Spectrier": [
-                   "Substitute", 3, "S", "BS",
+                   "Hex", 3, "S", "BS",
               ],
               "Tangrowth": [
-                   "Defensive Pivot", 4, "M", "PW",
+                   "Sleeper", 4, "M", "PW",
               ],
               "Tapu Fini": [
                    "Trapper", 4, "S", "SB",
@@ -7276,7 +7289,7 @@ module.exports = {
                    "Nasty Plot", 1, "S", "OS",
               ],
               "Toxapex": [
-                   "Physically Defensive", 4, "M", "PW",
+                   "The Pex", 4, "M", "PW",
               ],
               "Tyranitar": [
                    "Specially Defensive", 4, "P", "SW",
@@ -7294,6 +7307,7 @@ module.exports = {
               "Xerneas": [
                    "Geomancy", 3, "S", "BS",
                    "Defensive", 4, "S", "PW",
+                   "Choice Scarf", 2, "S", "RK",
               ],
               "Yveltal": [
                    "Fast Utility", 3, "P", "S",
@@ -7301,19 +7315,19 @@ module.exports = {
                    "Hone Claws", 1, "P", "OS",
                    "Special Attacker", 2, "M", "W",
                    "Choice Scarf", 3, "P", "RK",
+                   "Physical Attacker", 2, "P", "W",
                    "Choice Band", 2, "P", "W",
               ],
               "Zamazenta": [
                    "Choice Band", 1, "P", "W",
               ],
-              "Zamazenta-Crowned": [
-                   "Howl", 1, "P", "OS",
-              ],
               "Zarude": [
-                   "Defensive", 4, "P", "SW",
+                   "Specially Defensive", 4, "P", "SW",
+                   "Physically Defensive", 4, "P", "PW",
               ],
               "Zekrom": [
                    "Dragon Dance", 1, "P", "OS",
+                   "Mixed", 1, "M", "W",
               ],
               "Zygarde": [
                    "Dragon Dance", 1, "P", "W",
@@ -7653,13 +7667,13 @@ module.exports = {
               ]
          },
          "UU": {
-              "Aegislash": [
-                   "SubToxic", 4, "S", "SW",
-                   "Choice Specs", 1, "M", "W",
-                   "Swords Dance", 1, "P", "W",
-                   "Autotomize", 1, "M", "OS",
-                   "King's Shield + Toxic", 3, "M", "W",
-              ],
+          //     "Aegislash": [
+          //          "SubToxic", 4, "S", "SW",
+          //          "Choice Specs", 1, "M", "W",
+          //          "Swords Dance", 1, "P", "W",
+          //          "Autotomize", 1, "M", "OS",
+          //          "King's Shield + Toxic", 3, "M", "W",
+          //     ],
               "Amoonguss": [
                    "Defensive", 4, "M", "PW",
               ],
@@ -7673,10 +7687,6 @@ module.exports = {
               "Azumarill": [
                    "Choice Band", 1, "P", "W",
                    "Belly Drum", 1, "P", "OS",
-                   "Assault Vest", 3, "P", "W",
-              ],
-              "Celebi": [
-                   "Defensive Stealth Rock", 4, "S", "PW",
               ],
               "Celesteela": [
                    "Defensive", 4, "M", "SW",
@@ -7689,8 +7699,8 @@ module.exports = {
               "Chansey": [
                    "Defensive", 4, "P", "SW",
               ],
-              "Charizard": [
-                   "Sun Wallbreaker", 1, "S", "W",
+              "Cloyster": [
+                    "Shell Smash Sweeper", 1, "M", "OS",
               ],
               "Cobalion": [
                    "Utility", 2, "M", "S",
@@ -7705,15 +7715,18 @@ module.exports = {
               "Cresselia": [
                    "Trick Room Setter", 4, "S", "S",
               ],
+              "Crobat": [
+                    "Pivot", 2, "P", "S",
+              ],
               "Darmanitan": [
                    "Choice Scarf", 1, "P", "RK",
               ],
               "Darmanitan-Zen": [
                    "Choice Scarf", 1, "P", "RK",
               ],
-              "Diancie": [
-                   "Defensive", 4, "P", "S",
-              ],
+              "Dhelmise": [
+                    "Defensive Spinner", 4, "P", "PW",
+               ],
               "Diggersby": [
                    "Swords Dance", 1, "P", "W",
                    "Choice Scarf", 2, "P", "RK",
@@ -7729,12 +7742,11 @@ module.exports = {
                    "Swords Dance", 2, "P", "OS",
                    "Suicide Lead", 2, "P", "OL",
               ],
+              "Flygon": [
+                    "Defog", 2, "S", "S",
+              ],
               "Froslass": [
                    "Suicide Lead", 2, "P", "OL",
-              ],
-              "Gardevoir": [
-                   "Choice Scarf", 2, "S", "RK",
-                   "Offensive", 1, "S", "W",
               ],
               "Gastrodon": [
                    "Mixed Wall", 4, "M", "MW",
@@ -7745,31 +7757,27 @@ module.exports = {
               "Hatterene": [
                    "Calm Mind", 3, "S", "BS",
               ],
-              "Heracross": [
-                   "Guts Wallbreaker", 1, "P", "W",
+              "Hippowdon": [
+                    "Stealth Rock", 4, "P", "MW",
               ],
               "Hydreigon": [
+                   "HYDREIGON SPECS", 1, "S", "W",
                    "Choice Scarf", 1, "M", "RK",
-                   "Three Attacks", 2, "S", "W",
-                   "Nasty Plot", 1, "S", "W",
               ],
-              "Indeedee-F": [
-                   "Terrain Setter", 2, "S", "W",
+              "Inteleon": [
+                   "Offensive Pivot", 2, "M", "W",
+              ],
+              "Jellicent": [
+                   "Utility", 4, "S", "PW",
               ],
               "Jirachi": [
                    "Choice Scarf", 2, "P", "RK",
+                   "SubToxic", 3, "P", "S",
                    "Wish + Protect", 4, "P", "S",
                    "Stealth Rock", 4, "P", "S",
               ],
               "Keldeo": [
                    "Choice Specs", 1, "S", "W",
-                   "Calm Mind", 1, "S", "OS",
-              ],
-              "Kingdra": [
-                   "Rain Sweeper", 1, "S", "OS",
-              ],
-              "Klefki": [
-                   "Spikes", 4, "P", "S",
               ],
               "Krookodile": [
                    "Stealth Rock", 2, "P", "S",
@@ -7779,14 +7787,14 @@ module.exports = {
               "Lycanroc-Dusk": [
                    "All-out Attacker", 1, "P", "RK",
               ],
+              "Magneton": [
+                    "Choice Specs Trapper", 2, "S", "W",
+               ],
               "Mamoswine": [
                    "Wallbreaker", 1, "P", "W",
               ],
               "Mandibuzz": [
                    "Physically Defensive", 4, "P", "PW",
-              ],
-              "Mantine": [
-                   "Defensive", 4, "S", "PW",
               ],
               "Marowak-Alola": [
                    "Trick Room Wallbreaker", 1, "P", "W",
@@ -7794,10 +7802,6 @@ module.exports = {
               "Moltres": [
                    "Offensive", 2, "M", "W",
                    "Support", 2, "M", "S",
-              ],
-              "Moltres-Galar": [
-                   "Double Dance", 1, "S", "OS",
-                   "RestTalk", 4, "S", "SW",
               ],
               "Necrozma": [
                    "Dragon Dance", 1, "P", "OS",
@@ -7819,9 +7823,6 @@ module.exports = {
               "Obstagoon": [
                    "Guts", 2, "P", "W",
               ],
-              "Polteageist": [
-                   "Shell Smash Sweeper", 2, "S", "OS",
-              ],
               "Porygon2": [
                    "Trick Room Setter", 4, "P", "S",
               ],
@@ -7834,13 +7835,14 @@ module.exports = {
                    "Unaware Wall", 4, "M", "PW",
               ],
               "Raikou": [
-                   "Substitute + Calm Mind", 2, "S", "OS",
+                   "Pivot", 2, "S", "W",
               ],
               "Regidrago": [
                    "Choice Scarf", 1, "S", "RK",
               ],
               "Registeel": [
                    "Defensive", 4, "P", "SW",
+                   "Demon Regi (Defensive Setup)", 4, "P", "BS"
               ],
               "Reuniclus": [
                    "Assault Vest", 4, "S", "SW",
@@ -7871,6 +7873,11 @@ module.exports = {
               "Salazzle": [
                    "Offensive", 2, "M", "W",
               ],
+              "Scizor": [
+                   "Bulky Swords Dance", 3, "P", "BS",
+                   "3 Attacks + Roost", 4, "P", "MW",
+                   "Offensive Swords Dance", 1, "P", "OS",
+              ],
               "Scolipede": [
                    "Swords Dance", 1, "P", "OS",
                    "Suicide Lead", 2, "P", "OL",
@@ -7879,8 +7886,8 @@ module.exports = {
                    "Defensive Stealth Rock", 4, "M", "PW",
                    "Rain Sweeper", 2, "S", "OS",
               ],
-              "Sirfetch'd": [
-                   "Leek Wallbreaker", 1, "P", "W",
+              "Sigilyph": [
+                   "Offensive Defog", 2, "S", "W",
               ],
               "Skarmory": [
                    "Physical Wall", 4, "P", "PW",
@@ -7903,10 +7910,7 @@ module.exports = {
                    "CroCune", 3, "S", "BS",
               ],
               "Swampert": [
-                   "Physically Defensive", 4, "P", "PW",
-              ],
-              "Sylveon": [
-                   "Cleric", 4, "S", "S",
+                   "Mixed Wall", 4, "P", "MW",
               ],
               "Tangrowth": [
                    "Assault Vest", 4, "M", "SW",
@@ -7920,8 +7924,8 @@ module.exports = {
                    "Defensive Spinner", 4, "M", "S",
               ],
               "Thundurus-Therian": [
-                   "Nasty Plot", 1, "S", "W",
                    "Pivot", 2, "S", "W",
+                   "Nasty Plot", 1, "S", "W",
               ],
               "Togekiss": [
                    "Nasty Plot", 3, "S", "W",
@@ -7946,12 +7950,6 @@ module.exports = {
               "Venusaur": [
                    "Chlorophyll Sweeper", 1, "S", "OS",
               ],
-              "Volcanion": [
-                   "Defog", 2, "S", "W",
-              ],
-              "Weezing-Galar": [
-                   "Support", 4, "S", "S",
-              ],
               "Zarude": [
                    "Offensive Pivot", 2, "P", "S",
                    "Choice Scarf", 2, "P", "RK",
@@ -7964,10 +7962,19 @@ module.exports = {
               ]
          },
          "RU": {
+               "Abomasnow": [
+                    "Hail Setter", 2, "P", "OS",
+               ],
               "Aerodactyl": [
                    "Dragon Dance", 1, "P", "OS",
                    "3 Attacks + Roost", 1, "P", "W",
               ],
+              "Arctovish": [
+                    "Hail Wallbreaker", 1, "M", "W"
+               ],
+               "Aurorus": [
+                    "Hail Lead", 2, "S", "OL",
+               ],
               "Barbaracle": [
                    "Shell Smash", 1, "P", "OS",
               ],
@@ -7979,32 +7986,17 @@ module.exports = {
                    "Specially Defensive", 4, "P", "SW",
               ],
               "Celebi": [
-                   "Utility", 4, "S", "S",
-                   "Choice Scarf", 2, "S", "RK",
+                   "Nasty Plot", 2, "S", "OS",
               ],
               "Chandelure": [
                    "Wallbreaker", 2, "S", "W",
               ],
-              "Charizard": [
-                   "Sun Wallbreaker", 1, "S", "W",
-              ],
-              "Cobalion": [
-                   "Offensive Utility", 2, "S", "S",
-                   "Swords Dance", 1, "P", "OS",
-              ],
               "Cresselia": [
+                   "Choice Scarf", 2, "S", "S",
                    "Defensive", 4, "S", "PW",
               ],
               "Crobat": [
                    "Pivot", 2, "P", "S",
-              ],
-              "Darmanitan": [
-                   "Heavy-Duty Boots",
-                   "Choice Scarf"
-              ],
-              "Darmanitan-Zen": [
-                   "Heavy-Duty Boots", 1, "P", "W",
-                   "Choice Scarf", 1, "P", "RK",
               ],
               "Decidueye": [
                    "Choice Band", 1, "P", "W",
@@ -8049,8 +8041,11 @@ module.exports = {
               "Golurk": [
                    "Wallbreaker", 2, "P", "W",
               ],
+              "Guzzlord": [
+                    "Tank", 3, "P", "W"
+              ],
               "Heracross": [
-                   "Guts Wallbreaker", 1, "P", "W",
+                   "Flame Orb", 1, "P", "W",
                    "Choice Scarf", 1, "P", "RK",
               ],
               "Incineroar": [
@@ -8099,9 +8094,6 @@ module.exports = {
               "Noivern": [
                    "Offensive Utility", 2, "S", "W",
               ],
-              "Obstagoon": [
-                   "Guts Wallbreaker", 1, "P", "W",
-              ],
               "Pangoro": [
                    "Wallbreaker", 1, "P", "W",
               ],
@@ -8135,6 +8127,9 @@ module.exports = {
                    "Defensive Calm Mind", 3, "S", "BS",
                    "Assault Vest", 4, "S", "SW",
               ],
+              "Rhyperior": [
+                    "Stealth Rock", 4, "P", "MW",
+              ],
               "Ribombee": [
                    "Sticky Web", 2, "M", "OL",
               ],
@@ -8144,12 +8139,12 @@ module.exports = {
               "Salazzle": [
                    "Wallbreaker", 2, "S", "W",
               ],
+              "Sandslash-Alola": [
+                    "Hail Sweeper", 1, "P", "OS"
+              ],
               "Sharpedo": [
                    "Specially-based Mixed Cleaner", 1, "M", "OS",
                    "Physical Cleaner", 1, "P", "OS",
-              ],
-              "Shiftry": [
-                   "Sun Sweeper", 1, "P", "OS",
               ],
               "Sigilyph": [
                    "Life Orb Attacker", 1, "S", "W",
@@ -8186,9 +8181,6 @@ module.exports = {
                    "Nasty Plot", 3, "S", "BS",
                    "Utility", 4, "S", "S",
               ],
-              "Torkoal": [
-                   "Sun Support", 4, "S", "PW",
-              ],
               "Tornadus": [
                    "Offensive Utility", 2, "M", "S",
                    "Nasty Plot", 1, "S", "W",
@@ -8212,11 +8204,7 @@ module.exports = {
               "Vileplume": [
                    "Physically Defensive", 4, "S", "PW",
               ],
-              "Volcanion": [
-                   "Wallbreaker", 1, "S", "W",
-              ],
               "Weezing-Galar": [
-                   "Misty Terrain", 4, "S", "S",
                    "Defensive", 4, "S", "PW",
               ],
               "Xatu": [
@@ -8247,14 +8235,11 @@ module.exports = {
               "Aurorus": [
                    "Hail Setter", 2, "S", "S",
               ],
-              "Beartic": [
-                   "Hail Sweeper", 1, "P", "OS",
-              ],
               "Blastoise": [
                    "Shell Smash", 1, "S", "OS",
               ],
               "Braviary": [
-                   "Offensive", 1, "P", "W",
+                   "Substitute + Bulk Up", 3, "P", "BS",
               ],
               "Comfey": [
                    "Calm Mind", 3, "S", "BS",
@@ -8275,6 +8260,9 @@ module.exports = {
               "Diancie": [
                    "Stealth Rock", 4, "M", "S",
               ],
+              "Doublade": [
+                    "Swords Dance", 3, "P", "BS"
+              ],
               "Dragalge": [
                    "Utility", 2, "S", "W",
               ],
@@ -8292,6 +8280,12 @@ module.exports = {
                    "Swords Dance", 1, "P", "W",
                    "Specially Defensive", 4, "P", "SW",
               ],
+              "Espeon": [
+                    "Wallbreaker", 2, "S", "W"
+               ],
+               "Exeggutor-Alola": [
+                    "Pivot", 2, "S", "W"
+               ],
               "Exploud": [
                    "DAT LOUD", 1, "S", "W",
               ],
@@ -8307,6 +8301,10 @@ module.exports = {
               "Golurk": [
                    "Choice Band", 1, "P", "W",
               ],
+              "Grimmsnarl": [
+                    "Bulk Up", 3, "P", "BS",
+                    "Choice Band", 2, "P", "W"
+               ],
               "Guzzlord": [
                    "Choice Band", 1, "P", "W",
                    "Physically Defensive", 4, "P", "PW",
@@ -8316,12 +8314,17 @@ module.exports = {
                    "Choice Scarf", 1, "S", "RK",
               ],
               "Indeedee-F": [
-                   "Choice Specs", 1, "S", "W",
                    "Choice Scarf", 2, "S", "RK",
               ],
+              "Inteleon": [
+                    "Choice Specs", 1, "S", "W"
+               ],
               "Kingdra": [
                    "CritDra", 1, "S", "OS",
               ],
+              "Lycanroc": [
+                    "Sand Rush Sweeper", 1, "P", "OS"
+               ],
               "Machamp": [
                    "Guts Wallbreaker", 1, "P", "W",
               ],
@@ -8336,7 +8339,6 @@ module.exports = {
               ],
               "Omastar": [
                    "Shell Smash", 1, "S", "OS",
-                   "Lead", 2, "S", "OL",
               ],
               "Palossand": [
                    "Physically Defensive", 4, "S", "PW",
@@ -8355,9 +8357,15 @@ module.exports = {
               "Salazzle": [
                    "Nasty Plot", 1, "S", "OS",
               ],
+              "Sandslash": [
+                    "Sand Rush Sweeper", 1, "P", "OS"
+               ],
               "Scrafty": [
                    "Defensive Bulk Up", 3, "P", "BS",
               ],
+              "Scyther": [
+                    "Offensive Pivot", 2, "P", "S",
+               ],
               "Silvally-Fairy": [
                    "Swords Dance", 1, "P", "OS",
               ],
@@ -8376,6 +8384,13 @@ module.exports = {
               "Sneasel": [
                    "Wallbreaker", 1, "P", "W",
               ],
+              "Snorlax": [
+                    "CurseLax", 4, "P", "BS"
+               ],
+               "Stakataka": [
+                    "Offensive Trick Room", 1, "P", "W",
+                    "Utility", 4, "P", "MW"
+               ],
               "Starmie": [
                    "Wallbreaker", 2, "S", "W",
               ],
@@ -8395,6 +8410,10 @@ module.exports = {
               "Tauros": [
                    "All-out Attacker", 1, "P", "W",
               ],
+              "Togedemaru": [
+                    "Defensive Pivot", 4, "P", "S",
+                    "Choice Scarf", 2, "P", "RK"
+               ],
               "Toxicroak": [
                    "Swords Dance", 1, "P", "W",
               ],
@@ -8655,11 +8674,9 @@ module.exports = {
               "Hitmonlee": [
                    "Terrain Sweeper", 1, "P", "OS",
               ],
-              "Hitmontop": [
-                   "Offensive", 2, "P", "W",
-              ],
               "Jellicent": [
                    "Defensive Utility", 4, "S", "PW",
+                   "Special Wallbreaker", 2, "S", "W",
               ],
               "Jolteon": [
                    "Utility", 2, "S", "W",
@@ -8687,7 +8704,6 @@ module.exports = {
               ],
               "Lanturn": [
                    "Bulky Pivot", 4, "S", "MW",
-                   "Assault Vest", 4, "S", "SW",
               ],
               "Lapras": [
                    "RestTalk", 4, "S", "SW",
@@ -8779,8 +8795,8 @@ module.exports = {
                    "Defensive", 4, "S", "PW",
               ],
               "Perrserker": [
+                   "Swords Dance", 1, "P", "W",
                    "Choice Band", 1, "P", "W",
-                   "Assault Vest", 3, "P", "W",
               ],
               "Persian": [
                    "Revenge Killer", 1, "P", "RK",
@@ -8822,7 +8838,7 @@ module.exports = {
                    "Swords Dance", 1, "P", "OS",
               ],
               "Rapidash-Galar": [
-                   "Terrain Sweeper", 3, "S", "BS",
+                   "Grassy Seed Sweeper", 3, "S", "BS",
               ],
               "Regice": [
                    "Rock Polish", 1, "S", "OS",
@@ -9041,28 +9057,16 @@ module.exports = {
               "Chinchou": [
                    "Offensive Pivot", 2, "S", "W",
               ],
-              "Corphish": [
-                   "Wallbreaker", 1, "P", "W",
-              ],
               "Cottonee": [
                    "Memento", 2, "M", "S",
               ],
               "Croagunk": [
                    "Nasty Plot", 1, "S", "OS",
               ],
-              "Cufant": [
-                   "Bulky Attacker", 3, "P", "W",
-              ],
-              "Darumaka-Galar": [
-                   "Choice Scarf", 1, "P", "RKW",
-              ],
               "Diglett": [
                    "Air Balloon", 2, "P", "SB",
                    "Eviolite", 2, "P", "W",
                    "Life Orb", 1, "P", "W",
-              ],
-              "Drilbur": [
-                   "Offensive Rapid Spin", 2, "P", "W",
               ],
               "Dwebble": [
                    "Suicide Lead", 2, "P", "OL",
@@ -9072,20 +9076,20 @@ module.exports = {
                    "Offensive", 1, "M", "W",
               ],
               "Farfetch'd-Galar": [
-                   "Swords Dance", 1, "P", "W",
                    "Choice Scarf", 1, "P", "RK",
               ],
               "Ferroseed": [
                    "Defensive Support", 1, "P", "W",
               ],
               "Foongus": [
-                   "Defensive Pivot", 4, "M", "MW",
+                   "Tank", 4, "S", "MW",
               ],
               "Frillish": [
                    "Special Tank", 4, "S", "MW",
               ],
               "Grookey": [
                    "Offensive", 2, "P", "W",
+                   "Eviolite", 2, "P", "W",
               ],
               "Kabuto": [
                    "Support", 2, "P", "S",
@@ -9093,11 +9097,8 @@ module.exports = {
               "Koffing": [
                    "Offensive", 3, "S", "W",
               ],
-              "Krabby": [
-                   "Wallbreaker", 1, "P", "W",
-              ],
               "Larvesta": [
-                   "Defensive Pivot", 4, "P", "PW",
+                   "Physically Defensive Pivot", 4, "P", "PW",
               ],
               "Lickitung": [
                    "Defensive", 4, "P", "MW",
@@ -9106,8 +9107,9 @@ module.exports = {
                    "Belly Drum Sweeper", 1, "P", "OS",
               ],
               "Magnemite": [
-                   "SturdyJuice", 2, "S", "W",
                    "Choice Scarf", 2, "S", "RK",
+                   "Berry Juice", 3, "S", "W",
+                   "Trapper", 2, "S", "SB",
               ],
               "Mareanie": [
                    "Wall", 4, "M", "MW",
@@ -9125,31 +9127,28 @@ module.exports = {
                    "RestTalk", 4, "P", "MW",
               ],
               "Munchlax": [
-                   "CurseLax", 3, "P", "BS",
+                   "Defensive", 4, "P", "BS",
               ],
               "Natu": [
                    "Bulky Attacker", 3, "M", "W",
                    "Setup Sweeper", 2, "S", "OS",
                    "Dual Screens Support", 5, "S", "S",
               ],
-              "Oddish": [
-                   "Defensive", 4, "S", "PW",
-              ],
               "Omanyte": [
                    "Shell Smash Sweeper", 1, "S", "OS",
                    "Entry Hazard Setter", 3, "M", "S",
               ],
               "Onix": [
+                   "SturdyJuice", 2, "P", "S",
+                   "Dragon Dance", 1, "P", "OS",
                    "Weak Armor", 3, "P", "S",
-                   "Sturdy", 2, "P", "S",
-                   "Rock Head", 2, "P", "W",
               ],
               "Pawniard": [
                    "Berry Juice", 2, "P", "W",
               ],
               "Ponyta": [
-                   "Eviolite", 1, "P", "W",
-                   "Berry Juice", 4, "P", "MW",
+                   "Berry Juice Attacker", 1, "P", "W",
+                   "Eviolite", 4, "P", "MW",
               ],
               "Ponyta-Galar": [
                    "Calm Mind", 2, "S", "OS",
@@ -9169,13 +9168,13 @@ module.exports = {
                    "Shell Smash", 1, "P", "OS",
               ],
               "Shellos": [
-                   "Defensive", 4, "S", "MW",
+                   "Curse Sweeper", 4, "P", "BS",
               ],
               "Skrelp": [
                    "Special Attacker", 2, "S", "W",
               ],
               "Slowpoke": [
-                   "Bulky Pivot", 4, "S", "MW",
+                   "Pivot", 4, "S", "MW",
               ],
               "Snover": [
                    "Hail Setter", 2, "M", "S",
@@ -9184,19 +9183,21 @@ module.exports = {
                    "Dual Screens", 4, "M", "S",
               ],
               "Spritzee": [
-                   "Nasty Plot", 2, "S", "OS",
                    "Defensive", 4, "M", "S",
+                   "Nasty Plot", 2, "S", "OS",
               ],
               "Staryu": [
                    "Offensive", 1, "S", "W",
                    "Defensive", 4, "M", "PW",
               ],
+              "Stunky": [
+                    "Wallbreaker", 1, "M", "W"
+               ],
               "Tentacool": [
                    "Defensive Utility", 4, "M", "MW",
               ],
               "Timburr": [
                    "Bulky Attacker", 3, "P", "W",
-                   "Bulk Up", 3, "P", "BS",
               ],
               "Tirtouga": [
                    "Defensive", 4, "P", "MW",
@@ -9209,17 +9210,15 @@ module.exports = {
                    "Sweeper", 1, "P", "OS",
               ],
               "Tyrunt": [
-                   "Dragon Dance", 1, "P", "OS",
+                   "Dragon Dance Sweeper", 1, "P", "OS",
               ],
+              "Venipede": [
+                    "Spikes Setter", 2, "P", "OL"
+               ],
               "Vulpix": [
-                   "Choice Item", 2, "S", "RK",
+                   "Sun Setter", 2, "S", "W",
+                   "Choice Scarf", 2, "S", "RK"
               ],
-              "Wingull": [
-                   "Life Orb", 1, "M", "W",
-              ],
-              "Wynaut": [
-                   "Trapper", 5, "M", "S",
-              ]
          }
     }
 }

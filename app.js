@@ -150,18 +150,18 @@ async (req,res,next) => {
       genTierSets = response.data.dex[pokemon];
 
       // ********************************** //
-      // let setNameDict = {};
-      // for (const mon of Object.keys(response.data.dex).sort()) {
-      //   theSets = Object.keys(response.data.dex[mon]);
-      //   setNameDict[mon] = theSets;
-      // }
-      // let tierDict = {};
-      // tierDict[tier] = setNameDict;
-      // let genDict = {};
-      // genDict[generation] = tierDict;
-      // res.locals.tierDict = tierDict;
-      // res.locals.genDict = genDict;
-      //res.locals.genTierSetsDex = genTierSetsDex;
+      let setNameDict = {};
+      for (const mon of Object.keys(response.data.dex).sort()) {
+        theSets = Object.keys(response.data.dex[mon]);
+        setNameDict[mon] = theSets;
+      }
+      let tierDict = {};
+      tierDict[tier] = setNameDict;
+      let genDict = {};
+      genDict[generation] = tierDict;
+      res.locals.tierDict = tierDict;
+      res.locals.genDict = genDict;
+      res.locals.genTierSetsDex = genTierSetsDex;
       // ********************************** //
 
       if (genTierSets != null) {
@@ -1503,91 +1503,91 @@ function getPokemonLowerCase(pokemon) {
   return pokemonLowerCase;
 }
 
-function getPokemonLowerCaseSprite(pokemon) {
-  let pokemonLowerCase = "";
-  if (pokemon == "Mr. Mime") {
-    pokemonLowerCase = "mr-mime"
-  }
-  else if (pokemon == "Mr. Mime-Galar") {
-    pokemonLowerCase = "mr-mime-galar"
-  }
-  else if (pokemon == "Mr. Rime") {
-    pokemonLowerCase = "mr-rime"
-  }
-  else if (pokemon == "Mime Jr.") {
-    pokemonLowerCase = "mime-jr"
-  }
-  else if (pokemon == "Nidoran") {
-    pokemonLowerCase = "nidoran-m"
-  }
-  else if (pokemon == "Farfetch'd") {
-    pokemonLowerCase = "farfetchd"
-  }
-  else if (pokemon == "Sirfetch'd") {
-    pokemonLowerCase = "sirfetchd"
-  }
-  else if (pokemon == "Charizard-Mega-X") {
-    pokemonLowerCase = "charizard-mega-x"
-  }
-  else if (pokemon == "Charizard-Mega-Y") {
-    pokemonLowerCase = "charizard-mega-y"
-  }
-  else if (pokemon == "Mewtwo-Mega-X") {
-    pokemonLowerCase = "mewtwo-mega-x"
-  }
-  else if (pokemon == "Mewtwo-Mega-Y") {
-    pokemonLowerCase = "mewtwo-mega-y"
-  }
-  else if (pokemon == "Zygarde-10%") {
-    pokemonLowerCase = "zygarde-10"
-  }
-  else if (pokemon == "Zygarde-Complete") {
-    pokemonLowerCase = "zygarde-complete"
-  }
-  else if (pokemon == "Tapu Koko") {
-    pokemonLowerCase = "tapu-koko"
-  }
-  else if (pokemon == "Tapu Lele") {
-    pokemonLowerCase = "tapu-lele"
-  }
-  else if (pokemon == "Tapu Fini") {
-    pokemonLowerCase = "tapu-fini"
-  }
-  else if (pokemon == "Tapu Bulu") {
-    pokemonLowerCase = "tapu-bulu"
-  }
-  else if (pokemon == "Darmanitan-Galar-Zen") {
-    pokemonLowerCase = "darmanitan-galar-zen"
-  }
-  else if (pokemon == "Oricorio-Pau'") {
-    pokemonLowerCase = "oricorio-pau"
-  }
-  else if (pokemon == "Oricorio-Pom-Pom") {
-    pokemonLowerCase = "oricorio-pom-pom"
-  }
-  else if (pokemon == "Type: Null") {
-    pokemonLowerCase = "type-null"
-  }
-  else if (pokemon == "Necrozma-Dawn-Wings") {
-    pokemonLowerCase = "necrozma-dawn"
-  }
-  else if (pokemon == "Necrozma-Dusk-Mane") {
-    pokemonLowerCase = "necrozma-dusk"
-  }
-  else if (pokemon == "Urshifu-Rapid-Strike") {
-    pokemonLowerCase = "urshifu"
-  }
-  else if (pokemon == "Calyrex-Ice") {
-    pokemonLowerCase = "calyrex-ice-rider"
-  }
-  else if (pokemon == "Calyrex-Shadow") {
-    pokemonLowerCase = "calyrex-shadow-rider"
-  }
-  else {
-    pokemonLowerCase = pokemon.toLowerCase();
-  }
-  return pokemonLowerCase;
-}
+// function getPokemonLowerCaseSprite(pokemon) {
+//   let pokemonLowerCase = "";
+//   if (pokemon == "Mr. Mime") {
+//     pokemonLowerCase = "mr-mime"
+//   }
+//   else if (pokemon == "Mr. Mime-Galar") {
+//     pokemonLowerCase = "mr-mime-galar"
+//   }
+//   else if (pokemon == "Mr. Rime") {
+//     pokemonLowerCase = "mr-rime"
+//   }
+//   else if (pokemon == "Mime Jr.") {
+//     pokemonLowerCase = "mime-jr"
+//   }
+//   else if (pokemon == "Nidoran") {
+//     pokemonLowerCase = "nidoran-m"
+//   }
+//   else if (pokemon == "Farfetch'd") {
+//     pokemonLowerCase = "farfetchd"
+//   }
+//   else if (pokemon == "Sirfetch'd") {
+//     pokemonLowerCase = "sirfetchd"
+//   }
+//   else if (pokemon == "Charizard-Mega-X") {
+//     pokemonLowerCase = "charizard-mega-x"
+//   }
+//   else if (pokemon == "Charizard-Mega-Y") {
+//     pokemonLowerCase = "charizard-mega-y"
+//   }
+//   else if (pokemon == "Mewtwo-Mega-X") {
+//     pokemonLowerCase = "mewtwo-mega-x"
+//   }
+//   else if (pokemon == "Mewtwo-Mega-Y") {
+//     pokemonLowerCase = "mewtwo-mega-y"
+//   }
+//   else if (pokemon == "Zygarde-10%") {
+//     pokemonLowerCase = "zygarde-10"
+//   }
+//   else if (pokemon == "Zygarde-Complete") {
+//     pokemonLowerCase = "zygarde-complete"
+//   }
+//   else if (pokemon == "Tapu Koko") {
+//     pokemonLowerCase = "tapu-koko"
+//   }
+//   else if (pokemon == "Tapu Lele") {
+//     pokemonLowerCase = "tapu-lele"
+//   }
+//   else if (pokemon == "Tapu Fini") {
+//     pokemonLowerCase = "tapu-fini"
+//   }
+//   else if (pokemon == "Tapu Bulu") {
+//     pokemonLowerCase = "tapu-bulu"
+//   }
+//   else if (pokemon == "Darmanitan-Galar-Zen") {
+//     pokemonLowerCase = "darmanitan-galar-zen"
+//   }
+//   else if (pokemon == "Oricorio-Pau'") {
+//     pokemonLowerCase = "oricorio-pau"
+//   }
+//   else if (pokemon == "Oricorio-Pom-Pom") {
+//     pokemonLowerCase = "oricorio-pom-pom"
+//   }
+//   else if (pokemon == "Type: Null") {
+//     pokemonLowerCase = "type-null"
+//   }
+//   else if (pokemon == "Necrozma-Dawn-Wings") {
+//     pokemonLowerCase = "necrozma-dawn"
+//   }
+//   else if (pokemon == "Necrozma-Dusk-Mane") {
+//     pokemonLowerCase = "necrozma-dusk"
+//   }
+//   else if (pokemon == "Urshifu-Rapid-Strike") {
+//     pokemonLowerCase = "urshifu"
+//   }
+//   else if (pokemon == "Calyrex-Ice") {
+//     pokemonLowerCase = "calyrex-ice-rider"
+//   }
+//   else if (pokemon == "Calyrex-Shadow") {
+//     pokemonLowerCase = "calyrex-shadow-rider"
+//   }
+//   else {
+//     pokemonLowerCase = pokemon.toLowerCase();
+//   }
+//   return pokemonLowerCase;
+// }
 
 
 

@@ -45,19 +45,16 @@
             <% if(generation >= 6){%> 
                 <img 
                 src="http://play.pokemonshowdown.com/sprites/ani/<%= pokemonLowercase %>.gif"
-                width="150"
                 alt="Sprite of <%= pokemon %>">
             <% } %>
             <% if(generation == 5){%> 
                 <img 
                 src="http://play.pokemonshowdown.com/sprites/gen5ani/<%= pokemonLowercase %>.gif"
-                width="150"
                 alt="Sprite of <%= pokemon %>">
             <% } %> 
             <% if(generation < 5){%> 
                 <img 
                 src="http://play.pokemonshowdown.com/sprites/gen<%= generation %>/<%= pokemonLowercase %>.png"
-                width="150"
                 alt="Sprite of <%= pokemon %>">
             <% } %> 
         <% } %> 
