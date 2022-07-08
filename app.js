@@ -43,7 +43,7 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {console.log("we are connected!!!")});
 
-// middleware to test is the user is logged in, and if not, send them to the login page
+// middleware to test if the user is logged in, and if not, send them to the login page
 const isLoggedIn = (req,res,next) => {
   if (res.locals.loggedIn) {
     next()
