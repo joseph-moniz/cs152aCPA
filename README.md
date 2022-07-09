@@ -35,7 +35,11 @@ The following packages will be needed to use the app locally:
 ### Screenshots
 <details>
   <summary>Screenshot Demos</summary>
-
+  
+  #### Home Page
+  ![home page](https://user-images.githubusercontent.com/58448341/178093629-0f933aee-aa1a-4aa5-949c-8efeb0189d0e.png)
+  
+  
   #### View Sets Features
   ![view sets example](https://user-images.githubusercontent.com/58448341/178093481-a5150dfb-c977-4046-afac-5cccb596791b.png)
   ![view sets output](https://user-images.githubusercontent.com/58448341/178093488-d3da2489-ae89-4248-b222-ff4cc9f8e226.png)
@@ -55,8 +59,6 @@ The following packages will be needed to use the app locally:
   ![team summary 2](https://user-images.githubusercontent.com/58448341/178093536-6bed2898-0e6a-4cd0-84fa-8d380fb97f11.png)
   ![team summary 3](https://user-images.githubusercontent.com/58448341/178093540-5da012dd-30d1-4a7f-960e-3c56932d59e2.png)
   ![threatlist example](https://user-images.githubusercontent.com/58448341/178093545-3f2a6d8b-fc75-4d2c-97db-646af3a8cd4d.png)
-  
-  #### Home Page
-  ![home page](https://user-images.githubusercontent.com/58448341/178093629-0f933aee-aa1a-4aa5-949c-8efeb0189d0e.png)
+
 
 </details>
