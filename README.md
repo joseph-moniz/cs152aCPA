@@ -36,7 +36,7 @@ The following packages will be needed to use the app locally:
 <details>
   <summary>Screenshot Demos</summary>
   #### Home Page
-  ![home page](https://user-images.githubusercontent.com/58448341/178093363-42937d3f-ce5c-40a6-a4a9-d09a78ce50c5.png)
+  ![home page](https://user-images.githubusercontent.com/58448341/178093557-38fbbfa9-a7fa-4c83-8516-977c803fda1f.png)
 
   #### View Sets Features
   ![view sets example](https://user-images.githubusercontent.com/58448341/178093481-a5150dfb-c977-4046-afac-5cccb596791b.png)
@@ -51,7 +51,6 @@ The following packages will be needed to use the app locally:
   #### Teambuilder Helper
   ![teambuilder helper 1](https://user-images.githubusercontent.com/58448341/178093524-ac51e6e1-d379-446a-b251-9d9d6e764eb0.png)
   ![teambuilder helper 2](https://user-images.githubusercontent.com/58448341/178093523-5826720b-5d77-43b7-a7e5-6e288fb329e9.png)
-
 
   #### Team Summary Page
   ![team summary 1](https://user-images.githubusercontent.com/58448341/178093531-cb4ea4b4-c634-4b60-95ba-82d77a934483.png)
