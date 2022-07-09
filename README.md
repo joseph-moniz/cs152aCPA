@@ -29,4 +29,24 @@ The following packages will be needed to use the app locally:
   `npm install express-session`
   
   `npm install connect-mongodb-session`
+  
+  
+  
+### Screenshots
+  
+  
+#### Home Page
+  ![home page](https://user-images.githubusercontent.com/58448341/178093363-42937d3f-ce5c-40a6-a4a9-d09a78ce50c5.png)
+
+  
+#### View Sets Features
+  
+  
+#### Usage Statistics Features
+
+
+#### Teambuilder Helper
+
+
+#### Team Summary Page
 
