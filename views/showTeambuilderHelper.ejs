@@ -35,7 +35,7 @@
                         <% for (pokemon of Object.keys(genTierSetsDex[generation][tier])) {%>
                             <% if (members != null){%>
                                 <% if (memberNames.includes(pokemon)){%>
-                                    <option disabled>
+                                    <option style="background-color: rgb(15, 178, 15, 0.25);" disabled>
                                         <%= pokemon %>
                                     </option>
                                 <% } else {%>
