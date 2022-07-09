@@ -33,20 +33,29 @@ The following packages will be needed to use the app locally:
   
   
 ### Screenshots
-  
-  
-#### Home Page
+<details>
+  <summary>Screenshot Demos</summary>
+  #### Home Page
   ![home page](https://user-images.githubusercontent.com/58448341/178093363-42937d3f-ce5c-40a6-a4a9-d09a78ce50c5.png)
 
-  
-#### View Sets Features
-  
-  
-#### Usage Statistics Features
+  #### View Sets Features
+  ![view sets example](https://user-images.githubusercontent.com/58448341/178093481-a5150dfb-c977-4046-afac-5cccb596791b.png)
+  ![view sets output](https://user-images.githubusercontent.com/58448341/178093488-d3da2489-ae89-4248-b222-ff4cc9f8e226.png)
+  ![view allsets output](https://user-images.githubusercontent.com/58448341/178093494-fa084354-16e6-4064-8790-6cb8424f3699.png)
+
+  #### Usage Statistics Features
+  ![usage stats example](https://user-images.githubusercontent.com/58448341/178093505-4d448304-e8fb-4151-8daa-3527e5bca39c.png)  
+  ![usage stats tier output](https://user-images.githubusercontent.com/58448341/178093507-e2fbb1c6-2631-4f15-bdce-d1eb9fa2b31d.png)
+  ![usage stats mon output](https://user-images.githubusercontent.com/58448341/178093512-6f1ac719-44e5-4161-b687-379806209f38.png)
+
+  #### Teambuilder Helper
+  ![teambuilder helper 1](https://user-images.githubusercontent.com/58448341/178093524-ac51e6e1-d379-446a-b251-9d9d6e764eb0.png)
+  ![teambuilder helper 2](https://user-images.githubusercontent.com/58448341/178093523-5826720b-5d77-43b7-a7e5-6e288fb329e9.png)
 
 
-#### Teambuilder Helper
-
-
-#### Team Summary Page
-
+  #### Team Summary Page
+  ![team summary 1](https://user-images.githubusercontent.com/58448341/178093531-cb4ea4b4-c634-4b60-95ba-82d77a934483.png)
+  ![team summary 2](https://user-images.githubusercontent.com/58448341/178093536-6bed2898-0e6a-4cd0-84fa-8d380fb97f11.png)
+  ![team summary 3](https://user-images.githubusercontent.com/58448341/178093540-5da012dd-30d1-4a7f-960e-3c56932d59e2.png)
+  ![threatlist example](https://user-images.githubusercontent.com/58448341/178093545-3f2a6d8b-fc75-4d2c-97db-646af3a8cd4d.png)
+</details>
