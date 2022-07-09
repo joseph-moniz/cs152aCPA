@@ -35,8 +35,6 @@ The following packages will be needed to use the app locally:
 ### Screenshots
 <details>
   <summary>Screenshot Demos</summary>
-  #### Home Page
-
 
   #### View Sets Features
   ![view sets example](https://user-images.githubusercontent.com/58448341/178093481-a5150dfb-c977-4046-afac-5cccb596791b.png)
