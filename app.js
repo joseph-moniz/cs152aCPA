@@ -1524,7 +1524,7 @@ function getTeamDefensiveWeaknesses(members) {
       const monType = typesDex[member.monName][0];
       //iterate through all types
       for (type of Object.keys(typeChart)) {
-        //if the Pokemon's type takes super effective damage from a type, add its name once
+        //if the Pokemon's type takes super effective damage from a type, add the type once
         if (typeChart[monType]["damageTaken"][type] == 1) {
           allWeaknesses.push(type);
         }
@@ -1537,7 +1537,7 @@ function getTeamDefensiveWeaknesses(members) {
       const monType2 = typesDex[member.monName][1];
       //iterate through all types
       for (type of Object.keys(typeChart)) {
-        //if both the Pokemon's types take super effective damage from a type, add its name twice
+        //if both the Pokemon's types take super effective damage from a type, add the type twice
         if (typeChart[monType1]["damageTaken"][type] == 1 && typeChart[monType2]["damageTaken"][type] == 1) {
           allWeaknesses.push(type);
           allWeaknesses.push(type);
