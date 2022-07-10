@@ -1,3 +1,14 @@
+/*
+    Custom dictionary for the website that is used in several features of the app to find the EARLIEST generation of a Pokemon.
+
+    The key is the Pokemon name and the value is the earliest generation
+    Example: ("Ninjask": 3) means that Ninjask is in generations 3-8 but did not exist in generations 1-2
+
+    This dictionary is used in the Sets for Generation + Tier, All Sets for Generation, and Specific Pokemon Usage Statistics features for error-
+    checking purposes to see if the inputted Pokemon and the inputted generation are valid.
+    
+*/
+
 module.exports = {
     "Bulbasaur": 1, "Ivysaur": 1, "Venusaur": 1, "Venusaur-Mega": 6, "Charmander": 1, "Charmeleon": 1, "Charizard": 1, "Charizard-Mega-X": 6, 
     "Charizard-Mega-Y": 6, "Squirtle": 1, "Wartortle": 1, "Blastoise": 1, "Blastoise-Mega": 6, "Caterpie": 1, "Metapod": 1, "Butterfree": 1, 

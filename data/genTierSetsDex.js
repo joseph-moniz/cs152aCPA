@@ -1,3 +1,42 @@
+/*
+    Custom dictionary for the website that is used in several features of the app to find all the Pokemon with sets in all tiers in generations
+    6-8 and generate advanced details of each set.
+    This dictionary was generated using APIs from Smogon that contain sets for all Pokemon in a generation + tier. The names were used.
+    The numbers and letter abbreviations were manually edited over the course of a few days as shorthand for additional information that my website
+    generates
+
+    The top-level key is the generation, followed by the tier. The tier dictionary key is the bane if the Pokemon, and the value is an array
+    of set names and details. Each set and its details is 4 indexes long, with the first being the set name.
+
+    The second index is a number 1-5 indicating how defensive the specific set is (1 being fully offensive, 5 being fully defensive)
+    1 = fully offensive with minimum utility
+    2 = mostly offensive with some utility / offensive support Pokemon
+    3 = bulky offense / support Pokemon
+    4 = most walls and tanky supports (have at least 1 damaging move)
+    5 = walls and supports that do not have a damaging move
+
+    The third index is a letter indicating how the set deals damage
+    "P" = all physical damage
+    "S" = all special damage
+    "M" = mix of physical and special damage
+
+    The fourth index is an abbreviation that represents the general role/job of the set
+    "W" = Wallbreaker / general attacker
+    "OS" = Offensive Sweeper
+    "BS" = Bulky Sweeper
+    "PW" = Physical Wall
+    "SW" = Special Wall
+    "MW" = Mixed Wall
+    "S" = Support
+    "OL" = Offensive Lead
+    "RK" = Revenge Killer
+    "SB" = Stallbreaker
+
+    This dictionary is used in the Member object to fill the set and sets fields, the Teambuilder Helper feature for displaying the set names 
+    and for toggling between sets, and the Team Summary page for generating most of the info shown there
+    
+*/
+
 module.exports = {
     "6": {
          "Ubers": {
@@ -7083,7 +7122,7 @@ module.exports = {
                    "Stealth Rock Lead", 2, "P", "OL",
               ],
               "Blissey": [
-               "Special Wall", 5, "P", "SW",
+                    "Special Wall", 5, "P", "SW",
                ],
               "Buzzwole": [
                    "Defensive", 3, "P", "BS",
@@ -7099,10 +7138,10 @@ module.exports = {
                    "Nasty Plot", 1, "P", "OS",
               ],
               "Cinderace": [
-               "Physical Attacker", 2, "P", "W",
+                    "Physical Attacker", 2, "P", "W",
                ],
               "Clefable": [
-                   "Stealth Rock", 4, "S", "PW",
+                   "Defensive", 4, "S", "PW",
               ],
               "Cloyster": [
                    "Suicide Lead", 2, "P", "OL",
@@ -7130,6 +7169,7 @@ module.exports = {
               "Eternatus": [
                    "Specially Defensive", 4, "S", "SW",
                    "Meteor Beam", 1, "S", "W",
+                   "Demon (Cosmic Power)", 3, "S", "BS",
                    "Life Orb", 1, "S", "W",
                    "Physically Defensive", 3, "S", "PW"
               ],
@@ -7167,9 +7207,9 @@ module.exports = {
                    "Dual Screens", 4, "P", "S",
               ],
               "Groudon": [
-                   "Bulky Booster", 3, "P", "BS",
-                   "Double Dance", 1, "P", "OS",
-                   "Defensive", 4, "P", "PW",
+                    "Bulky Booster", 3, "P", "BS",
+                    "Double Dance", 1, "P", "OS",
+                    "Defensive", 4, "P", "PW",
               ],
               "Heatran": [
                    "Specially Defensive Trapper", 4, "S", "SW",
@@ -7189,7 +7229,7 @@ module.exports = {
                    "SubCM", 3, "S", "BS",
               ],
               "Kyurem": [
-               "Pressure", 3, "P", "BS",
+                    "Pressure", 3, "P", "BS",
                ],
               "Kyurem-Black": [
                    "Dragon Dance", 1, "P", "OS",

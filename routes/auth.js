@@ -5,7 +5,7 @@
   /login (get and post)
   /logout (get)
   When the user logs in or signs in, 
-  it adds their user name and user object to the req.session for use in the app.js controller
+  it adds their username and user object to the req.session for use in the app.js controller
   and it sets the res.locals properties for use in the view
   res.locals.loggedIn
   res.local.username

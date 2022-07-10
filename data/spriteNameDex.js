@@ -1,3 +1,14 @@
+/*
+    Custom dictionary for the website that is used in several features of the app to generate the small sprite icons of Pokemon.
+    This dictionary was generated using some information from an API that contains sprite images of every Pokemon
+
+    The key is the Pokemon name in its proper format and the value is the API version of the name that is in the URL for the sprite icon image.
+
+    This dictionary is used in the Teambuilder Helper and Team Summary features for generating the small sprite icons of the Pokemon as seen
+    in these features.
+    
+*/
+
 module.exports = {
     "Bulbasaur": "bulbasaur",
     "Ivysaur": "ivysaur",

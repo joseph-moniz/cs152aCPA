@@ -1,3 +1,14 @@
+/*
+    Custom dictionary for the website that is used in several features of the app to find the type/s of a given Pokemon.
+    This dictionary was generated using some information from an API that contains general details of Pokemon, including typings.
+
+    The key is the Pokemon name in its proper format and the value is an array with the Pokemon's typing.
+
+    This dictionary is used in the Teambuilder Helper and Team Summary features for generating the type icons of the Pokemon seen in these features
+    as well as in the Team Summary calculations involving the type synergies of the user's team.
+    
+*/
+
 module.exports = {
     "Bulbasaur": [
          "Grass",
@@ -1601,8 +1612,7 @@ module.exports = {
         "Water"
     ],
     "Groudon": [
-         "Ground",
-         ""
+         "Ground"
     ],
     "Groudon-Primal": [
          "Ground",

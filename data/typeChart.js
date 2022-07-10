@@ -1,3 +1,26 @@
+/*
+    Custom dictionary for the website that is used in several features of the app to calculate how effective types are against every other type.
+    This format is common for generating type charts in many Pokemona apps.
+    This dictionary was generated using a similar type chart as a template.
+
+    The key is the type and the value is a dictionary containing every type and how effective the key type is against them.
+
+    0 = neutral
+    1 = super effective
+    2 = not very effective
+    3 = no effect
+
+    Examples:
+    typeChart["Bug"]["damageTaken"]["Fairy"] = 0 (Bug takes neutral damage from Fairy / Fairy deals neutral damage to Bug)
+    typeChart["Fire"]["damageTaken"]["Water"] = 1 (Fire takes super effective damage from Water / Water is super effective against Fire)
+    typeChart["Fire"]["damageTaken"]["Grass"] = 2 (Fire takes not very effective damage from Grass / Grass is not very effective against Fire)
+    typeChart["Ground"]["damageTaken"]["Electric"] = 3 (Ground takes no damage from Electric / Electric has no effect on Ground)
+
+
+    This dictionary is used in the Team Summary features for the calculations involving the type synergies of the user's team
+    
+*/
+
 module.exports = {
     "Bug":{
         "damageTaken":{

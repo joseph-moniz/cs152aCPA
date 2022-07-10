@@ -1,3 +1,14 @@
+/*
+    Custom dictionary for the website that is used to find the correct format of a move.
+    This dictionary was generated using some information from an API that has details of all moves.
+
+    The key is the name of the move in the API and the value is the correct formatting/capitalization of the move name
+
+    This dictionary is used in the Specific Pokemon Usage Statistics feature for generating the move names in the table in the correct
+    format.
+    
+*/
+
 module.exports =
 {
     "10000000voltthunderbolt": "10,000,000 Volt Thunderbolt",

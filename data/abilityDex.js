@@ -1,3 +1,14 @@
+/*
+    Custom dictionary for the website that is used to find the correct format of an ability.
+    This dictionary was generated using some information from an API that has details of all abilities
+
+    The key is the name of the ability from the API and the value is the correct formatting/capitalization of the ability name
+
+    This dictionary is used in the Specific Pokemon Usage Statistics feature for generating the ability names in the table in the correct
+    format.
+    
+*/
+
 module.exports =
 {
     "noability": "No Ability",
