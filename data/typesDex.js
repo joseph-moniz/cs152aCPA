@@ -2936,10 +2936,34 @@ module.exports = {
         "Ghost",
         "Grass"
     ],
+    "Pumpkaboo-Large": [
+        "Ghost",
+        "Grass"
+     ],
+     "Pumpkaboo-Small": [
+        "Ghost",
+        "Grass"
+     ],
+     "Pumpkaboo-Super": [
+        "Ghost",
+        "Grass"
+     ],
     "Gourgeist": [
         "Ghost",
         "Grass"
     ],
+    "Gourgeist-Large": [
+          "Ghost",
+          "Grass"
+     ],
+     "Gourgeist-Small": [
+          "Ghost",
+          "Grass"
+     ],
+     "Gourgeist-Super": [
+          "Ghost",
+          "Grass"
+     ],
     "Bergmite": [
          "Ice"
     ],
