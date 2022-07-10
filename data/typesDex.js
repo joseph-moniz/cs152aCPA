@@ -597,8 +597,8 @@ module.exports = {
          "Flying"
     ],
     "Gyarados-Mega": [
-         "Grass",
-         ""
+         "Water",
+         "Dark"
     ],
     "Lapras": [
          "Water",
@@ -3171,8 +3171,8 @@ module.exports = {
          "Fighting"
     ],
     "Wimpod": [
-         "Grass",
-         ""
+         "Bug",
+         "Water"
     ],
     "Golisopod": [
          "Bug",
