@@ -102,9 +102,9 @@ module.exports = {
     "Meowstic": 6, "Meowstic-F": 6, "Honedge": 6, "Doublade": 6, "Aegislash": 6, "Spritzee": 6, "Aromatisse": 6, "Swirlix": 6, "Slurpuff": 6, 
     "Inkay": 6, "Malamar": 6, "Binacle": 6, "Barbaracle": 6, "Skrelp": 6, "Dragalge": 6, "Clauncher": 6, "Clawitzer": 6, "Helioptile": 6, 
     "Heliolisk": 6, "Tyrunt": 6, "Tyrantrum": 6, "Amaura": 6, "Aurorus": 6, "Sylveon": 6, "Hawlucha": 6, "Dedenne": 6, "Carbink": 6, "Goomy": 6, 
-    "Sliggoo": 6, "Goodra": 6, "Klefki": 6, "Phantump": 6, "Trevenant": 6, "Pumpkaboo": 6, "Gourgeist": 6, "Bergmite": 6, "Avalugg": 6, "Noibat": 6, 
-    "Noivern": 6, "Xerneas": 6, "Yveltal": 6, "Zygarde": 6, "Zygarde-10%": 6, "Zygarde-Complete": 6, "Diancie": 6, "Diancie-Mega": 6, "Hoopa": 6, 
-    "Hoopa-Unbound": 6, "Volcanion": 6,
+    "Sliggoo": 6, "Goodra": 6, "Klefki": 6, "Phantump": 6, "Trevenant": 6, "Pumpkaboo": 6, "Pumpkaboo-Large": 6, "Pumpkaboo-Small": 6, "Pumpkaboo-Super": 6, 
+    "Gourgeist": 6, "Gourgeist-Large": 6, "Gourgeist-Small": 6, "Gourgeist-Super": 6, "Bergmite": 6, "Avalugg": 6, "Noibat": 6, "Noivern": 6, 
+    "Xerneas": 6, "Yveltal": 6, "Zygarde": 6, "Zygarde-10%": 6, "Zygarde-Complete": 6, "Diancie": 6, "Diancie-Mega": 6, "Hoopa": 6, "Hoopa-Unbound": 6, "Volcanion": 6,
 
     "Rowlet": 7, "Dartrix": 7, "Decidueye": 7, "Litten": 7, "Torracat": 7, "Incineroar": 7, "Popplio": 7, "Brionne": 7, "Primarina": 7, 
     "Pikipek": 7, "Trumbeak": 7, "Toucannon": 7, "Yungoos": 7, "Gumshoos": 7, "Grubbin": 7, "Charjabug": 7, "Vikavolt": 7, "Crabrawler": 7, 
