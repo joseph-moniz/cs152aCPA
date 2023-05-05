@@ -53,6 +53,20 @@ This is the full list of dependencies:
     "http-errors": "~1.6.3",
     "mongoose": "^6.4.0",
     "morgan": "~1.9.1"`
+
+
+### Running Locally
+To run the website locally on your own browser, do the following steps: 
+
+1. **Download Zip** from Github and extract files.
+2. Open terminal.
+3. Use command `cd` and navigate to the path for the newly downloaded directory.
+4. Use command `npm install express-ejs-layouts`
+5. Use command `npm install`
+6. Use command `npm install nodemon -g`
+7. Use command `nodemon`
+The website should now be running!
+
   
 ### Screenshots
 <details>
