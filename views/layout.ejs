@@ -45,17 +45,23 @@
               </a>
             </li>
 
+            <% if (username == "jmoniz" || username == "Fireflame" || username == "Fireflame479") {%>
+              <li class="nav-item">
+                <a class="nav-link" href="/data">Data</a>
+              </li>
+            <% } %>
+          </ul>
+
+          <ul class="navbar-nav navbar-right mb-2 mb-lg-0">
             <% if (!loggedIn) {%>
               <li class="nav-item">
                 <a class="nav-link" href="/login">Login/Signup</a>
               </li>
-              <% } else { %>
-              
-                
-                <li class="nav-item">
-                  <a class="nav-link" href="/logout">Logout <%= username %></a>
-                </li>
-              <% } %>
+            <% } else { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout <%= username %></a>
+              </li>
+            <% } %>
           </ul>
           
         </div>

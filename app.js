@@ -103,6 +103,17 @@ app.use('/users', usersRouter);
 // ******************************************************************************************************************//
 //All pages and data loaded in them 
 
+app.get('/data',
+(req,res,next) => {
+  res.render('data')
+});
+
+app.post('/data',
+async (req,res,next) => {
+  const {pokemon} = req.body;
+  res.render('showData')
+})
+
 app.get('/sets',
 (req,res,next) => {
   //keys of genDex is a list of all Pokemon names, used for the autocomplete feature when typing a Pokemon name
