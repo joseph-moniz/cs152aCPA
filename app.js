@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const layouts = require("express-ejs-layouts");
 
+const helper = require('./helper/helperFunctions');
+
 //load all custom dictionaries used in app
 const genDex = require('./data/genDex');
 const abilityDex = require('./data/abilityDex');
@@ -14,6 +16,13 @@ const genTierSetsDex = require('./data/genTierSetsDex');
 const spriteNameDex = require('./data/spriteNameDex');
 const typesDex = require('./data/typesDex');
 const typeChart = require('./data/typeChart');
+
+const abilitiesRaw = require('./data/abilitiesRaw');
+const itemsRaw = require('./data/itemsRaw');
+
+const missingSprites = require('./data/missingSpritesList.js');
+
+const totalGenNum = 9;
 
 const axios = require('axios');
 const auth = require('./routes/auth');
@@ -101,18 +110,43 @@ app.use('/users', usersRouter);
 
 
 // ******************************************************************************************************************//
+
 //All pages and data loaded in them 
 
-app.get('/data',
+// ******************************************************************************************************************//
+//Print Data page for admin use only
+//designed to update the custom dictionaries used by getting updated information from the Smogon API and making it a proper format
+
+app.get('/printData',
 (req,res,next) => {
-  res.render('data')
+  res.render('printData')
 });
 
-app.post('/data',
+app.post('/printData',
 async (req,res,next) => {
-  const {pokemon} = req.body;
-  res.render('showData')
+  const {dataType} = req.body;
+  res.locals.dataType = dataType;
+  let updatedData = {};
+  if (dataType == "abilities") {
+    updatedData = getDictionaryFromDataType(dataType, abilitiesRaw);
+  } else if (dataType == "items") {
+      updatedData = getDictionaryFromDataType(dataType, itemsRaw);
+  } else if (dataType == "moves") {
+      const response = await axios.get('https://play.pokemonshowdown.com/data/moves.json');
+      const currentData = response.data;
+      updatedData = getDictionaryFromDataType(dataType, currentData);
+  } else if (dataType == "pokemonTypes") {
+      const response = await axios.get('https://play.pokemonshowdown.com/data/pokedex.json');
+      const currentData = response.data
+      updatedData = getDictionaryFromDataType(dataType, currentData);
+  }
+  //res.locals.test = helper.testFunction("1","2");
+  res.locals.updatedData = updatedData;
+  res.render('showPrintData')
 })
+
+// ******************************************************************************************************************//
+
 
 app.get('/sets',
 (req,res,next) => {
@@ -135,7 +169,18 @@ async (req,res,next) => {
     const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
     const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
 
-    res.locals.pokemonLowercase = getPokemonLowerCase(pokemon); //format for URL when generating images of Pokemon
+    let pokemonLowerCase = getPokemonLowerCase(pokemon);
+    //check to see if the Pokemon has an animated sprite in generation 9
+    //if it does not, flag it as true to use backup sprite and use alternate lowercase name
+    let missingSpriteCheck = false;
+    if (generation == "9") {
+      if (missingSprites.list.includes(pokemon)) {
+        missingSpriteCheck = true;
+        pokemonLowerCase = getPokemonLowerCaseBackupSprite(pokemon);
+      }
+    }
+    res.locals.missingSpriteCheck = missingSpriteCheck;
+    res.locals.pokemonLowercase = pokemonLowerCase; //format for URL when generating images of Pokemon
 
     //check if the user inputted generation and tier is a valid format and not in nonexistantGenTiers array
     res.locals.nonexistantTierFlag = getNonExistantTierFlag(nonexistantGenTiers, genPlusTier);
@@ -174,18 +219,18 @@ async (req,res,next) => {
       // this is the function that was used to generate the Pokemon set names for tiers in gens 6-8 for the genTierSetIndex.
       // used for debugging or updating the dictionary
 
-      let setNameDict = {};
-      for (const mon of Object.keys(response.data.dex).sort()) {
-        theSets = Object.keys(response.data.dex[mon]);
-        setNameDict[mon] = theSets;
-      }
-      let tierDict = {};
-      tierDict[tier] = setNameDict;
-      let genDict = {};
-      genDict[generation] = tierDict;
-      res.locals.tierDict = tierDict;
-      res.locals.genDict = genDict;
-      res.locals.genTierSetsDex = genTierSetsDex;
+      // let setNameDict = {};
+      // for (const mon of Object.keys(response.data.dex).sort()) {
+      //   theSets = Object.keys(response.data.dex[mon]);
+      //   setNameDict[mon] = theSets;
+      // }
+      // let tierDict = {};
+      // tierDict[tier] = setNameDict;
+      // let genDict = {};
+      // genDict[generation] = tierDict;
+      // res.locals.tierDict = tierDict;
+      // res.locals.genDict = genDict;
+      // res.locals.genTierSetsDex = genTierSetsDex;
       // ********************************** //
 
       if (genTierSets != null) {
@@ -237,11 +282,24 @@ async (req,res,next) => {
   //only look for information if the name the user inputs for the Pokemon is a valid Pokemon name
   if (res.locals.correctNameFormatCheck) {
     res.locals.pokemon = pokemon;
-    res.locals.pokemonLowercase = getPokemonLowerCase(pokemon); //format for URL when generating images of Pokemon
     res.locals.generation = generation;
     res.locals.minGen = genDex[pokemon];
     const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
     const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
+
+    let pokemonLowerCase = getPokemonLowerCase(pokemon); //format for URL when generating images of Pokemon
+    //check to see if the Pokemon has an animated sprite in generation 9
+    //if it does not, flag it as true to use backup sprite and use alternate lowercase name
+    let missingSpriteCheck = false;
+    if (generation == "9") {
+      if (missingSprites.list.includes(pokemon)) {
+        missingSpriteCheck = true;
+        pokemonLowerCase = getPokemonLowerCaseBackupSprite(pokemon);
+      }
+    }
+    res.locals.missingSpriteCheck = missingSpriteCheck;
+    res.locals.pokemonLowercase = pokemonLowerCase; //format for URL when generating images of Pokemon
+
 
     //array to hold all the sets for all of the tiers the Pokemon is in
     //this array has 7 indexes, 1 for each tier
@@ -289,6 +347,101 @@ async (req,res,next) => {
     res.locals.allTierSetsList = allTierSets.filter(e => e.length);
   }
   res.render('showAllSets')
+})
+
+app.get('/allSetsGenerations',
+(req,res,next) => {
+  //keys of genDex is a list of all Pokemon names, used for the autocomplete feature when typing a Pokemon name
+  res.locals.allMonNames = Object.keys(genDex);
+  res.render('allSetsGenerations')
+});
+
+app.post('/allSetsGenerations',
+async (req,res,next) => {
+  const {pokemon} = req.body;
+  res.locals.correctNameFormatCheck = Object.keys(genDex).includes(pokemon);
+
+  //only look for information if the name the user inputs for the Pokemon is a valid Pokemon name
+  if (res.locals.correctNameFormatCheck) {
+    res.locals.pokemon = pokemon;
+    const minGen = genDex[pokemon];
+    res.locals.minGen = minGen;
+    const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
+    const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
+
+    let pokemonLowerCase = getPokemonLowerCase(pokemon); //format for URL when generating images of Pokemon
+    //check to see if the Pokemon has an animated sprite in generation 9
+    //if it does not, flag it as true to use backup sprite and use alternate lowercase name
+    let missingSpriteCheck = false;
+    if (minGen == "9") {
+      if (missingSprites.list.includes(pokemon)) {
+        missingSpriteCheck = true;
+        pokemonLowerCase = getPokemonLowerCaseBackupSprite(pokemon);
+      }
+    }
+    res.locals.missingSpriteCheck = missingSpriteCheck;
+    res.locals.pokemonLowercase = pokemonLowerCase; //format for URL when generating images of Pokemon
+
+
+    let allTiersGenerationsSets = {};
+    let genList = [];
+    let currentGen = parseInt(minGen);
+    //find all the sets for every generation the Pokemon is in
+    for (let i = 0; i < totalGenNum - minGen + 1; i++) {
+
+    //array to hold all the sets for all of the tiers the Pokemon is in
+    //this array has 7 indexes, 1 for each tier
+      let allTierSets = [];
+
+      //loop over all tiers in a generation
+      for (let j = 0; j < tiers.length; j++) {
+        const tierLowercase = tiers[j].toLowerCase();
+        const genPlusTier = currentGen.toString() + tierLowercase;
+        let tierSets = [];
+        // //if the tier does not exist, the index corresponding to that tier is empty
+        if (nonexistantGenTiers.includes(genPlusTier)) {
+          allTierSets[j] = [];
+        }
+        else {
+          const response = await axios.get('https://play.pokemonshowdown.com/data/sets/gen'+genPlusTier+'.json')
+          console.dir(response.data.length)
+          const genTierSets = response.data.dex[pokemon];
+          if (genTierSets != null) {
+            const sets = Object.keys(genTierSets);
+            const setDetails = Object.values(genTierSets);
+            let evSpreads = null;
+            //generations 1-2 did not have EVs for Pokemon, so they are not calculated if generation = 1 or 2
+            if (currentGen > 2) {
+              //reformat EVs
+              const evNames = getEVNames(sets, setDetails);
+              const evValues = getEVValues(sets, setDetails);
+              evSpreads = getEVSpreads(evNames, evValues);
+            }
+            //add to big array a smaller array that contains the tier name, the sets, set details, and EV spreads
+            //the indexes for the last 3 are all the same, so index 0 of sets, setDetails, and evSpreads would be the
+            //set name, set details, and EV spread of the first set for the Pokemon
+            tierSets = [tiers[j], sets, setDetails, evSpreads]
+          }
+          else {
+            //if the Pokemon does not have a set in the tier, the index for that tier in the big array is empty
+            allTierSets[j] = [];
+          }
+          allTierSets[j] = tierSets;
+        }
+      }
+      //filters out all empty indexes, leaving only the tiers the Pokemon is in and the corresponding information
+
+      const allTierSetsList = allTierSets.filter(e => e.length);
+      allTiersGenerationsSets[currentGen.toString()] = allTierSetsList;
+      genList[i] = currentGen.toString();
+      currentGen++;
+    }
+
+    res.locals.totalGenNum = totalGenNum;
+    res.locals.allTiersGenerationsSets = allTiersGenerationsSets;
+    res.locals.genList = genList;
+  }
+  res.render('showAllSetsGenerations')
 })
 
 app.get('/usageStatsTier',
@@ -1601,6 +1754,49 @@ function clearRedundantTypes(typeList1, typeList2) {
   return newList;
 }
 
+
+//function that returns the dictionary of data from the corresponding data type to update the data in the dictionaries for this website
+function getDictionaryFromDataType(dataType, data) {
+  let updatedData = {};
+  if (dataType == "abilities") {
+    const abilityAPINames = Object.keys(data);
+    for (let i = 0; i < abilityAPINames.length; i++) {
+      updatedData[abilityAPINames[i]] = data[abilityAPINames[i]]["name"];
+    }
+  } else if (dataType == "items") {
+    const itemAPINames = Object.keys(data);
+    for (let i = 0; i < itemAPINames.length; i++) {
+      updatedData[itemAPINames[i]] = data[itemAPINames[i]]["name"];
+    }
+  } else if (dataType == "moves") {
+    const moveAPINames = Object.keys(data);
+    for (let i = 0; i < moveAPINames.length; i++) {
+      updatedData[moveAPINames[i]] = data[moveAPINames[i]]["name"];
+    }
+
+  } else if (dataType == "pokemonTypes") {
+    const pokemonAPINames = Object.keys(data);
+    let counter = 0;
+    let currentPokemon = pokemonAPINames[counter];
+    let currentPokemonName = data[currentPokemon]["name"];
+    while (currentPokemon != "missingno") {
+      if (currentPokemonName.substring(currentPokemonName.length - 5) != "-Gmax" 
+          && currentPokemonName.substring(currentPokemonName.length - 5) != "-Tera" 
+          && currentPokemonName.substring(currentPokemonName.length - 6) != "-Totem"
+          && currentPokemonName.substring(0, 8) != "Pikachu-") {
+            updatedData[currentPokemonName] = data[currentPokemon]["types"];
+            currentPokemon = pokemonAPINames[counter++];
+            currentPokemonName = data[currentPokemon]["name"];
+      } else {
+        currentPokemon = pokemonAPINames[counter++];
+        currentPokemonName = data[currentPokemon]["name"];
+      }
+    }
+  }
+
+  return updatedData;
+}
+
 //function that compares the date of the API data for sets in a generation and tier to April 2021
 //returns true if date is as new or newer and false otherwise
 //the boolean from this function is used to determine whether to use the process for getting teammate usage percentages for newer data
@@ -1802,7 +1998,32 @@ function getPokemonLowerCase(pokemon) {
   return pokemonLowerCase;
 }
 
-
+function getPokemonLowerCaseBackupSprite(pokemon) {
+  const pokemonNameSplit = pokemon.split(" ");
+  let pokemonLowerCase = "";
+  if (pokemon == "Wooper-Paldea") {
+    pokemonLowerCase = "wooper-paldean"
+  } 
+  else if (pokemon == "Tauros-Paldea-Combat") {
+    pokemonLowerCase = "tauros-paldean"
+  }
+  else if (pokemon == "Tauros-Paldea-Aqua") {
+    pokemonLowerCase = "tauros-paldean-aqua"
+  }
+  else if (pokemon == "Tauros-Paldea-Blaze") {
+    pokemonLowerCase = "tauros-paldean-blaze"
+  }
+  //pokemon that are two words long (e.g. Great Tusk) will be hyphenated instead
+  else if (pokemonNameSplit.length == 2) {
+    const word1 = pokemonNameSplit[0].toLowerCase();
+    const word2 = pokemonNameSplit[1].toLowerCase();
+    pokemonLowerCase = word1 + "-" + word2;
+  }
+  else {
+    pokemonLowerCase = pokemon.toLowerCase();
+  }
+  return pokemonLowerCase;
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
