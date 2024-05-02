@@ -1,0 +1,222 @@
+<style>
+    #example {font-family: monospace; color: blue}
+  
+    input {
+  border: 1px solid transparent;
+  border-color: black;
+  background-color: white;
+  padding: 10px;
+  font-size: 16px;
+  }
+  
+  input[type=text] {
+  background-color: white;
+  width: 100%;
+  }
+  
+  input[type=submit] {
+  background-color: DodgerBlue;
+  color: #fff;
+  cursor: pointer;
+  }
+  
+  /*the container must be positioned relative:*/
+  .autocomplete {
+  position: relative;
+  display: inline-block;
+  }
+  
+  .autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+  }
+  
+  .autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+  }
+  
+  /*when hovering an item:*/
+  .autocomplete-items div:hover {
+  background-color: white; 
+  }
+  
+  /*when navigating through the items using the arrow keys:*/
+  .autocomplete-active {
+  background-color: DodgerBlue !important; 
+  color: #ffffff; 
+  }
+  </style>
+  
+  
+  <h2>Find All Generation Sets</h2>
+  <div style="background-color: rgb(255, 251, 226); border: solid; border-color: rgb(207, 204, 181); padding: 25px; width: auto">
+    <p style="font-size: 16px">This is the page to view competitive Pokemon sets for battling with Smogon standards. 
+        Data is collected by Smogon. Enter a Pokemon's name to view all of the top sets of that Pokemon for all tiers in every generation.</p>
+    <br>
+    <form method="post" action="/allSetsGenerations" autocomplete="off">
+        <div class="autocomplete" style="width:300px;">
+            <p style="font-size: 16px">Enter Pokemon: <input type="text" name="pokemon" id="monInput"></p>
+        </div>
+        <br>
+        <hr>
+        <input type="submit">
+    </form>
+  </div>
+  <hr>
+  <h6>Name Format</h6>
+  <p>Names of Pokemon must be typed in the proper format in order to search for Pokemon sets. The following is a list of specifics regarding name
+      formatting:
+  </p>
+  <ul>
+      <li><p style="margin-bottom:5px">Mega Pokemon should be in <span style="font-family: monospace"><b>[Pokemon]-Mega</b></span> format.
+          For Pokemon with two Mega Evolutions, the format should be <span style="font-family: monospace"><b>[Pokemon]-Mega-X</b></span> and
+          <span style="font-family: monospace"><b>[Pokemon]-Mega-Y</b></span></p>
+          <p style="margin-bottom:5px">Examples: <span style="font-family: monospace"><b>Mega Houndoom</b></span> should be <span id="example"><b>Houndoom-Mega</b></span>.
+          <span style="font-family: monospace"><b>Mega Charizard X</b></span> should be <span id="example"><b>Charizard-Mega-X</b></span> and 
+          <span style="font-family: monospace"><b>Mega Charizard Y</b></span> should be <span id="example"><b>Charizard-Mega-Y</b></span>.</p>
+      </li>
+      <li><p style="margin-bottom:5px">Regional formes of Pokemon should be in <span style="font-family: monospace"><b>[Pokemon]-[Forme]</b></span> format.</p>
+          <p style="margin-bottom:5px">Examples: <span style="font-family: monospace"><b>Alolan Raichu</b></span> should be <span id="example"><b>Raichu-Alola</b></span>.
+          <span style="font-family: monospace"><b>Galarian Stunfisk</b></span> should be <span id="example"><b>Stunfisk-Galar</b></span>.
+          <span style="font-family: monospace"><b>Hisuian Growlithe</b></span> should be <span id="example"><b>Growlithe-Hisui</b></span>.
+          <span style="font-family: monospace"><b>Paldean Wooper</b></span> should be <span id="example"><b>Wooper-Paldea</b></span>.</p>
+      </li>
+      <li><p style="margin-bottom:5px">Non-regional formes of Pokemon should also be in <span style="font-family: monospace"><b>[Pokemon]-[Forme]</b></span> format.
+          The normal forme of a Pokemon with multiple formes should just be in <span style="font-family: monospace"><b>[Pokemon]</b></span> format.</p>
+          <p style="margin-bottom:5px">Examples: <span id="example"><b>Rotom</b></span> and <span id="example"><b>Rotom-Wash</b></span>; 
+              <span id="example"><b>Deoxys</b></span> and <span id="example"><b>Deoxys-Attack</b></span>;
+              <span id="example"><b>Groudon</b></span> and <span id="example"><b>Groudon-Primal</b></span>;
+              <span id="example"><b>Giratina</b></span> and <span id="example"><b>Giratina-Origin</b></span>;
+              <span id="example"><b>Arceus</b></span> and <span id="example"><b>Arceus-Rock</b></span>;
+              <span id="example"><b>Landorus</b></span> and <span id="example"><b>Landorus-Therian</b></span>.</p>
+      </li>
+      <li><p style="margin-bottom:5px">Formes of Pokemon in which the forme name has multiple words or the forme itself has formes should be in 
+          <span style="font-family: monospace"><b>[Pokemon]-[Forme]</b></span> format, but every word or sub-forme should be separated by a hyphen.</p>
+          <p style="margin-bottom:5px">Examples: <span style="font-family: monospace"><b>Rapid Strike Urshifu</b></span> should be <span id="example"><b>Urshifu-Rapid-Strike</b></span>.
+          <span style="font-family: monospace"><b>Galarian Zen Mode Darmanitan</b></span> should be <span id="example"><b>Darmanitan-Galar-Zen</b></span>.
+          <span style="font-family: monospace"><b>Paldean Tauros Blaze Breed</b></span> should be <span id="example"><b>Tauros-Paldea-Blaze</b></span>.</p>
+      </li>
+      <li><p style="margin-bottom:5px">All punctuation and spaces should be kept for Pokemon names that have them.</p>
+          <p style="margin-bottom:5px">Examples: <span id="example"><b>Farfetch'd</b></span>, <span id="example"><b>Mr. Mime</b></span>, 
+          <span id="example"><b>Ho-Oh</b></span>, <span id="example"><b>Zygarde-10%</b></span>, <span id="example"><b>Type: Null</b></span>,
+          <span id="example"><b>Great Tusk</b></span>, <span id="example"><b>Chien-Pao</b></span>.</p>
+      </li>
+      <li><p style="margin-bottom:5px">Male and female Nidoran are different Pokemon, and male and female forms of other Pokemon have different stats. The male version shoud be  
+          <span style="font-family: monospace"><b>[Pokemon]</b></span> and the female version should be <span style="font-family: monospace"><b>[Pokemon]-F</b></span>.</p>
+          <p style="margin-bottom:5px">Examples: <span id="example"><b>Nidoran</b></span> and <span id="example"><b>Nidoran-F</b></span>.</p>
+      </li>
+  </ul>
+  
+  <script>
+      
+      function autocomplete(inp, arr) {
+      /*the autocomplete function takes two arguments,
+      the text field element and an array of possible autocompleted values:*/
+      var currentFocus;
+      /*execute a function when someone writes in the text field:*/
+      inp.addEventListener("input", function(e) {
+          var a, b, i, val = this.value;
+          /*close any already open lists of autocompleted values*/
+          closeAllLists();
+          if (!val) { return false;}
+          currentFocus = -1;
+          /*create a DIV element that will contain the items (values):*/
+          a = document.createElement("DIV");
+          a.setAttribute("id", this.id + "autocomplete-list");
+          a.setAttribute("class", "autocomplete-items");
+          /*append the DIV element as a child of the autocomplete container:*/
+          this.parentNode.appendChild(a);
+          /*for each item in the array...*/
+          for (i = 0; i < arr.length; i++) {
+            /*check if the item starts with the same letters as the text field value:*/
+            if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+              /*create a DIV element for each matching element:*/
+              b = document.createElement("DIV");
+              /*make the matching letters bold:*/
+              b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+              b.innerHTML += arr[i].substr(val.length);
+              /*insert a input field that will hold the current array item's value:*/
+              b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+              /*execute a function when someone clicks on the item value (DIV element):*/
+                  b.addEventListener("click", function(e) {
+                  /*insert the value for the autocomplete text field:*/
+                  inp.value = this.getElementsByTagName("input")[0].value;
+                  /*close the list of autocompleted values,
+                  (or any other open lists of autocompleted values:*/
+                  closeAllLists();
+              });
+              a.appendChild(b);
+            }
+          }
+      });
+      /*execute a function presses a key on the keyboard:*/
+      inp.addEventListener("keydown", function(e) {
+          var x = document.getElementById(this.id + "autocomplete-list");
+          if (x) x = x.getElementsByTagName("div");
+          if (e.keyCode == 40) {
+            /*If the arrow DOWN key is pressed,
+            increase the currentFocus variable:*/
+            currentFocus++;
+            /*and and make the current item more visible:*/
+            addActive(x);
+          } else if (e.keyCode == 38) { //up
+            /*If the arrow UP key is pressed,
+            decrease the currentFocus variable:*/
+            currentFocus--;
+            /*and and make the current item more visible:*/
+            addActive(x);
+          } else if (e.keyCode == 13) {
+            /*If the ENTER key is pressed, prevent the form from being submitted,*/
+            e.preventDefault();
+            if (currentFocus > -1) {
+              /*and simulate a click on the "active" item:*/
+              if (x) x[currentFocus].click();
+            }
+          }
+      });
+      function addActive(x) {
+        /*a function to classify an item as "active":*/
+        if (!x) return false;
+        /*start by removing the "active" class on all items:*/
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        /*add class "autocomplete-active":*/
+        x[currentFocus].classList.add("autocomplete-active");
+      }
+      function removeActive(x) {
+        /*a function to remove the "active" class from all autocomplete items:*/
+        for (var i = 0; i < x.length; i++) {
+          x[i].classList.remove("autocomplete-active");
+        }
+      }
+      function closeAllLists(elmnt) {
+        /*close all autocomplete lists in the document,
+        except the one passed as an argument:*/
+        var x = document.getElementsByClassName("autocomplete-items");
+        for (var i = 0; i < x.length; i++) {
+          if (elmnt != x[i] && elmnt != inp) {
+          x[i].parentNode.removeChild(x[i]);
+        }
+      }
+    }
+    /*execute a function when someone clicks in the document:*/
+    document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+    });
+    }
+  
+  const allMonNames = <%- JSON.stringify(allMonNames) %>;
+  
+  autocomplete(document.getElementById("monInput"), allMonNames)
+  </script>

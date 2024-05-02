@@ -1,0 +1,75 @@
+<div style="background-color: white; border: solid; padding: 25px; width: auto">
+        <% if (correctNameFormatCheck){ %>
+            <h2><b>All <%= pokemon %> Sets</b></h2>
+            <% if(minGen == totalGenNum){%>
+                <p style="font-size: 26px">Generation <%= minGen %></p>
+            <% } else { %>
+                <p style="font-size: 26px">Generations <%= minGen %>-<%= totalGenNum %></p>
+            <% } %>
+            <br>
+            <br>
+            <% for(var gen of Object.keys(allTiersGenerationsSets).reverse()){%>
+                <p style="font-size: 24px"><b><u>Generation <%= gen %></b></u></p>
+                <% if(gen >= 6){%> 
+                    <% if (gen == 9 && missingSpriteCheck == true) { %>
+                        <img 
+                        src="https://img.pokemondb.net/sprites/home/normal/<%= pokemonLowercase %>.png"
+                        alt="Sprite of <%= pokemon %>">
+                    <% } else { %>
+                        <img 
+                        src="http://play.pokemonshowdown.com/sprites/ani/<%= pokemonLowercase %>.gif"
+                        alt="Sprite of <%= pokemon %>">
+                    <% } %>
+                <% } %>
+                <% if(gen == 5){%> 
+                    <img 
+                    src="http://play.pokemonshowdown.com/sprites/gen5ani/<%= pokemonLowercase %>.gif"
+                    alt="Sprite of <%= pokemon %>">
+                <% } %> 
+                <% if(gen < 5){%> 
+                    <img 
+                    src="http://play.pokemonshowdown.com/sprites/gen<%= gen %>/<%= pokemonLowercase %>.png"
+                    alt="Sprite of <%= pokemon %>">
+                <% } %> 
+                <br>
+                <br>
+
+                <% for(var i=0; i<allTiersGenerationsSets[gen].length; i++){%> 
+                    <p style="font-size: 20px"><b><u><%= allTiersGenerationsSets[gen][i][0] %></b></u></p>
+                    <% for(var j=0; j<allTiersGenerationsSets[gen][i][1].length; j++){%> 
+                        <p style="font-size: 18px; margin-bottom: 5px"><b><%= allTiersGenerationsSets[gen][i][1][j] %></b></p>
+                        <p style="font-size: 16px; margin: 0"><%= pokemon %> 
+                        <% if(gen > 1){%>   
+                            @ <%= allTiersGenerationsSets[gen][i][2][j].item %></p>
+                        <% } %>
+                        <% if(gen > 2){%>
+                            <p style="font-size: 16px; margin: 0">Ability: <%= allTiersGenerationsSets[gen][i][2][j].ability %></p>
+                            <p style="font-size: 16px; margin: 0">EVs: <%= allTiersGenerationsSets[gen][i][3][j] %></p>
+                            <% if(gen == 9){%>
+                                <p style="font-size: 16px; margin: 0">Tera Type: <%= allTiersGenerationsSets[gen][i][2][j].teraType %></p>
+                            <% } %>
+                            <p style="font-size: 16px; margin: 0"><%= allTiersGenerationsSets[gen][i][2][j].nature %> Nature</p>
+                        <% } %>
+                        <% for(var k=0; k<allTiersGenerationsSets[gen][i][2][j].moves.length; k++){%> 
+                            <p style="font-size: 16px; margin: 0">- <%= allTiersGenerationsSets[gen][i][2][j].moves[k]%></p>
+                        <% } %>
+                        <% if(j != allTiersGenerationsSets[gen][i][1].length - 1){%> 
+                            <br>
+                        <% } %>
+                    <% } %>
+                    <% if(i != allTiersGenerationsSets[gen].length - 1){%> 
+                    <br>
+                    <br>
+                    <% } %>
+                <% } %>
+                <% if(gen != Object.keys(allTiersGenerationsSets)[0]){%> 
+                    <br>
+                    <hr>
+                    <br>
+                <% } %>
+            <% } %>
+        <% } else { %>
+            <h2>Error</h2>
+            <p style="font-size: 24px">Please use the correct format when inputting a Pokemon name.</p>
+        <% } %> 
+</div>

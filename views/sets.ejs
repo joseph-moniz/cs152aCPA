@@ -71,6 +71,7 @@ input[type=submit] {
       <p style="font-size: 16px">
       Select generation:
       <select name="generation">
+          <option value="9">Generation 9</option>
           <option value="8">Generation 8</option>
           <option value="7">Generation 7</option>
           <option value="6">Generation 6</option>
@@ -109,9 +110,11 @@ input[type=submit] {
         <span style="font-family: monospace"><b>Mega Charizard X</b></span> should be <span id="example"><b>Charizard-Mega-X</b></span> and 
         <span style="font-family: monospace"><b>Mega Charizard Y</b></span> should be <span id="example"><b>Charizard-Mega-Y</b></span>.</p>
     </li>
-    <li><p style="margin-bottom:5px">Alolan and Galarian formes of Pokemon should be in <span style="font-family: monospace"><b>[Pokemon]-[Forme]</b></span> format.</p>
+    <li><p style="margin-bottom:5px">Regional formes of Pokemon should be in <span style="font-family: monospace"><b>[Pokemon]-[Forme]</b></span> format.</p>
         <p style="margin-bottom:5px">Examples: <span style="font-family: monospace"><b>Alolan Raichu</b></span> should be <span id="example"><b>Raichu-Alola</b></span>.
-        <span style="font-family: monospace"><b>Galarian Stunfisk</b></span> should be <span id="example"><b>Stunfisk-Galar</b></span>.</p>
+        <span style="font-family: monospace"><b>Galarian Stunfisk</b></span> should be <span id="example"><b>Stunfisk-Galar</b></span>.
+        <span style="font-family: monospace"><b>Hisuian Growlithe</b></span> should be <span id="example"><b>Growlithe-Hisui</b></span>.
+        <span style="font-family: monospace"><b>Paldean Wooper</b></span> should be <span id="example"><b>Wooper-Paldea</b></span>.</p>
     </li>
     <li><p style="margin-bottom:5px">Non-regional formes of Pokemon should also be in <span style="font-family: monospace"><b>[Pokemon]-[Forme]</b></span> format.
         The normal forme of a Pokemon with multiple formes should just be in <span style="font-family: monospace"><b>[Pokemon]</b></span> format.</p>
@@ -125,13 +128,15 @@ input[type=submit] {
     <li><p style="margin-bottom:5px">Formes of Pokemon in which the forme name has multiple words or the forme itself has formes should be in 
         <span style="font-family: monospace"><b>[Pokemon]-[Forme]</b></span> format, but every word or sub-forme should be separated by a hyphen.</p>
         <p style="margin-bottom:5px">Examples: <span style="font-family: monospace"><b>Rapid Strike Urshifu</b></span> should be <span id="example"><b>Urshifu-Rapid-Strike</b></span>.
-        <span style="font-family: monospace"><b>Galarian Zen Mode Darmanitan</b></span> should be <span id="example"><b>Darmanitan-Galar-Zen</b></span>.</p>
+        <span style="font-family: monospace"><b>Galarian Zen Mode Darmanitan</b></span> should be <span id="example"><b>Darmanitan-Galar-Zen</b></span>.
+        <span style="font-family: monospace"><b>Paldean Tauros Blaze Breed</b></span> should be <span id="example"><b>Tauros-Paldea-Blaze</b></span>.</p>
     </li>
     <li><p style="margin-bottom:5px">All punctuation and spaces should be kept for Pokemon names that have them.</p>
         <p style="margin-bottom:5px">Examples: <span id="example"><b>Farfetch'd</b></span>, <span id="example"><b>Mr. Mime</b></span>, 
-        <span id="example"><b>Ho-Oh</b></span>, <span id="example"><b>Zygarde-10%</b></span>, <span id="example"><b>Type: Null</b></span>.</p>
+        <span id="example"><b>Ho-Oh</b></span>, <span id="example"><b>Zygarde-10%</b></span>, <span id="example"><b>Type: Null</b></span>,
+        <span id="example"><b>Great Tusk</b></span>, <span id="example"><b>Chien-Pao</b></span>.</p>
     </li>
-    <li><p style="margin-bottom:5px">Male and female Nidoran are different Pokemon, and male and female Indeedee have different stats. The male version shoud be  
+    <li><p style="margin-bottom:5px">Male and female Nidoran are different Pokemon, and male and female forms of other Pokemon have different stats. The male version shoud be  
         <span style="font-family: monospace"><b>[Pokemon]</b></span> and the female version should be <span style="font-family: monospace"><b>[Pokemon]-F</b></span>.</p>
         <p style="margin-bottom:5px">Examples: <span id="example"><b>Nidoran</b></span> and <span id="example"><b>Nidoran-F</b></span>.</p>
     </li>
