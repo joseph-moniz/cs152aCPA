@@ -1,0 +1,27 @@
+<div style="background-color: white; border: solid; padding: 25px;">
+    <p><b>Updated dictionary for 
+        <% if (dataType == "abilities") { %> 
+            Abilities
+        <% } else if (dataType == "items") { %> 
+            Items
+        <% } else if (dataType == "moves") { %> 
+            Moves
+        <% } else if (dataType == "pokemonTypes") { %> 
+            Pokemon Types
+        <% } %></b></p>
+        <br>
+        <br>
+        
+
+    <% if (dataType == "abilities") { %> 
+        <p>Use <a href="https://play.pokemonshowdown.com/data/abilities.js">https://play.pokemonshowdown.com/data/abilities.js</a> to update raw dictionary</p>
+        <br>
+    <% } %>
+    <% if (dataType == "items") { %> 
+        <p>Use <a href="https://play.pokemonshowdown.com/data/items.js">https://play.pokemonshowdown.com/data/items.js</a> to update raw dictionary</p>
+        <p>Add "nothing": "No Item" at end of dictionary</p>
+        <br>
+    <% } %>
+    <%- JSON.stringify(updatedData, null, " ") %>
+    <br>
+</div>
