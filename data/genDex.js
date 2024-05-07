@@ -71,7 +71,7 @@ module.exports = {
     "Abomasnow": 4, "Abomasnow-Mega": 6, "Weavile": 4, "Magnezone": 4, "Lickilicky": 4, "Rhyperior": 4, "Tangrowth": 4, "Electivire": 4, "Magmortar": 4, "Togekiss": 4, 
     "Yanmega": 4, "Leafeon": 4, "Glaceon": 4, "Gliscor": 4, "Mamoswine": 4, "Porygon-Z": 4, "Gallade": 4, "Gallade-Mega": 6, "Probopass": 4, "Dusknoir": 4, 
     "Froslass": 4, "Rotom": 4, "Rotom-Fan": 4, "Rotom-Frost": 4, "Rotom-Heat": 4, "Rotom-Mow": 4, "Rotom-Wash": 4, "Uxie": 4, "Mesprit": 4, 
-    "Azelf": 4, "Dialga": 4, "Palkia": 4, "Heatran": 4, "Regigigas": 4, "Giratina": 4, "Giratina-Origin": 4, "Cresselia": 4, "Phione": 4, 
+    "Azelf": 4, "Dialga": 4, "Dialga-Origin": 4, "Palkia": 4, "Palkia-Origin": 4, "Heatran": 4, "Regigigas": 4, "Giratina": 4, "Giratina-Origin": 4, "Cresselia": 4, "Phione": 4, 
     "Manaphy": 4, "Darkrai": 4, "Shaymin": 4, "Shaymin-Sky": 4, "Arceus": 4, "Arceus-Bug": 4, "Arceus-Dark": 4, "Arceus-Dragon": 4, 
     "Arceus-Electric": 4, "Arceus-Fairy": 7, "Arceus-Fighting": 4, "Arceus-Fire": 4, "Arceus-Flying": 4, "Arceus-Ghost": 4, "Arceus-Grass": 4, 
     "Arceus-Ground": 4, "Arceus-Ice": 4, "Arceus-Poison": 4, "Arceus-Psychic": 4, "Arceus-Rock": 4, "Arceus-Steel": 4, "Arceus-Water": 4,
@@ -96,7 +96,7 @@ module.exports = {
     "Reshiram": 5, "Zekrom": 5, "Landorus": 5, "Landorus-Therian": 5, "Kyurem": 5, "Kyurem-Black": 5, "Kyurem-White": 5, "Keldeo": 5, 
     "Keldeo-Resolute": 5, "Meloetta": 5, "Meloetta-Pirouette": 5, "Genesect": 5,
 
-    "Chespin": 6, "Quilladin": 6, "Chesnaught": 6, "Fennekin": 6, "Braixen": 6, "Delphox": 6, "Froakie": 6, "Frogadier": 6, "Greninja": 6, 
+    "Chespin": 6, "Quilladin": 6, "Chesnaught": 6, "Fennekin": 6, "Braixen": 6, "Delphox": 6, "Froakie": 6, "Frogadier": 6, "Greninja": 6, "Greninja-Ash": 6,
     "Bunnelby": 6, "Diggersby": 6, "Fletchling": 6, "Fletchinder": 6, "Talonflame": 6, "Scatterbug": 6, "Spewpa": 6, "Vivillon": 6, "Litleo": 6, 
     "Pyroar": 6, "Flabebe": 6, "Floette": 6, "Florges": 6, "Skiddo": 6, "Gogoat": 6, "Pancham": 6, "Pangoro": 6, "Furfrou": 6, "Espurr": 6, 
     "Meowstic": 6, "Meowstic-F": 6, "Honedge": 6, "Doublade": 6, "Aegislash": 6, "Spritzee": 6, "Aromatisse": 6, "Swirlix": 6, "Slurpuff": 6, 
@@ -108,8 +108,8 @@ module.exports = {
 
     "Rowlet": 7, "Dartrix": 7, "Decidueye": 7, "Decidueye-Hisui": 8, "Litten": 7, "Torracat": 7, "Incineroar": 7, "Popplio": 7, "Brionne": 7, "Primarina": 7, 
     "Pikipek": 7, "Trumbeak": 7, "Toucannon": 7, "Yungoos": 7, "Gumshoos": 7, "Grubbin": 7, "Charjabug": 7, "Vikavolt": 7, "Crabrawler": 7, 
-    "Crabominable": 7, "Oricorio": 7, "Oricorio-Pau'": 7, "Oricorio-Pom-Pom": 7, "Oricorio-Sensu": 7, "Cutiefly": 7, "Ribombee": 7, "Rockruff": 7, 
-    "Lycanroc": 7, "Lycanroc-Dusk": 7, "Lycanroc-Midnight": 7, "Wishiwashi": 7, "Mareanie": 7, "Toxapex": 7, "Mudbray": 7, "Mudsdale": 7, 
+    "Crabominable": 7, "Oricorio": 7, "Oricorio-Pa'u": 7, "Oricorio-Pom-Pom": 7, "Oricorio-Sensu": 7, "Cutiefly": 7, "Ribombee": 7, "Rockruff": 7, 
+    "Lycanroc": 7, "Lycanroc-Dusk": 7, "Lycanroc-Midnight": 7, "Wishiwashi": 7, "Wishiwashi-School": 7, "Mareanie": 7, "Toxapex": 7, "Mudbray": 7, "Mudsdale": 7, 
     "Dewpider": 7, "Araquanid": 7, "Fomantis": 7, "Lurantis": 7, "Morelull": 7, "Shiinotic": 7, "Salandit": 7, "Salazzle": 7, "Stufful": 7, 
     "Bewear": 7, "Bounsweet": 7, "Steenee": 7, "Tsareena": 7, "Comfey": 7, "Oranguru": 7, "Passimian": 7, "Wimpod": 7, "Golisopod": 7, 
     "Sandygast": 7, "Palossand": 7, "Pyukumuku": 7, "Type: Null": 7, "Silvally": 7, "Silvally-Bug": 7, "Silvally-Dark": 7, "Silvally-Dragon": 7, 
