@@ -13,7 +13,7 @@ const abilityDex = require('./data/abilityDex');
 const itemsDex = require('./data/itemsDex');
 const movesDex = require('./data/movesDex');
 const genTierSetsDex = require('./data/genTierSetsDex');
-const spriteNameDex = require('./data/spriteNameDex');
+const spriteIconDex = require('./data/spriteIconDex');
 const typesDex = require('./data/typesDex');
 const typeChart = require('./data/typeChart');
 
@@ -111,7 +111,7 @@ app.use('/users', usersRouter);
 
 // ******************************************************************************************************************//
 
-//All pages and data loaded in them 
+//All pages and data loaded in them
 
 // ******************************************************************************************************************//
 //Print Data page for admin use only
@@ -139,7 +139,36 @@ async (req,res,next) => {
       const response = await axios.get('https://play.pokemonshowdown.com/data/pokedex.json');
       const currentData = response.data
       updatedData = getDictionaryFromDataType(dataType, currentData);
+  } else if (dataType == "pokemonSpriteIconDex") {
+      updatedData = getDictionaryFromDataType(dataType, genDex);
   }
+  
+    // const genPlusTier = generation+tier.toLowerCase(); //format for URL during API fetch
+    // const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
+    // const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
+    // const response = await axios.get('https://play.pokemonshowdown.com/data/sets/gen'+genPlusTier+'.json')
+    // console.dir(response.data.length)
+    
+
+    // // ********************************** //
+    // // this is the function that was used to generate the Pokemon set names for tiers in gens 6-8 for the genTierSetIndex.
+    // // used for debugging or updating the dictionary
+
+    // let setNameDict = {};
+    // for (const mon of Object.keys(response.data.dex).sort()) {
+    //   theSets = Object.keys(response.data.dex[mon]);
+    //   setNameDict[mon] = theSets;
+    // }
+    // let tierDict = {};
+    // tierDict[tier] = setNameDict;
+    // let genDict = {};
+    // genDict[generation] = tierDict;
+    // res.locals.tierDict = tierDict;
+    // res.locals.genDict = genDict;
+    // res.locals.genTierSetsDex = genTierSetsDex;
+    // // ********************************** //
+
+
   //res.locals.test = helper.testFunction("1","2");
   res.locals.updatedData = updatedData;
   res.render('showPrintData')
@@ -458,19 +487,48 @@ async (req,res,next) => {
   const genPlusTier = generation + tier.toLowerCase(); //for API search
   const genTierSearch = getGenTierSearch(genPlusTier);
   const elo = getELO(genPlusTier, rating); //for API search and results page
-  const yearMonth = getYearMonth(genPlusTier); //for API search
+  
+  
+  //calculates the most recent reliable data Smogon has for the given tier and generation
+  //data is skipped if there were less than 100 battles
 
+  //temporarily start at the most recent date (1 month previous from current date)
+  //if the link is not valid, keep going back until the most recent date for the generation and tier
+  const startingYearMonth = getStartingYearMonthData();
+  let yearMonthTemp = startingYearMonth;
+  let validFormatsTemp = await getValidFormats(yearMonthTemp)
+  
+  //with this temporary starting point, keep checking previous data until there is one that includes more than 100 battles
+  while (!validFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+    yearMonthTemp = updateYearMonth(yearMonthTemp);
+    validFormatsTemp = await getValidFormats(yearMonthTemp);
+  }
+  let responseYearMonth = await axios.get('https://www.smogon.com/stats/'+yearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json');
+  let numBattlesTemp = responseYearMonth.data.info["number of battles"]; 
+  while (validFormatsTemp.includes(genTierSearch+'-'+elo+'.json') && numBattlesTemp < 100 || !validFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+    yearMonthTemp = updateYearMonth(yearMonthTemp);
+    validFormatsTemp = await getValidFormats(yearMonthTemp);
+    if (validFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+      responseYearMonth = await axios.get('https://www.smogon.com/stats/'+yearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json');
+      numBattlesTemp = responseYearMonth.data.info["number of battles"];
+    }
+  }
+  const yearMonth = yearMonthTemp; //for API search and results page
+  const numBattles = numBattlesTemp; //for results page
+  
   res.locals.rating = rating;
   res.locals.elo = elo;
   res.locals.generation = generation;
   res.locals.tier = tier;
-  res.locals.date = getDate(yearMonth);
+  res.locals.date = yearMonth;
+  res.locals.numBattles = numBattles;
   
   const response = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
   console.dir(response.data.length);
   const usageData = response.data.data;
   const monsList = Object.keys(usageData);
   const monsDetails = Object.values(usageData);
+  res.locals.numBattles = numBattles.toLocaleString();
 
   let monAndUsagePercentDict = {};
   let filteredMonsList = [];
@@ -488,13 +546,84 @@ async (req,res,next) => {
   for (let i = 0; i < filteredMonsList.length; i++) {
     monAndUsagePercentDict[filteredMonsList[i]] = (filteredUsages[i]* 100).toFixed(5); 
   }
-  
+
+
   //sort dictionary by usage percentage
   monAndUsagePercentDict = sortDictByValue(monAndUsagePercentDict);
 
   //keys of now sorted dictionary is a list of Pokemon in the tier with > 0.5% usage ordered by usage percent
-  res.locals.sortedMonsList = Object.keys(monAndUsagePercentDict);
+  const sortedMonsList = Object.keys(monAndUsagePercentDict);
+  res.locals.sortedMonsList = sortedMonsList;
   res.locals.monAndUsagePercentDict = monAndUsagePercentDict;
+
+
+  //calculates the most recent reliable data Smogon has for the given tier and generation
+  //data is skipped if there were less than 100 battles
+  //this one is used to find the rank delta and usage % delta, which requires doing the loop for every Pokemon from the starting tier results
+
+  //temporarily start at the most recent date (1 month previous from current date)
+  //if the link is not valid, keep going back until the most recent date for the generation and tier
+    
+  const previousDataStartingYearMonth = updateYearMonth(yearMonth);
+  let previousDataYearMonthTemp = previousDataStartingYearMonth;
+  let previousDataValidFormatsTemp = await getValidFormats(previousDataYearMonthTemp);
+
+  //with this temporary starting point, keep checking previous data until there is one that includes more than 100 battles
+  while (!previousDataValidFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+    previousDataYearMonthTemp = updateYearMonth(previousDataYearMonthTemp);
+    previousDataValidFormatsTemp = await getValidFormats(previousDataYearMonthTemp);
+  }
+  let previousDataResponseYearMonth = await axios.get('https://www.smogon.com/stats/'+previousDataYearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json');
+  let previousDataNumBattlesTemp = previousDataResponseYearMonth.data.info["number of battles"]; 
+  while (previousDataValidFormatsTemp.includes(genTierSearch+'-'+elo+'.json') && previousDataNumBattlesTemp < 100 || !previousDataValidFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+    previousDataYearMonthTemp = updateYearMonth(previousDataYearMonthTemp);
+    previousDataValidFormatsTemp = await getValidFormats(previousDataYearMonthTemp);
+    if (previousDataValidFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+      previousDataResponseYearMonth = await axios.get('https://www.smogon.com/stats/'+previousDataYearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json');
+      previousDataNumBattlesTemp = previousDataResponseYearMonth.data.info["number of battles"];
+    }
+  }
+
+  const previousDataYearMonth = previousDataYearMonthTemp; //for API search and results page
+  res.locals.previousDataYearMonth = previousDataYearMonth;
+  let previousDataMonAndUsagePercentDictUnsorted = {};
+  let usagePercentDeltaDict = {};
+  const previousDataResponse = await axios.get('https://www.smogon.com/stats/'+previousDataYearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
+  const previousDataAllDetails = previousDataResponse.data.data
+  for (const pokemon of sortedMonsList) {
+    const previousDataMonDetails = previousDataAllDetails[pokemon];
+    if (previousDataMonDetails != null) {
+      const usagePercent = monAndUsagePercentDict[pokemon];
+      const previousDataUsagePercent = previousDataMonDetails.usage * 100;
+      const usagePercentDelta = usagePercent - previousDataUsagePercent;
+      usagePercentDeltaDict[pokemon] = usagePercentDelta.toFixed(5);
+      previousDataMonAndUsagePercentDictUnsorted[pokemon] = previousDataUsagePercent;
+    }
+    else {
+      usagePercentDeltaDict[pokemon] = monAndUsagePercentDict[pokemon];
+      previousDataMonAndUsagePercentDictUnsorted[pokemon] = 0;
+    }
+  }
+
+  res.locals.usagePercentDeltaDict = usagePercentDeltaDict;
+  const previousDataMonAndUsagePercentDict = sortDictByValue(previousDataMonAndUsagePercentDictUnsorted);
+  const previousSortedMonsList = Object.keys(previousDataMonAndUsagePercentDict);
+
+  let rankDeltaDict = {};
+  for (const pokemon of sortedMonsList) {
+    const currentRank = sortedMonsList.indexOf(pokemon) + 1;
+    const previousRank = previousSortedMonsList.indexOf(pokemon) + 1;
+    let rankDelta = (previousRank - currentRank); //inverted because the lower the rank, the better
+    if (currentRank == -1 || previousRank == -1) {
+      rankDeltaDict[pokemon] = null;
+    } else {
+      rankDeltaDict[pokemon] = rankDelta;
+    }
+  }
+  res.locals.rankDeltaDict = rankDeltaDict;
+
+  //for sprite icons
+  res.locals.spriteIconDex = spriteIconDex;
 
   res.render('showUsageStatsTier')
 })
@@ -515,25 +644,90 @@ async (req,res,next) => {
     if (res.locals.correctNameFormatCheck) {
       res.locals.rating = rating;
       res.locals.pokemon = pokemon;
-      res.locals.pokemonLowercase = getPokemonLowerCase(pokemon);
     
       //determines how many moves/items/teammates etc are shown in the results page
       res.locals.cap = 10;
-      const teammateCap = 10;
+      const teammatesCap = 10;
+      const checksAndCountersCap = 12;
 
       const generation = getGenFromString(format);
       const tier = getTierFromString(format);
       const genPlusTier = generation + tier.toLowerCase();
       const genTierSearch = getGenTierSearch(genPlusTier);
       const elo = getELO(genPlusTier, rating);
-      const yearMonth = getYearMonth(genPlusTier);
       const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
       const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
+
+
+      let pokemonLowerCase = getPokemonLowerCase(pokemon); //format for URL when generating images of Pokemon
+      //check to see if the Pokemon has an animated sprite in generation 9
+      //if it does not, flag it as true to use backup sprite and use alternate lowercase name
+      let missingSpriteCheck = false;
+      if (generation == "9") {
+        if (missingSprites.list.includes(pokemon)) {
+          missingSpriteCheck = true;
+          pokemonLowerCase = getPokemonLowerCaseBackupSprite(pokemon);
+        }
+      }
+      res.locals.missingSpriteCheck = missingSpriteCheck;
+      res.locals.pokemonLowercase = pokemonLowerCase; //format for URL when generating images of Pokemon
+
+
+      //calculates the most recent reliable data Smogon has for the given tier and generation
+      //data is skipped if there were less than 100 battles
+
+      //temporarily start at the most recent date (1 month previous from current date)
+      //if the link is not valid, keep going back until the most recent date for the generation and tier
+      const startingYearMonth = getStartingYearMonthData();
+      let yearMonthTemp = startingYearMonth;
+      let validFormatsTemp = await getValidFormats(yearMonthTemp)
+      console.log(genTierSearch, elo)      
+      //with this temporary starting point, keep checking previous data until there is one that includes more than 100 battles
+      while (!validFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+        yearMonthTemp = updateYearMonth(yearMonthTemp);
+        validFormatsTemp = await getValidFormats(yearMonthTemp);
+      }
+      let responseYearMonth = await axios.get('https://www.smogon.com/stats/'+yearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json');
+      let numBattlesTemp = responseYearMonth.data.info["number of battles"]; 
+      while (validFormatsTemp.includes(genTierSearch+'-'+elo+'.json') && numBattlesTemp < 100 || !validFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+        yearMonthTemp = updateYearMonth(yearMonthTemp);
+        validFormatsTemp = await getValidFormats(yearMonthTemp);
+        if (validFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+          responseYearMonth = await axios.get('https://www.smogon.com/stats/'+yearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json');
+          numBattlesTemp = responseYearMonth.data.info["number of battles"];
+        }
+      }
+      const yearMonth = yearMonthTemp; //for API search and results page
+      const numBattles = numBattlesTemp; //for results page
+
+
+      const previousDataStartingYearMonth = updateYearMonth(yearMonth);
+      let previousDataYearMonthTemp = previousDataStartingYearMonth;
+      let previousDataValidFormatsTemp = await getValidFormats(previousDataYearMonthTemp);
+      console.log(genTierSearch, elo)      
+      //with this temporary starting point, keep checking previous data until there is one that includes more than 100 battles
+      while (!previousDataValidFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+        previousDataYearMonthTemp = updateYearMonth(previousDataYearMonthTemp);
+        previousDataValidFormatsTemp = await getValidFormats(previousDataYearMonthTemp);
+      }
+      let previousDataResponseYearMonth = await axios.get('https://www.smogon.com/stats/'+previousDataYearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json');
+      let previousDataNumBattlesTemp = previousDataResponseYearMonth.data.info["number of battles"]; 
+      while (previousDataValidFormatsTemp.includes(genTierSearch+'-'+elo+'.json') && previousDataNumBattlesTemp < 100 || !previousDataValidFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+        previousDataYearMonthTemp = updateYearMonth(previousDataYearMonthTemp);
+        previousDataValidFormatsTemp = await getValidFormats(previousDataYearMonthTemp);
+        if (previousDataValidFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+          previousDataResponseYearMonth = await axios.get('https://www.smogon.com/stats/'+previousDataYearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json');
+          previousDataNumBattlesTemp = previousDataResponseYearMonth.data.info["number of battles"];
+        }
+      }
+      const previousDataYearMonth = previousDataYearMonthTemp; //for API search and results page
+      res.locals.previousDataYearMonth = previousDataYearMonth;
 
       res.locals.generation = generation;
       res.locals.tier = tier;
       res.locals.elo = elo;
-      res.locals.date = getDate(yearMonth);
+      res.locals.date = yearMonth;
+      res.locals.numBattles = numBattles.toLocaleString();
       res.locals.minGen = genDex[pokemon];
 
       //generate an array of all tiers the Pokemon is in for error message when the Pokemon chosen is not in the tier chosen
@@ -541,19 +735,17 @@ async (req,res,next) => {
       let tiersInIndex = 0;
       for (const newTier of tiers) {
         const genPlusTier = generation+newTier.toLowerCase();
-        const genTierSearch = getGenTierSearch(genPlusTier);
-        const elo = getELO(genPlusTier, rating);
-        const yearMonth = getYearMonth(genPlusTier);
         const nonexistantTierFlag = getNonExistantTierFlag(nonexistantGenTiers, genPlusTier);
         if (!nonexistantTierFlag) {
-          const responseTier = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
-          if (responseTier.data.data[pokemon] != null) {
+          const responseTier = await axios.get('https://play.pokemonshowdown.com/data/sets/gen'+genPlusTier+'.json')
+          if (responseTier.data.dex[pokemon] != null) {
             tiersIn[tiersInIndex] = newTier;
             tiersInIndex++;
           }
         }
       }
       res.locals.otherTiers = tiersIn;
+      
       
       //look for information only if the Pokemon has a set in at least one tier and the generation is higher than the minimum generation
       //the Pokemon is in
@@ -565,6 +757,7 @@ async (req,res,next) => {
         const monDetails = allDetails[pokemon];
         if (monDetails != null) {
           const usagePercent = monDetails.usage * 100;
+          const rank = getRank(allDetails, pokemon);
 
           //pass dictionary through method that generates new dictionaries of moves/abilities/items/EV spreads and their usage percentages
           const movesSorted = getStats(monDetails, "Moves");
@@ -577,28 +770,38 @@ async (req,res,next) => {
           let teammatesSorted = {};
           const newEnough = compareDates(yearMonth);
           if (newEnough) {
-            teammatesSorted = getTeammatesNew(monDetails, teammateCap);
+            teammatesSorted = getTeammatesNew(monDetails, teammatesCap);
           }
           else {
-            teammatesSorted = getTeammatesOld(allDetails, monDetails, teammateCap);
+            teammatesSorted = getTeammatesOld(allDetails, monDetails, teammatesCap);
           }
 
-          const rank = getRank(allDetails, pokemon);
+          //generate checks and counters info
+          const checksAndCountersSorted = getChecksAndCounters(monDetails, checksAndCountersCap);
+         
+          const checksAndCountersTextResponse = await axios.get('https://www.smogon.com/stats/'+yearMonth+'/moveset/'+genTierSearch+'-'+elo+'.txt')
+          const checksAndCountersTextData = checksAndCountersTextResponse.data;
+          let checksAndCountersTextDataSplit = checksAndCountersTextData.split("+----------------------------------------+");
+          const textMonIndex = getNameIndexFromCCText(checksAndCountersTextDataSplit, pokemon);
+          const checksAndCountersKOAndSwitchData = getKOAndSwitchedDataFromCCText(checksAndCountersTextDataSplit, textMonIndex);
+          res.locals.checksAndCountersKOAndSwitchData = checksAndCountersKOAndSwitchData;
 
 
           res.locals.monDetails = monDetails;
-          res.locals.usagePercent = usagePercent;
+          res.locals.usagePercent = usagePercent.toFixed(5);
           res.locals.rank = rank;
           res.locals.moves = Object.keys(movesSorted);
           res.locals.abilities = Object.keys(abilitiesSorted);
           res.locals.items = Object.keys(itemsSorted);
           res.locals.spreads = Object.keys(spreadsSorted);
           res.locals.teammates = Object.keys(teammatesSorted);
+          res.locals.checksAndCounters = Object.keys(checksAndCountersSorted);
           res.locals.movesStats = movesSorted;
           res.locals.abilitiesStats = abilitiesSorted;
           res.locals.itemsStats = itemsSorted;
           res.locals.spreadsStats = spreadsSorted;
           res.locals.teammatesStats = teammatesSorted;
+          res.locals.checksAndCountersStats = checksAndCountersSorted;
 
         }
         else {
@@ -611,12 +814,36 @@ async (req,res,next) => {
           res.locals.items = [];
           res.locals.spreads = [];
           res.locals.teammates = [];
+          res.locals.checksAndCounters = [];
           res.locals.movesStats = {};
           res.locals.abilitiesStats = {};
           res.locals.itemsStats = {};
           res.locals.spreadsStats = {};
           res.locals.teammatesStats = {};
+          res.locals.checksAndCountersStats = {};
         }
+
+        const previousDataResponse = await axios.get('https://www.smogon.com/stats/'+previousDataYearMonth+'/chaos/'+genTierSearch+'-'+elo+'.json')
+        console.dir(response.data.length);
+        const previousDataAllDetails = previousDataResponse.data.data
+        const previousDataMonDetails = previousDataAllDetails[pokemon];
+        if (previousDataMonDetails != null) {
+          const usagePercent = monDetails.usage * 100;
+          const previousDataUsagePercent = previousDataMonDetails.usage * 100;
+          const usagePercentDelta = usagePercent - previousDataUsagePercent;
+          res.locals.usagePercentDelta = usagePercentDelta.toFixed(5);
+        }
+        else {
+          res.locals.usagePercentDelta = 0;
+        }
+
+        const currentRank = getRank(allDetails, pokemon);
+        const previousRank = getRank(previousDataAllDetails, pokemon);
+        let rankDelta = (previousRank - currentRank); //inverted because the lower the rank, the better
+        res.locals.rankDelta = rankDelta;
+
+        res.locals.spriteIconDex = spriteIconDex;
+
       }
     }
     res.render('showUsageStatsMon')
@@ -640,7 +867,7 @@ app.post('/teambuilderHelper',
       res.locals.generation = generation;
       res.locals.tier = tier;
       res.locals.genTierSetsDex = genTierSetsDex;
-      res.locals.spriteNameDex = spriteNameDex;
+      res.locals.spriteIconDex = spriteIconDex;
       res.locals.typesDex = typesDex;
       res.locals.members = await Member.find({userId:res.locals.user._id}).skip(Member.count() - 6);
 
@@ -670,7 +897,7 @@ app.get('/showTeambuilderHelper',
       res.locals.generation = generation;
       res.locals.tier = tier;
       res.locals.genTierSetsDex = genTierSetsDex;
-      res.locals.spriteNameDex = spriteNameDex;
+      res.locals.spriteIconDex = spriteIconDex;
       res.locals.typesDex = typesDex;
       const members = await Member.find({userId:res.locals.user._id}).skip(Member.count() - 6);
       if (members == null) {
@@ -706,7 +933,7 @@ app.post('/showTeambuilderHelper',
       res.locals.generation = generation;
       res.locals.tier = tier;
       res.locals.genTierSetsDex = genTierSetsDex;
-      res.locals.spriteNameDex = spriteNameDex;
+      res.locals.spriteIconDex = spriteIconDex;
       res.locals.typesDex = typesDex;
 
       //create a new Member object when the user adds a Pokemon to their team
@@ -949,7 +1176,7 @@ app.get('/teamSummary',
       res.locals.lowercaseNames = lowercaseNames;
       res.locals.teamMoveTypes = teamMoveTypes;
       res.locals.genTierSetsDex = genTierSetsDex;
-      res.locals.spriteNameDex = spriteNameDex;
+      res.locals.spriteIconDex = spriteIconDex;
       res.locals.typesDex = typesDex;
       res.locals.monsList = monNames;
       res.locals.lowercaseNamesTier = lowercaseNamesTier;
@@ -971,21 +1198,30 @@ app.get('/teamSummary',
 
 
   
-// get and post for a test page when it is needed for debugging
-// app.get('/test',
-// (req,res,next) => {
-//   res.render('test')
-// });
+//get and post for a test page when it is needed for debugging
+app.get('/test',
+(req,res,next) => {
+  res.render('test')
+});
 
-// app.post('/test',
-// async (req,res,next) => {
-//   const {pokemon, tier, generation} = req.body;
-//   res.locals.pokemon = pokemon;
+app.post('/test',
+async (req,res,next) => {
+  const {format, rating} = req.body;
+  res.locals.format = format
+  res.locals.rating = rating
 
+  const generation = getGenFromString(format);
+  const tier = getTierFromString(format);
+  const genPlusTier = generation + tier.toLowerCase(); //for API search
+  const genTierSearch = getGenTierSearch(genPlusTier);
+  const elo = getELO(genPlusTier, rating); //for API search and results page
+  
+  res.locals.genDex = genDex;
 
-//     res.render('showTest')
+  res.render('showTest')
+  
 
-// })
+})
 
 
 
@@ -1188,17 +1424,17 @@ function getGenFromString(format) {
 
 //function that takes the String combination of the year and month of the API data being used for the usage statistics sections as an input 
 //and outputs the year and month in month/year format (ex: 2022-05 --> 5/22)
-function getDate(yearMonth) {
-  const yearAndDate = yearMonth.split("-");
-  const year = yearAndDate[0];
-  const yearLastTwoNums = year.slice(-2);
-  let dateNum = yearAndDate[1];
-  if (dateNum.split("")[0] == "0") {
-    dateNum = dateNum.slice(1);
-  }
-  const date = dateNum+"/"+yearLastTwoNums;
-  return date;
-}
+// function getDate(yearMonth) {
+//   const yearAndDate = yearMonth.split("-");
+//   const year = yearAndDate[0];
+//   const yearLastTwoNums = year.slice(-2);
+//   let dateNum = yearAndDate[1];
+//   if (dateNum.split("")[0] == "0") {
+//     dateNum = dateNum.slice(1);
+//   }
+//   const date = dateNum+"/"+yearLastTwoNums;
+//   return date;
+// }
 
 
 /*
@@ -1295,10 +1531,14 @@ function getTeammatesOld(allDetails, monDetails, cap) {
 
   //sort temp dictionary based on percent and put top teammates (based on cap) in new dictionary
   const sortedTempTeammates = sortDictByValue(tempTeammates);
-  sortedTempTeammateNames = Object.keys(sortedTempTeammates);
-  sortedTempTeammateValues = Object.values(sortedTempTeammates);
+  const sortedTempTeammateNames = Object.keys(sortedTempTeammates);
+  const sortedTempTeammateValues = Object.values(sortedTempTeammates);
   let topTeammates = {};
-  for (let i = 0; i < Object.keys(sortedTempTeammates).length; i++) {
+  let numTimes = cap;
+  if (sortedTempTeammateNames.length < cap) {
+    numTimes = sortedTempTeammateNames.length;
+  }
+  for (let i = 0; i < numTimes; i++) {
     topTeammates[sortedTempTeammateNames[i]] = sortedTempTeammateValues[i];
   }
 
@@ -1311,10 +1551,14 @@ function getTeammatesNew(monDetails, cap) {
   //order teammates based on value, then get all top teammates up to the cap
   //dictionary of top teammates and their values
   const sortedTeammates = sortDictByValue(monDetails["Teammates"]);
-  sortedTeammateNames = Object.keys(sortedTeammates);
-  sortedTeammateValues = Object.values(sortedTeammates);
+  const sortedTeammateNames = Object.keys(sortedTeammates);
+  const sortedTeammateValues = Object.values(sortedTeammates);
   let topTeammates = {};
-  for (let i = 0; i < cap; i++) {
+  let numTimes = cap;
+  if (sortedTeammateNames.length < cap) {
+    numTimes = sortedTeammateNames.length;
+  }
+  for (let i = 0; i < numTimes; i++) {
     topTeammates[sortedTeammateNames[i]] = sortedTeammateValues[i];
   }
 
@@ -1338,6 +1582,124 @@ function getTeammatesNew(monDetails, cap) {
   return monAndTeammatePercentDict;
 }
 
+function getChecksAndCounters(monDetails, cap) {
+  //create dictionary of all teammates and their json values
+  const checksAndCountersRawDict = monDetails["Checks and Counters"];
+  let checksAndCountersInfoDictAll = {}
+  const pokemon = Object.keys(checksAndCountersRawDict);
+  //need to add 2 infos from txt file
+
+  //get checks and counters data for all Pokemon listed under checks and counters
+  for (const mon of pokemon) {
+    const totalEncounters = checksAndCountersRawDict[mon][0]; 
+    const switchedOrKOedPercent = (checksAndCountersRawDict[mon][1]*100);
+    const standardDeviation = (checksAndCountersRawDict[mon][2]*100);
+    
+    // weighted score, to remove bias towards low probability matchups
+    const weightedScore = (switchedOrKOedPercent - (4 * standardDeviation)); //the higher the number, the better the check/counter
+    checksAndCountersInfoDictAll[mon] = [totalEncounters, switchedOrKOedPercent, standardDeviation, weightedScore];
+    
+  }
+
+  //rank all the checks and counters by the score
+  let scoreDict = {};
+  for (const mon of Object.keys(checksAndCountersInfoDictAll)) {
+    scoreDict[mon] = checksAndCountersInfoDictAll[mon][3];
+  }
+
+  const sortedChecksAndCountersDict = sortDictByValue(scoreDict);
+  const sortedChecksAndCountersNames = Object.keys(sortedChecksAndCountersDict);
+
+  //only keep checks and counters that have a 50 score or higher, with the maximum number in the dictionary being the cap
+  //score of > 50 means the opposing Pokemon listed as a check/counter caused a KO or switch against the Pokemon more than half the time
+  //if the length of the top checks is less than the cap, only iterate the length
+  let numTimes = cap;
+  if (sortedChecksAndCountersNames.length < cap) {
+    numTimes = sortedChecksAndCountersNames.length;
+  }
+  
+  let topChecksAndCounters = {};
+  for (let i = 0; i < numTimes; i++) {
+    const score = sortedChecksAndCountersDict[sortedChecksAndCountersNames[i]];
+    if (score >= 50) {
+      topChecksAndCounters[sortedChecksAndCountersNames[i]] = checksAndCountersInfoDictAll[sortedChecksAndCountersNames[i]];
+    }
+  }
+  
+  return topChecksAndCounters;
+}
+
+
+//this function parses the text file equivalent of the Smogon usage json files to access data not available in the json file
+//this function specifically filters the text to retrieve the index of the name of the Pokemon in the big text file
+//used to find the correct Checks and Counters section
+function getNameIndexFromCCText(dataSplit, pokemon) {
+  let monNameIndex = null;
+  let found = false;
+  let index = 1;
+  //while the Pokemon name hasn't been found, parse the text file to retrieve the next Pokemon name
+  while (!found) {
+    let nameSplit = dataSplit[index];
+    nameSplit = nameSplit.split(" | ");
+    let nameJoin = nameSplit.join().trim();
+    nameJoin = nameJoin.substring(1, nameJoin.length - 1);
+    nameSplit = nameJoin.split("  ");
+    const monNameText = nameSplit[0];
+    console.log(monNameText);
+    if (monNameText == pokemon) {
+      monNameIndex = index;
+      found = true;
+    }
+    else {
+      index = index + 9; //with the way the data is split, the next index that has a name is 9 indexes away from the previous name
+    }
+  }
+  console.log(monNameIndex);
+  return monNameIndex;
+
+}
+
+//this function parses the text file equivalent of the Smogon usage json files to access data not available in the json file
+//this function specifically filters the text to retrieve the KO and switched out% data for the usage stats pages
+function getKOAndSwitchedDataFromCCText(dataSplit, textMonIndex) {
+  //with the way the data is split, the index with the checks and counters info is 7 indexes away from the index with the Pokemon name
+  const textChecksAndCountersIndex = textMonIndex + 7; 
+  console.log(textChecksAndCountersIndex);
+  let ccSplit = dataSplit[textChecksAndCountersIndex];
+  ccSplit = dataSplit[textChecksAndCountersIndex].split("\n");
+  let ccJoin = ccSplit.join();
+
+  ccSplit = ccJoin.split("| , |");
+  ccJoin = ccSplit.join();
+
+  ccSplit = ccJoin.split("|, |");
+  ccJoin = ccSplit.join();
+  ccJoin = ccJoin.substring(0, ccJoin.length-4);
+
+  ccSplit = ccJoin.split("\t");
+  ccJoin = ccSplit.join();
+
+  ccSplit = ccJoin.split(",,");
+  ccJoin = ccSplit.join();
+
+  ccSplit = ccJoin.split(", ").slice(2);
+  ccJoin = ccSplit.join();
+
+  ccSplit = ccJoin.split(",");
+  let koSwitchData = [];
+  let counter = 0;
+  for (let i = 1; i < ccSplit.length; i = i + 2) {
+    const koSwitchDataString = ccSplit[i].substring(1, ccSplit[i].length - 1);
+    const koSwitchSplit = koSwitchDataString.split(" ");
+    const koSwitchDataEntry = [koSwitchSplit[0], koSwitchSplit[3]];
+    koSwitchData[counter] = koSwitchDataEntry;
+    counter++;
+  }
+  return koSwitchData;
+}
+
+
+
 //function that returns the rank of the Pokemon chosen in the Pokemon Usage Statistics section based on usage percent
 function getRank(allDetails, pokemon) {
   //create dictionary of all Pokemon in the tier and their rank
@@ -1353,9 +1715,10 @@ function getRank(allDetails, pokemon) {
   //since array is ordered, the rank is just equal to the index in the array + 1
   pokemonList = Object.keys(usagesAndRanks);
   for (let i = 0; i < pokemonList.length; i++) {
-    usagesAndRanks[pokemonList[i]].push(i);
+    usagesAndRanks[pokemonList[i]].push(i + 1);
   }
-  const rank = usagesAndRanks[pokemon][1] + 1;
+  console.log(usagesAndRanks[pokemon])
+  const rank = usagesAndRanks[pokemon][1];
   return rank;
 }
 
@@ -1792,6 +2155,11 @@ function getDictionaryFromDataType(dataType, data) {
         currentPokemonName = data[currentPokemon]["name"];
       }
     }
+  } else if (dataType == "pokemonSpriteIconDex") {
+    const allPokemonNames = Object.keys(genDex);
+    for (let i = 0; i < allPokemonNames.length; i++) {
+      updatedData[allPokemonNames[i]] = getPokemonLowerCaseSpriteIcon(allPokemonNames[i]);
+    }
   }
 
   return updatedData;
@@ -1819,16 +2187,12 @@ function compareDates(yearMonth) {
 //Beginner, Average, etc. make more sense for users than arbitrary numbers
 function getELO(genPlusTier, rating) {
   let elo = "";
-  //gen 8 OU has slightly higher ELO rating benchmarks for the data
-  if (genPlusTier == "8ou") {
-    if (rating == "Skilled") {
+  //gen 9 OU has slightly higher ELO rating benchmarks for the data
+  if (genPlusTier == "9ou" && rating == "Skilled") {
       elo = "1695";
-    }
-    if (rating == "Expert") {
+  } else if (genPlusTier == "9ou" && rating == "Expert") {
       elo = "1825";
-    }
-  }
-  else {
+  } else {
     if (rating == "Beginner") {
       elo = "0";
     }
@@ -1905,6 +2269,169 @@ function getYearMonth(genPlusTier) {
   return yearMonth;
 }
 
+//calculates the most recent reliable data Smogon has for the given tier and generation
+//data is skipped if there were less than 100 battles
+// async function getYearMonthUpdated(genTierSearch, elo) {
+//   try {
+//     //temporarily start at the most recent date (1 month previous from current date)
+//     //if the link is not valid, keep going back until the most recent date for the generation and tier
+//     const startingYearMonth = getStartingYearMonthData();
+//     let yearMonthTemp = startingYearMonth;
+//     let validFormatsTemp = getValidFormats(yearMonthTemp)
+//     console.log('https://www.smogon.com/stats/'+yearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json')
+    
+//     //with this temporary starting point, keep checking previous data until there is one that includes more than 100 battles
+//     while (!validFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+//       yearMonthTemp = updateYearMonth(yearMonthTemp);
+//       validFormatsTemp = getValidFormats(yearMonthTemp);
+//     }
+//     console.log("checkpoint 1")
+//     let responseYearMonth = await axios.get('https://www.smogon.com/stats/'+yearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json');
+//     let numBattlesTemp = responseYearMonth.data.info["number of battles"]; 
+//     while (validFormatsTemp.includes(genTierSearch+'-'+elo+'.json') && numBattlesTemp < 100 || !validFormatsTemp.includes(genTierSearch+'-'+elo+'.json')) {
+//       yearMonthTemp = updateYearMonth(yearMonthTemp);
+//       validFormatsTemp = getValidFormats(yearMonthTemp);
+//       if (validURL) {
+//         responseYearMonth = await axios.get('https://www.smogon.com/stats/'+yearMonthTemp+'/chaos/'+genTierSearch+'-'+elo+'.json');
+//         numBattlesTemp = responseYearMonth.data.info["number of battles"];
+//       }
+//     }
+//     console.log("checkpoint 2")
+//     const yearMonth = yearMonthTemp; //for API search and results page
+//     return yearMonth;
+    
+//   }catch(err){
+//    if (err.response) {
+//     console.log(err.response.status)
+//    }
+//   }
+// }
+
+//function that generates the theoretical most updated date for Smogon data, which is one month behind the current date
+function getStartingYearMonthData() {
+  const currentDate = new Date();
+  const currentYearInt = currentDate.getFullYear();
+  const currentMonthInt = currentDate.getMonth() + 1; //getMonth() gives months from 0-11 so +1 makes 1-12
+  
+  //Most updated Smogon usage data is always from the previous month from the current month
+  //turns current month into previous month and updates the year if the month goes from January to December
+  let currentMonthDataInt = currentMonthInt - 1;
+  let currentYearDataInt = currentYearInt;
+  if (currentMonthDataInt == 0) {
+    currentMonthDataInt = 12;
+    currentYearDataInt = currentYearInt - 1;
+  }
+
+  //make string version of the year in year-month format
+  let currentMonthData = "";
+  if (currentMonthDataInt < 10) {
+    currentMonthData = "0"+currentMonthDataInt.toString();
+  } else {
+    currentMonthData = currentMonthDataInt.toString();
+  }
+  const startingYearMonth = currentYearDataInt.toString()+"-"+currentMonthData;
+  return startingYearMonth;
+}
+
+//function that updates the string for the year and month used in getYearMonthUpdated to get the most recent data
+function updateYearMonth(yearMonth) {
+  const yearMonthSplit = yearMonth.split("-");
+  const year = parseInt(yearMonthSplit[0]);
+  const month = parseInt(yearMonthSplit[1]);
+  let extraHeader = "None";
+  if (yearMonthSplit.length == 3) {
+    extraHeader = yearMonthSplit[2];
+  }
+
+  let newYearMonth = "";
+  if (extraHeader == "None") {
+    let newMonth = month - 1;
+    let newYear = year;
+    //turns current month into previous month and updates the year if the month goes from January to December
+    if (newMonth == 0) {
+      newMonth = 12;
+      newYear = year - 1;
+    }
+    if (newMonth < 10) {
+      newYearMonth = newYear.toString()+"-0"+newMonth.toString();
+    } else {
+      newYearMonth = newYear.toString()+"-"+newMonth.toString();
+    }
+    //some of the stats in the Smogon stat index have an extra header for the year and month, which are case-by-case specific
+    if (newYearMonth == "2023-12" || newYearMonth == "2023-09" || newYearMonth == "2020-10" || newYearMonth == "2020-06" 
+    || newYearMonth == "2020-12" || newYearMonth == "2020-11") {
+      if (newYearMonth == "2023-12" || newYearMonth == "2020-10") {
+        newYearMonth = newYearMonth+"-DLC2";
+      } else if (newYearMonth == "2023-09" || newYearMonth == "2020-06"){
+        newYearMonth = newYearMonth+"-DLC1";
+      } else {
+        newYearMonth = newYearMonth+"-H2";
+      }
+    }
+  } else {
+    if (extraHeader == "H2") {
+      if (month < 10) {
+        newYearMonth = year.toString()+"-0"+month.toString()+"-H1";
+      } else {
+        newYearMonth = year.toString()+"-"+month.toString()+"-H1";
+      }
+    } else {
+      if (month < 10) {
+        newYearMonth = year.toString()+"-0"+month.toString();
+      } else {
+        newYearMonth = year.toString()+"-"+month.toString();
+      }
+    }
+  }
+  return newYearMonth;
+}
+
+//function to check if a URL is valid
+//used in usage stats pages to obtain the most recent data
+// async function isValidURL(string) {
+//   try {
+//     const response = await axios.get(string);
+//     console.log(response.status);
+//     return response.status;
+//   }catch(err){
+//    if (err.response) {
+//     console.log(err.response.status)
+//    }
+//   }
+// }
+
+
+async function getValidFormats(yearMonth) {
+  try {
+    const response = await axios.get("https://www.smogon.com/stats/"+yearMonth+"/chaos/");
+    let dataIndex = response.data;
+    dataIndex = dataIndex.split("\r\n");
+    dataIndex = dataIndex.slice(4, -3)
+    let dataList = [];
+    for (let i = 0; i < dataIndex.length; i++) {
+      dataList[i] = dataIndex[i].split(" ")
+    }
+    let dataListFiltered = [];
+    for (let i = 0; i < dataList.length; i++) {
+      dataListFiltered[i] = dataList[i][1];
+    }
+    let dataListRefined = [];
+    for (let i = 0; i < dataListFiltered.length; i++) {
+      dataListRefined[i] = dataListFiltered[i].split("\"")[2];
+    }
+    let dataListNames = [];
+    for (let i = 0; i < dataListRefined.length; i++) {
+      dataListNames[i] = dataListRefined[i].slice(1, -4);
+    }
+    const validFormats = dataListNames;
+    return validFormats;
+  }catch(err){
+   if (err.response) {
+    console.log(err.response.status)
+   }
+  }
+}
+
 //function that has the properly formatted name of a Pokemon as input and returns the lowercase version of the name to use in the URL when
 //getting the sprites of the Pokemon
 //most Pokemon names are just the names but all in lowercase
@@ -1925,6 +2452,9 @@ function getPokemonLowerCase(pokemon) {
   }
   else if (pokemon == "Farfetch'd") {
     pokemonLowerCase = "farfetchd"
+  }
+  else if (pokemon == "Farfetch'd-Galar") {
+    pokemonLowerCase = "farfetchd-galar"
   }
   else if (pokemon == "Ho-Oh") {
     pokemonLowerCase = "hooh"
@@ -1947,9 +2477,6 @@ function getPokemonLowerCase(pokemon) {
   else if (pokemon == "Zygarde-10%") {
     pokemonLowerCase = "zygarde-10"
   }
-  else if (pokemon == "Zygarde-Complete") {
-    pokemonLowerCase = "zygarde-complete"
-  }
   else if (pokemon == "Tapu Koko") {
     pokemonLowerCase = "tapukoko"
   }
@@ -1965,7 +2492,7 @@ function getPokemonLowerCase(pokemon) {
   else if (pokemon == "Darmanitan-Galar-Zen") {
     pokemonLowerCase = "darmanitan-galarzen"
   }
-  else if (pokemon == "Oricorio-Pau'") {
+  else if (pokemon == "Oricorio-Pa'u") {
     pokemonLowerCase = "oricorio-pau"
   }
   else if (pokemon == "Oricorio-Pom-Pom") {
@@ -1998,6 +2525,8 @@ function getPokemonLowerCase(pokemon) {
   return pokemonLowerCase;
 }
 
+//function that has the properly formatted name of a Pokemon as input and returns the lowercase version of the name to use in the URL when
+//getting the sprites of the Pokemon that do not have a gif sprite on Smogon
 function getPokemonLowerCaseBackupSprite(pokemon) {
   const pokemonNameSplit = pokemon.split(" ");
   let pokemonLowerCase = "";
@@ -2021,6 +2550,159 @@ function getPokemonLowerCaseBackupSprite(pokemon) {
   }
   else {
     pokemonLowerCase = pokemon.toLowerCase();
+  }
+  return pokemonLowerCase;
+}
+
+//function that has the properly formatted name of a Pokemon as input and returns the lowercase version of the name to use in the URL when
+//getting the sprite icons of the Pokemon
+function getPokemonLowerCaseSpriteIcon(pokemon) {
+  let pokemonLowerCase = "";
+  let pokemonName = pokemon;
+  const pokemonNameSplit = pokemonName.split(" ");
+
+  //pokemon that are two words long (e.g. Great Tusk) will be hyphenated instead
+  if (pokemonNameSplit.length == 2) {
+    pokemonName = pokemonName.replace(/ /g,'-');
+  }
+  if (pokemon.includes("'")) {
+    pokemonName = pokemonName.replace("'","");
+  } 
+  if (pokemon.includes(".")) {
+    pokemonName = pokemonName.replace(".",'').replace(/ /g,'-');
+  } 
+
+  //after preformatting, check specific cases
+  else if (pokemonName == "Tauros-Paldea-Combat") {
+    pokemonLowerCase = "tauros-paldean-combat"
+  }
+  else if (pokemonName == "Tauros-Paldea-Blaze") {
+    pokemonLowerCase = "tauros-paldean-blaze"
+  }
+  else if (pokemonName == "Tauros-Paldea-Aqua") {
+    pokemonLowerCase = "tauros-paldean-aqua"
+  }
+  else if (pokemonName == "Deoxys") {
+    pokemonLowerCase = "deoxys-normal"
+  } 
+  else if (pokemonName == "Shaymin") {
+    pokemonLowerCase = "shaymin-land"
+  } 
+  else if (pokemonName == "Deoxys") {
+    pokemonLowerCase = "deoxys-normal"
+  } 
+  else if (pokemonName == "Darmanitan") {
+    pokemonLowerCase = "darmanitan-standard"
+  } 
+  else if (pokemonName == "Darmanitan-Galar") {
+    pokemonLowerCase = "darmanitan-galarian-standard"
+  } 
+  else if (pokemonName == "Darmanitan-Galar-Zen") {
+    pokemonLowerCase = "darmanitan-galarian-zen"
+  } 
+  else if (pokemonName == "Basculin") {
+    pokemonLowerCase = "basculin-red-striped"
+  } 
+  else if (pokemonName == "Meloetta") {
+    pokemonLowerCase = "meloetta-aria"
+  } 
+  else if (pokemonName == "Keldeo") {
+    pokemonLowerCase = "keldeo-ordinary"
+  } 
+  else if (pokemonName == "Tornadus" || pokemonName == "Thundurus" || pokemonName == "Landorus" || pokemonName == "Enamorus") {
+    pokemonLowerCase = pokemonName.toLowerCase()+'-incarnate'
+  } 
+  else if (pokemonName == "Meowstic" || pokemonName == "Indeedee" || pokemonName == "Basculegion" || pokemonName == "Oinkologne") {
+    pokemonLowerCase = pokemonName.toLowerCase()+'-male'
+  } 
+  else if (pokemonName == "Meowstic-F" || pokemonName == "Indeedee-F" || pokemonName == "Basculegion-F" || pokemonName == "Oinkologne-F") {
+    pokemonLowerCase = pokemonName.toLowerCase()+'-female'
+  } 
+  else if (pokemonName == "Aegislash") {
+    pokemonLowerCase = "aegislash-shield"
+  } 
+  else if (pokemonName == "Pumpkaboo" || pokemonName == "Gourgeist") {
+    pokemonLowerCase = pokemonName.toLowerCase()+'-average'
+  } 
+  else if (pokemonName == "Zygarde") {
+    pokemonLowerCase = "zygarde-50"
+  } 
+  else if (pokemonName == "Zygarde-10%") {
+    pokemonLowerCase = "zygarde-10"
+  } 
+  else if (pokemonName == "Hoopa") {
+    pokemonLowerCase = "hoopa-confined"
+  } 
+  else if (pokemonName == "Oricorio") {
+    pokemonLowerCase = "oricorio-baile"
+  } 
+  else if (pokemonName == "Lycanroc") {
+    pokemonLowerCase = "lycanroc-midday"
+  } 
+  else if (pokemonName == "Wishiwashi") {
+    pokemonLowerCase = "wishiwashi-solo"
+  } 
+  else if (pokemonName == "Type: Null") {
+    pokemonLowerCase = "type-null"
+  } 
+  else if (pokemonName == "Minior") {
+    pokemonLowerCase = "minior-core"
+  } 
+  else if (pokemonName == "Toxtricity") {
+    pokemonLowerCase = "toxtricity-amped"
+  } 
+  else if (pokemonName == "Eiscue") {
+    pokemonLowerCase = "eiscue-ice"
+  } 
+  else if (pokemonName == "Morpeko") {
+    pokemonLowerCase = "morpeko-full-belly"
+  } 
+  else if (pokemonName == "Zacian" || pokemonName == "Zamazenta") {
+    pokemonLowerCase = pokemonName.toLowerCase()+'-hero'
+  } 
+  else if (pokemonName == "Urshifu") {
+    pokemonLowerCase = "urshifu-single-strike"
+  } 
+  else if (pokemonName == "Calyrex-Ice" || pokemonName == "Calyrex-Shadow") {
+    pokemonLowerCase = pokemonName.toLowerCase()+'-rider'
+  } 
+  else if (pokemonName == "Maushold") {
+    pokemonLowerCase = "maushold-family4"
+  } 
+  else if (pokemonName == "Squawkabilly") {
+    pokemonLowerCase = "squawkabilly-green"
+  } 
+  else if (pokemonName == "Palafin") {
+    pokemonLowerCase = "palafin-zero"
+  } 
+  else if (pokemonName == "Tatsugiri") {
+    pokemonLowerCase = "tatsugiri-curly"
+  } 
+  else if (pokemonName == "Dudunsparce") {
+    pokemonLowerCase = "dudunsparce-two-segment"
+  } 
+  else if (pokemonName == "Gimmighoul") {
+    pokemonLowerCase = "gimmighoul-chest"
+  } 
+  else if (pokemonName == "Ogerpon") {
+    pokemonLowerCase = "ogerpon-teal"
+  } 
+  else if (pokemonName == "Terapagos") {
+    pokemonLowerCase = "terapagos-normal"
+  } 
+  
+  //regional forms are last so this can work with Darmanitan-Galar
+  else if (pokemonName.substring(pokemonName.length - 6) == "-Alola" || pokemonName.substring(pokemonName.length - 7) == "-Paldea") {
+    pokemonLowerCase = pokemonName.toLowerCase()+'n';
+  } 
+  else if (pokemonName.substring(pokemonName.length - 6) == "-Galar") {
+    pokemonLowerCase = pokemonName.toLowerCase()+'ian';
+  }
+  else if (pokemonName.substring(pokemonName.length - 6) == "-Hisui") {
+    pokemonLowerCase = pokemonName.toLowerCase()+'an';
+  }
+  else {
+    pokemonLowerCase = pokemonName.toLowerCase();
   }
   return pokemonLowerCase;
 }

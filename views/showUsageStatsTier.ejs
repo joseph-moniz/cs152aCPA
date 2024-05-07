@@ -1,13 +1,21 @@
 <style>
-    table, th, td {
+    table, tr {
       border: 1px solid black;
       border-collapse: collapse;
+      vertical-align: middle;
+    }
+    th, td  {
+        border: 0;
+        vertical-align: middle;
+        border-spacing: 10;
     }
 </style>
 
 <h2><b>Usage Statistics for Generation <%= generation %> <%= tier %></b></h2>
 <p style="font-size: 25px; margin-bottom:5px">Skill level: <%= rating %> (<%= elo %> ELO)</p>
-<p style="font-size: 25px; margin-bottom:5px">Data from <%= date %></p>
+<p style="font-size: 25px; margin-bottom:5px">Data from <b><%= date %></b></p>
+<p style="font-size: 25px; margin-bottom:5px"><span>&#916;</span> Data from <%= previousDataYearMonth %></p>
+<p style="font-size: 25px; margin-bottom:5px">Number of Battles: <%= numBattles %></p>
 <br>
 <p style="font-size: 16px">The following is a table of the most current viable usage statistics for Generation <%= generation %> <%= tier %>.
 The left column is the rank of the Pokemon in terms of usage, the middle column is the Pokemon, and the right column is the usage percent of the Pokemon. 
@@ -17,18 +25,45 @@ The <b>usage percent</b> of a Pokemon represents how often a Pokemon is seen on 
 
 <table class="table table-hover table-condensed" style="width:50%; margin-left: auto; margin-right: auto; background-color:white">
     <thead>
-        <th>Rank</th>
-        <th>Pokemon</th>
-        <th>Usage %</th>
+        <th class="noBorderBottom">Rank</th>
+        <th class="noBorderBottom"></th>
+        <th class="noBorderBottom">Pokemon</th>
+        <th class="noBorderBottom">Usage Percent</th>
+        <th class="noBorderBottom">Usage Percent <span>&#916;</span></th>
+        <th class="noBorderBottom">Rank <span>&#916;</span></th>
     </thead>
     <tbody>
         <% for(var i=0; i<sortedMonsList.length; i++){%> 
         <tr> 
-            <td><%= i + 1 %></td> 
-            <td><%= sortedMonsList[i] %></td> 
+            <td style="text-align: right"><%= i + 1 %></td> 
+            <td><img 
+                src="https://img.pokemondb.net/sprites/scarlet-violet/icon/avif/<%= spriteIconDex[sortedMonsList[i]] %>.avif"
+                height="56px"
+                width="68px"
+                alt="Sprite icon of <%= sortedMonsList[i] %>"> %></td> 
+            <td><%= sortedMonsList[i] %></td>
             <td><%= monAndUsagePercentDict[sortedMonsList[i]] %>%</td> 
+            <td>
+                <% if (usagePercentDeltaDict[sortedMonsList[i]] < 0) {%>
+                    <span style="color:red"><%= usagePercentDeltaDict[sortedMonsList[i]] %>%</span>
+                <% } else if (usagePercentDeltaDict[sortedMonsList[i]] > 0) {%>
+                    <span style="color:green">+<%= usagePercentDeltaDict[sortedMonsList[i]] %>%</span>
+                 <% } else {%>
+                    <p id="tableText"><%= usagePercentDeltaDict[sortedMonsList[i]] %>%
+                <% } %>
+            </td>
+            <td>
+                <% if (rankDeltaDict[sortedMonsList[i]] < 0) {%>
+                    <span style="color:red"><%= rankDeltaDict[sortedMonsList[i]] %></span>
+                <% } else if (rankDeltaDict[sortedMonsList[i]] > 0) {%>
+                    <span style="color:green">+<%= rankDeltaDict[sortedMonsList[i]] %></span>
+                <% } else if (rankDeltaDict[sortedMonsList[i]] == 0){%>
+                    <%= rankDeltaDict[sortedMonsList[i]] %>
+                <% } else {%>
+                    N/A
+                <% } %>
+            </td>
         </tr>
         <% } %>
     </tbody>
 </table>
-
