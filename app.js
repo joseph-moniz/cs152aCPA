@@ -126,6 +126,8 @@ app.post('/printData',
 async (req,res,next) => {
   const {dataType} = req.body;
   res.locals.dataType = dataType;
+  const generationsTeambuilder = ["6", "7", "8", "9"];
+  const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
   let updatedData = {};
   if (dataType == "abilities") {
     updatedData = getDictionaryFromDataType(dataType, abilitiesRaw);
@@ -141,18 +143,34 @@ async (req,res,next) => {
       updatedData = getDictionaryFromDataType(dataType, currentData);
   } else if (dataType == "pokemonSpriteIconDex") {
       updatedData = getDictionaryFromDataType(dataType, genDex);
+  } else if (dataType == "genTierSetsDex") {
+      const validTiersTeambuilder = ["gen6ubers", "gen6ou", "gen6uu", "gen6ru", "gen6nu", "gen6pu", "gen6lc", 
+      "gen7ubers", "gen7ou", "gen7uu", "gen7ru", "gen7nu", "gen7pu", "gen7lc", "gen8ubers", "gen8ou", "gen8uu", "gen8ru", "gen8nu", "gen8pu", "gen8lc", 
+      "gen9ubers", "gen9ou", "gen9uu", "gen9ru", "gen9nu", "gen9pu", "gen9lc"]
+
+      let genTierSetsAll = {};
+      for (const gen of generationsTeambuilder) {
+        const response = await axios.get('https://play.pokemonshowdown.com/data/sets/gen'+gen+'.json');
+        const currentData = response.data;
+        genTierSetsAll[gen] = currentData;
+      }
+      const genTierSetsDexDraft = generateNewGenTierSetsDex(generationsTeambuilder, validTiersTeambuilder, genTierSetsAll);
+      updatedData = updateGenTierSetsDexInfo(genTierSetsDexDraft);
+      
+  } else if (dataType == "blankSets") {
+      updatedData = getBlankSetsFromDex(generationsTeambuilder, genTierSetsDex);
   }
   
     // const genPlusTier = generation+tier.toLowerCase(); //format for URL during API fetch
-    // const tiers = ["Ubers", "OU", "UU", "RU", "NU", "PU", "LC"];
-    // const nonexistantGenTiers = ["4ru", "3ru", "2ru", "1ru", "3pu", "2pu", "1pu", "3lc", "2lc", "1lc"];
+    
+    
     // const response = await axios.get('https://play.pokemonshowdown.com/data/sets/gen'+genPlusTier+'.json')
     // console.dir(response.data.length)
     
 
-    // // ********************************** //
-    // // this is the function that was used to generate the Pokemon set names for tiers in gens 6-8 for the genTierSetIndex.
-    // // used for debugging or updating the dictionary
+    // ********************************** //
+    // this is the function that was used to generate the Pokemon set names for tiers in gens 6-8 for the genTierSetIndex.
+    // used for debugging or updating the dictionary
 
     // let setNameDict = {};
     // for (const mon of Object.keys(response.data.dex).sort()) {
@@ -166,10 +184,12 @@ async (req,res,next) => {
     // res.locals.tierDict = tierDict;
     // res.locals.genDict = genDict;
     // res.locals.genTierSetsDex = genTierSetsDex;
-    // // ********************************** //
+    // ********************************** //
 
 
   //res.locals.test = helper.testFunction("1","2");
+  res.locals.generationsTeambuilder = generationsTeambuilder;
+  res.locals.tiers = tiers;
   res.locals.updatedData = updatedData;
   res.render('showPrintData')
 })
@@ -986,6 +1006,7 @@ app.get('/toggleSet/:itemId',
       else {
         member.monSet = member.monSets[currentIndex + 4];
       }
+      console.log(member.monSet)
       await member.save();
       res.redirect('/showTeambuilderHelper');
     }
@@ -1458,7 +1479,7 @@ function getStats(monDetails, keyword) {
       if (keyword == "Moves") {
         //only add moves that have a usage percent of 0.5% or greater
         if (((monDetails[keyword][item] / weightedStatTotal) * 400) >= 0.5) {
-          monAndStatPercentDict[movesDex[item]] = ((monDetails[keyword][item] / weightedStatTotal) * 400).toFixed(3);
+          monAndStatPercentDict[movesDex[item][0]] = ((monDetails[keyword][item] / weightedStatTotal) * 400).toFixed(3);
         }
       }
       else {
@@ -2131,10 +2152,11 @@ function getDictionaryFromDataType(dataType, data) {
     for (let i = 0; i < itemAPINames.length; i++) {
       updatedData[itemAPINames[i]] = data[itemAPINames[i]]["name"];
     }
+    updatedData["nothing"] = "No Item";
   } else if (dataType == "moves") {
     const moveAPINames = Object.keys(data);
     for (let i = 0; i < moveAPINames.length; i++) {
-      updatedData[moveAPINames[i]] = data[moveAPINames[i]]["name"];
+      updatedData[moveAPINames[i]] = [data[moveAPINames[i]]["name"], data[moveAPINames[i]]["type"]];
     }
 
   } else if (dataType == "pokemonTypes") {
@@ -2142,6 +2164,7 @@ function getDictionaryFromDataType(dataType, data) {
     let counter = 0;
     let currentPokemon = pokemonAPINames[counter];
     let currentPokemonName = data[currentPokemon]["name"];
+    //stop after finishing all valid Pokemon while filtering out some unnecessary ones
     while (currentPokemon != "missingno") {
       if (currentPokemonName.substring(currentPokemonName.length - 5) != "-Gmax" 
           && currentPokemonName.substring(currentPokemonName.length - 5) != "-Tera" 
@@ -2164,6 +2187,137 @@ function getDictionaryFromDataType(dataType, data) {
 
   return updatedData;
 }
+
+//function that returns the dictionary of data from the corresponding data type to massively help update the data in genTierSetsDex
+function generateNewGenTierSetsDex(generationsTeambuilder, validTiersTeambuilder, genTierSetsAll) {
+  let teambuilderData = {};
+  //for every generation, check all the tiers from the Smogon data
+  for (const gen of generationsTeambuilder) {
+    let teambuilderGenData = {};
+    const genTiers = Object.keys(genTierSetsAll[gen]);
+    for (const genTier of genTiers) {
+      let teambuilderTierData = {};
+      //if the tier is in the valid tiers list used in the website, add all the Pokemon
+      if (validTiersTeambuilder.includes(genTier)) {
+        const pokemonList = (Object.keys(genTierSetsAll[gen][genTier]["dex"])).sort();
+        //for each Pokemon, add all of its set names with empty strings to be filtered later
+        for (const mon of pokemonList) {
+          let pokemonAllSetsData = [];
+          const setList = Object.keys(genTierSetsAll[gen][genTier]["dex"][mon]);
+          for (const set of setList) {
+            const setData = [set, "", "", ""];
+            pokemonAllSetsData.push(...setData);
+          }
+          teambuilderTierData[mon] = pokemonAllSetsData
+        }
+        const tier = changeTierFormat(genTier);
+        console.log(tier)
+        teambuilderGenData[tier] = teambuilderTierData;
+      }
+    }
+    teambuilderData[gen] = teambuilderGenData;
+  }
+  
+  return teambuilderData;
+}
+
+//function that takes the draft version of the genTierSetsDex and updates the set information
+//used for the print data page to generate the updated genTierSetsDex
+function updateGenTierSetsDexInfo(genTierSetsDexDraft) {
+  const gens = Object.keys(genTierSetsDexDraft);
+  for (const gen of gens) {
+    const tiers = Object.keys(genTierSetsDexDraft[gen]);
+    for (const tier of tiers) {
+      const pokemonList = Object.keys(genTierSetsDexDraft[gen][tier]);
+      const pokemonListOld = Object.keys(genTierSetsDex[gen][tier]);
+
+      //for every Pokemon in a specific tier and generation, if the Pokemon also appeared in the pre-updated genTierSetsDex, update its data
+      for (const mon of pokemonList) {
+        if (pokemonListOld.includes(mon)) {
+          let setData = genTierSetsDexDraft[gen][tier][mon];
+          const setDataOld = genTierSetsDex[gen][tier][mon];
+          let setNames = [];
+          let setNamesOld = [];
+          //set names appear every 4th index
+          for (let i = 0; i < setData.length; i = i + 4) {
+            setNames.push(setData[i]);
+          }
+          for (let i = 0; i < setDataOld.length; i = i + 4) {
+            setNamesOld.push(setDataOld[i]);
+          }
+
+          //iterate over each set
+          for (const set of setNames) {
+            //if the Pokemon includes a set with the same name as one in the pre-updated genTierSetsDex, then it is the same set
+            //the rest of the data then gets copied over to the new genTierSetsDex
+            //because it is one list, and not all sets are the same, the data is updated from the specific index of the set name
+            if (setNamesOld.includes(set)) {
+              const setIndex = setData.indexOf(set);
+              const setIndexOld = setDataOld.indexOf(set);
+              for (let i = 1; i < 4; i++) {
+                setData[setIndex+i] = setDataOld[setIndexOld+i];
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return genTierSetsDexDraft;
+}
+
+//function that returns all the Pokemon in genTierSetsDex that have blank sets, but keeping the same formatting
+//makes it much easier to find the Pokemon that need to be updated, instead of manually scanning the dictionary
+function getBlankSetsFromDex(generationsTeambuilder, genTierSetsDex) {
+  let blankSetsData = {};
+  //for every generation, check all the tiers from the Smogon data
+  for (const gen of generationsTeambuilder) {
+    let blankSetsGenData = {};
+    const tiers = Object.keys(genTierSetsDex[gen]);
+    for (const tier of tiers) {
+      let blankSetsTierData = {};
+      const pokemonList = (Object.keys(genTierSetsDex[gen][tier])).sort();
+      for (const mon of pokemonList) {
+        let pokemonAllSetsData = [];
+        const setData = genTierSetsDex[gen][tier][mon]
+        let setNames = [];
+        for (let i = 0; i < setData.length; i = i + 4) {
+          setNames.push(setData[i]);
+        }
+        //for each Pokemon's set, check if the indexes next to the set name are blank
+        //if they are, add them to the blankSetsData dictionary
+        for (const set of setNames) {
+          const setIndex = setData.indexOf(set);
+          if (setData[setIndex+1] === "" && setData[setIndex+2] === "" && setData[setIndex+3] === "") {
+            const blankSetData = [set, "", "", ""];
+            pokemonAllSetsData.push(...blankSetData);
+          }
+        }
+        //only add Pokemon if they had a blank set
+        if (pokemonAllSetsData.length > 0) {
+          blankSetsTierData[mon] = pokemonAllSetsData;
+        } 
+      }
+      blankSetsGenData[tier] = blankSetsTierData;
+    }
+    blankSetsData[gen] = blankSetsGenData;
+  }
+  
+  return blankSetsData;
+}
+
+
+//function that given one tier format changes it to the proper name without the generation (ex: gen6ubers -> Ubers)
+function changeTierFormat(genTier) {
+  let tier = genTier.substring(4, genTier.length);
+  if (tier == "ubers") {
+    tier = "Ubers";
+  } else {
+    tier = tier.toUpperCase();
+  }
+  return tier
+}
+
 
 //function that compares the date of the API data for sets in a generation and tier to April 2021
 //returns true if date is as new or newer and false otherwise

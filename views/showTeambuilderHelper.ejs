@@ -94,11 +94,11 @@
                         </div>
                             <p style="margin-bottom:5px"><%= member.monSet %></p>
                                 <% if (member.monSets.length > 4){%>
-                                <p>
-                                    <button style="margin:5px" onclick="location.href='/toggleSet/<%= member.id %>'; setTimeout(function(){window.location.reload();},10);" 
-                                    type="button">
-                                    Change set</button>
-                                </p>
+                                    <p>
+                                        <button style="margin:5px" onclick="location.href='/toggleSet/<%= member.id %>'; setTimeout(function(){window.location.reload();},10);" 
+                                        type="button">
+                                        Change set</button>
+                                    </p>
                                 <% } else { %>
                                     <br>
                                     <br>
@@ -138,5 +138,37 @@
         const teamName = document.getElementById('teamName').value;
         return teamName;
     }
+
+    // function getSetName() {
+    //     const setName = document.getElementById('setNames').value;
+    //     return setName;
+    // }
+
+    // function changeFunction(selectValue){
+    //     var x = selectValue.value;
+    //     document.getElementById("showValue").value = x;
+    // }
+
+    // async function toggleSet(memberId) {
+    //     try {
+    //         var e = document.getElementById("setNames");
+    //         var value = e.value;
+    //         var setName = e.options[e.selectedIndex].text
+    //         const member = await Member.findOne({_id:memberId});
+    //         member.monSet = setName;
+    //         await member.save();
+    //         res.redirect('/showTeambuilderHelper');
+
+    //     } 
+    //     catch(e){
+    //         next(e);
+    //     }
+    // }
+
+    // function getIndex() {
+    //         var e = document.getElementById("setNames");
+    //         var setIndex = e.selectedIndex;
+    //         document.getElementById("showValue").value = setIndex;;
+    //     }
 
 </script>

@@ -1,15 +1,6 @@
 <div style="background-color: white; border: solid; padding: 25px;">
-    <p><b>Updated dictionary for 
-        <% if (dataType == "abilities") { %> 
-            Abilities
-        <% } else if (dataType == "items") { %> 
-            Items
-        <% } else if (dataType == "moves") { %> 
-            Moves
-        <% } else if (dataType == "pokemonTypes") { %> 
-            Pokemon Types
-        <% } %></b></p>
-        <br>
+    <p style="font-size: 18px;"><b>Updated dictionary for <%= dataType %></b></p>
+        <p><b>Click the data to automatically select it for easy copy paste without scrolling.</b></p>
         <br>
         
 
@@ -19,9 +10,37 @@
     <% } %>
     <% if (dataType == "items") { %> 
         <p>Use <a href="https://play.pokemonshowdown.com/data/items.js">https://play.pokemonshowdown.com/data/items.js</a> to update raw dictionary</p>
-        <p>Add "nothing": "No Item" at end of dictionary</p>
         <br>
     <% } %>
-    <pre><%- JSON.stringify(updatedData, null, " ") %></pre>
-    <br>
+    <div onclick="selectText(this.id)" id="elementID">
+        <pre><%- JSON.stringify(updatedData, null, " ") %></pre>
+    </div>
 </div>
+
+<script>
+    //function that highlights anything in a div element by clicking
+    //extremely useful to instantly copy and paste the printed data without scrolling for so long trying to highlighy everything
+    //control + A doesn't work because it highlights all text on the website
+    function selectText(id){
+	var sel, range;
+	var el = document.getElementById(id); //get element id
+	if (window.getSelection && document.createRange) { //Browser compatibility
+	  sel = window.getSelection();
+	  if(sel.toString() == ''){ //no text selection
+		 window.setTimeout(function(){
+			range = document.createRange(); //range object
+			range.selectNodeContents(el); //sets Range
+			sel.removeAllRanges(); //remove all ranges from selection
+			sel.addRange(range);//add Range to a Selection.
+		},1);
+	  }
+	}else if (document.selection) { //older ie
+		sel = document.selection.createRange();
+		if(sel.text == ''){ //no text selection
+			range = document.body.createTextRange();//Creates TextRange object
+			range.moveToElementText(el);//sets Range
+			range.select(); //make selection.
+		}
+	}
+}
+</script>
